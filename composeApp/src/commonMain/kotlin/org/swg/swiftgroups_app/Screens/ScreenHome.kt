@@ -13,7 +13,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 
 
-class ScreenHome : Screen {
+object ScreenHome : Screen {
 
     @Composable
     override fun Content() {
@@ -27,10 +27,10 @@ class ScreenHome : Screen {
             Text("Screen Home")
             Button(
                 onClick = {
-                    navigator.push(ScreenEvents())
+                    navigator.push(ScreenEvents)
                 }
             ) {
-                Text("Navigate to Screen B");
+                Text("Navigate to Screen B")
             }
         }
     }

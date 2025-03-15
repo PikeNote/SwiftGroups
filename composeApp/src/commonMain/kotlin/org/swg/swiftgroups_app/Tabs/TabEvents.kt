@@ -14,7 +14,7 @@ import org.swg.swiftgroups_app.Screens.ScreenEvents
 object TabEvents : Tab {
     @Composable
     override fun Content() {
-        Navigator(screen = ScreenEvents()) { navigator ->
+        Navigator(screen = ScreenEvents) { navigator ->
             SlideTransition(navigator = navigator)
         }
     }
@@ -22,7 +22,7 @@ object TabEvents : Tab {
     override val options : TabOptions
         @Composable
         get() {
-            val icon = rememberVectorPainter(FontAwesomeIcons.Solid.Star);
+            val icon = rememberVectorPainter(FontAwesomeIcons.Solid.Star)
             val title = "Events"
             val index: UShort = 1u
 

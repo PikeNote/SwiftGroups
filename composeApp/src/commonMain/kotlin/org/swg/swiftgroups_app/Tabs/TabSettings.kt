@@ -14,7 +14,7 @@ import org.swg.swiftgroups_app.Screens.ScreenEvents
 object TabSettings : Tab {
     @Composable
     override fun Content() {
-        Navigator(screen = ScreenEvents()) { navigator ->
+        Navigator(screen = ScreenEvents) { navigator ->
             SlideTransition(navigator = navigator)
         }
     }

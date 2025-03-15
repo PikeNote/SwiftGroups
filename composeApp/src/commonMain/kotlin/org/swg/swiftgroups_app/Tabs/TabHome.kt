@@ -14,7 +14,7 @@ import org.swg.swiftgroups_app.Screens.ScreenHome
 object  TabHome : Tab {
     @Composable
     override fun Content() {
-        Navigator(screen = ScreenHome()) { navigator ->
+        Navigator(screen = ScreenHome) { navigator ->
             SlideTransition(navigator = navigator)
         }
     }
@@ -22,7 +22,7 @@ object  TabHome : Tab {
     override val options : TabOptions
         @Composable
         get() {
-            val icon = rememberVectorPainter(FontAwesomeIcons.Solid.CalendarWeek);
+            val icon = rememberVectorPainter(FontAwesomeIcons.Solid.CalendarWeek)
             val title = "My Day"
             val index: UShort = 0u
 
