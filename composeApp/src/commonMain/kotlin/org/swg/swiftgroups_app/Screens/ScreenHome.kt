@@ -25,17 +25,17 @@ import kotlinx.coroutines.runBlocking
 import org.swg.swiftgroups_app.Components.Home.EventHome
 import org.swg.swiftgroups_app.Components.Home.ProfileBar
 import org.swg.swiftgroups_app.Fonts.AppFont
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.font.FontWeight
-
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
+import cafe.adriel.voyager.core.model.rememberScreenModel
 
 object ScreenHome : Screen {
 
+    @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
-        val viewModel = remember { HomeViewModel() }
+        val viewModel: HomeViewModel = rememberScreenModel { HomeViewModel() }
         val navigator = LocalNavigator.currentOrThrow
 
 
