@@ -21,6 +21,7 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.multiplatform.webview.cookie.Cookie
+import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.Fonts.AppFont.InterFontFamily
 import org.swg.swiftgroups_app.Fonts.AppFont.InterTypography
 import org.swg.swiftgroups_app.Tabs.TabEvents
@@ -33,21 +34,6 @@ import org.swg.swiftgroups_app.getScreenResult
 object Home : Screen {
 
     private var cookies : List<Cookie>? = null
-    private val theme = Colors(
-        primary = Color(0xffffffff),
-        primaryVariant = Color(0xFF0279fd),
-        secondary = Color(0xFF0279fd),
-        secondaryVariant = Color(0xFF0279fd),
-        background = Color(0xffffffff),
-        surface = Color(0xffffffff),
-        error = Color(0xFFB00020),
-        onPrimary = Color(0xff000000),
-        onSecondary = Color(0xff000000),
-        onBackground = Color(0xff000000),
-        onSurface = Color(0xff000000),
-        onError = Color(0xffffffff),
-        isLight = true
-    )
 
     @Composable
     override fun Content() {
@@ -56,7 +42,7 @@ object Home : Screen {
         cookies = getScreenResult("cookies")
 
 
-        MaterialTheme(colors = theme, typography = InterTypography()) {
+        MaterialTheme(colors = AppTheme.theme, typography = InterTypography()) {
 
             TabNavigator(TabHome) {
 
@@ -65,8 +51,8 @@ object Home : Screen {
                         BottomNavigation {
                             TabItem(TabHome)
                             TabItem(TabEvents)
-                            TabItem(TabGroups)
                             TabItem(TabFeed)
+                            TabItem(TabGroups)
                             TabItem(TabSettings)
 
                         }

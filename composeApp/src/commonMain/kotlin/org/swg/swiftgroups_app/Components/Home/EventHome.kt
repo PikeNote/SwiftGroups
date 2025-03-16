@@ -30,11 +30,11 @@ import compose.icons.fontawesomeicons.solid.Info
 import compose.icons.fontawesomeicons.solid.LocationArrow
 import compose.icons.fontawesomeicons.solid.PencilAlt
 import compose.icons.fontawesomeicons.solid.Qrcode
-import org.swg.swiftgroups_app.CGAPI.Item0
+import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEventData
 import org.swg.swiftgroups_app.Components.Home.Button.LogoButton
 import org.swg.swiftgroups_app.Fonts.AppFont
 
-class EventHome (  val eventDat : Item0) {
+class EventHome (private val eventDat : UpcomingEventData) {
 
     @Composable
     fun Content() {

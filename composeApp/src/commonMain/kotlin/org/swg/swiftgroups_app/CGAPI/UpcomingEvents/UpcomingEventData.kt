@@ -1,9 +1,9 @@
-package org.swg.swiftgroups_app.CGAPI
+package org.swg.swiftgroups_app.CGAPI.UpcomingEvents
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Item0(
+data class UpcomingEventData(
     val attendees_count: Int,
     val attending: String,
     val checkin_attendees: Int,

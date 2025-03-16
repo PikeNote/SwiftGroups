@@ -23,7 +23,7 @@ object TabGroups : Tab {
         @Composable
         get() {
             val icon = rememberVectorPainter(FontAwesomeIcons.Regular.User)
-            val title = "Events"
+            val title = "Groups"
             val index: UShort = 1u
 
             return TabOptions(

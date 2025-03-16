@@ -7,14 +7,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.swg.swiftgroups_app.CGAPI.CGAPI
-import org.swg.swiftgroups_app.CGAPI.UpcomingEvents
+import org.swg.swiftgroups_app.CGAPI.CGAPI.grabProfileData
+import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
+import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 
 class HomeViewModel : ViewModel() {
-    var upcomingEvents by mutableStateOf(UpcomingEvents(0, emptyList(), 0))
 
-    fun test() {
+    init {
+        fetchData()
+    }
+
+    var upcomingEvents by mutableStateOf(UpcomingEvents(0, emptyList(), 0))
+    var profileData by mutableStateOf(emptyList<ProfileDataItem>())
+
+    fun fetchData() {
         viewModelScope.launch {
             upcomingEvents = CGAPI.grabMyEvents()
+            profileData = CGAPI.grabProfileData()
         }
     }
 }

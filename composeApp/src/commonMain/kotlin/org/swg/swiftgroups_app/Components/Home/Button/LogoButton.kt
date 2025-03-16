@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.swg.swiftgroups_app.Fonts.AppFont
 
@@ -21,6 +23,8 @@ fun LogoButton (
     modifier: Modifier = Modifier,
     logo: ImageVector,
     text: String,
+    size: Dp = 12.dp,
+    textStyle: TextStyle = AppFont.InterTypography().subtitle2,
     onClick: ()-> Unit)
 {
     Column (
@@ -34,7 +38,7 @@ fun LogoButton (
         Icon(
             logo,  text,
             modifier = Modifier
-                .size(12.dp))
-        Text(text, style = AppFont.InterTypography().subtitle2)
+                .size(size))
+        Text(text, style = textStyle)
     }
 }

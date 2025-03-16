@@ -23,22 +23,38 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.runBlocking
 import org.swg.swiftgroups_app.Components.Home.EventHome
+import org.swg.swiftgroups_app.Components.Home.ProfileBar
 import org.swg.swiftgroups_app.Fonts.AppFont
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.text.font.FontWeight
 
 
 object ScreenHome : Screen {
 
-    private val viewModel = HomeViewModel()
-
     @Composable
     override fun Content() {
-        viewModel.test()
+        val viewModel = remember { HomeViewModel() }
         val navigator = LocalNavigator.currentOrThrow
+
 
         Column (
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(Modifier.height(20.dp))
+
+            Text("SwiftGroups", style=AppFont.InterTypography().h2, fontWeight = FontWeight.Black)
+
+            Spacer(Modifier.height(10.dp))
+
+            viewModel.profileData.forEach { data ->
+                ProfileBar(data).Content()
+            }
+
+            Spacer(Modifier.height(10.dp))
             Column(
                 Modifier
                     .fillMaxWidth()
