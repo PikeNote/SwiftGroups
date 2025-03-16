@@ -1,37 +1,99 @@
 package org.swg.swiftgroups_app.Screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import kotlinx.coroutines.runBlocking
+import org.swg.swiftgroups_app.Components.Home.EventHome
+import org.swg.swiftgroups_app.Fonts.AppFont
 
 
 object ScreenHome : Screen {
 
+    private val viewModel = HomeViewModel()
+
     @Composable
     override fun Content() {
+        viewModel.test()
         val navigator = LocalNavigator.currentOrThrow
 
-        Column(
-            Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Column (
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center
         ) {
-            Text("Screen Home")
-            Button(
-                onClick = {
-                    navigator.push(ScreenEvents)
-                }
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .offset(x = (10).dp),
+                verticalArrangement = Arrangement.Center,
             ) {
-                Text("Navigate to Screen B")
+                Text("My Events", style= AppFont.InterTypography().h3)
+                Spacer(modifier = Modifier.height(10.dp))
+                LazyRow(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(195.dp)
+                        .clip(shape = RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp))
+                        .background(Color(0xFFd9d9d9)),
+                    contentPadding = PaddingValues(horizontal = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    userScrollEnabled = true
+                ) {
+                    runBlocking  {
+                        viewModel.upcomingEvents.list.forEach { data ->
+                            item {
+                                EventHome(data).Content();
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .offset(x = (10).dp),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text("Events Hosted by My Groups", style= AppFont.InterTypography().h3)
+                Spacer(modifier = Modifier.height(10.dp))
+                LazyRow(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(195.dp)
+                        .clip(shape = RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp))
+                        .background(Color(0xFFd9d9d9)),
+                    contentPadding = PaddingValues(horizontal = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    userScrollEnabled = true
+                ) {
+
+
+                }
             }
         }
+
     }
 }

@@ -1,0 +1,41 @@
+package org.swg.swiftgroups_app.CGAPI
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Item0(
+    val attendees_count: Int,
+    val attending: String,
+    val checkin_attendees: Int,
+    val connections_more: Int,
+    val display_map: Int,
+    val event_date: String,
+    val event_description: String?,
+    val event_display_list: String,
+    val event_end_date: String?,
+    val event_end_time: String,
+    val event_end_utc: String,
+    val event_group: String,
+    val event_group_id: Int,
+    val event_header: String?,
+    val event_id: Int,
+    val event_name: String,
+    val event_start_time: String,
+    val event_start_utc: String,
+    val event_timezone: String,
+    val event_type: String,
+    val friends_more_going: Int,
+    val interested: Int,
+    val isLive: Int,
+    val isOnGoing: Int,
+    val location: String,
+    val manage: Int,
+    val notifications_status: Int,
+    val pdfTicketsUrl: String?,
+    val photoHeight: Int?,
+    val photo_url: String?,
+    val register_url: String?,
+    val registered: Int?,
+    val share_url: String?,
+    val showRegisterButton: Int?,
+)

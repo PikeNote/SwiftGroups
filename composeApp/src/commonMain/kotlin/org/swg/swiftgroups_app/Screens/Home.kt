@@ -9,11 +9,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -23,22 +21,17 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.multiplatform.webview.cookie.Cookie
-import org.jetbrains.compose.resources.Font
+import org.swg.swiftgroups_app.Fonts.AppFont.InterFontFamily
+import org.swg.swiftgroups_app.Fonts.AppFont.InterTypography
 import org.swg.swiftgroups_app.Tabs.TabEvents
 import org.swg.swiftgroups_app.Tabs.TabFeed
 import org.swg.swiftgroups_app.Tabs.TabGroups
 import org.swg.swiftgroups_app.Tabs.TabHome
 import org.swg.swiftgroups_app.Tabs.TabSettings
 import org.swg.swiftgroups_app.getScreenResult
-import swiftgroups.composeapp.generated.resources.Res
-import swiftgroups.composeapp.generated.resources.inter
-import swiftgroups.composeapp.generated.resources.inter_bold
-
 
 object Home : Screen {
 
-    private var interFontFamily : FontFamily? = null
-    private var interBoldFontFamily : FontFamily? = null
     private var cookies : List<Cookie>? = null
     private val theme = Colors(
         primary = Color(0xffffffff),
@@ -62,12 +55,8 @@ object Home : Screen {
 
         cookies = getScreenResult("cookies")
 
-        interFontFamily = FontFamily(Font(Res.font.inter))
-        interBoldFontFamily = FontFamily(Font(Res.font.inter_bold))
 
-        val interFont = Typography(defaultFontFamily = interFontFamily!!)
-
-        MaterialTheme(colors = theme, typography = interFont) {
+        MaterialTheme(colors = theme, typography = InterTypography()) {
 
             TabNavigator(TabHome) {
 
@@ -105,7 +94,7 @@ object Home : Screen {
                 }
             },
             label = {
-                Text(tab.options.title, fontFamily  = interBoldFontFamily, fontWeight = FontWeight.Bold)
+                Text(tab.options.title, fontFamily  = InterFontFamily(), fontWeight = FontWeight.Bold)
             },
             selectedContentColor = Color(0xFF0279fd),
             unselectedContentColor = Color(0xFF929292)
