@@ -13,6 +13,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
+import swiftgroups.composeapp.generated.resources.Res
 
 
 object CGAPI {
@@ -25,15 +26,13 @@ object CGAPI {
             })
         }
     }
-    var cookies : List<Cookie> = emptyList()
+
+    var cookieHeader = "";
 
     suspend fun grabMyEvents(): UpcomingEvents {
         var cookieHeader = ""
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_events_new?view=events_i_am_attending&limit=15&range=0") {
             method = HttpMethod.Get
-            cookies.forEach { ck ->
-                cookieHeader += "${ck.name}=${ck.value};"
-            }
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
                 append(HttpHeaders.Cookie, cookieHeader)
@@ -56,9 +55,6 @@ object CGAPI {
         var cookieHeader = ""
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_profile") {
             method = HttpMethod.Get
-            cookies.forEach { ck ->
-                cookieHeader += "${ck.name}=${ck.value};"
-            }
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
                 append(HttpHeaders.Cookie, cookieHeader)
@@ -73,5 +69,26 @@ object CGAPI {
             return emptyList()
         }
 
+    }
+
+    suspend fun checkLoggedIn() : Boolean {
+        var cookieHeader = ""
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_auto_login.aspx") {
+            // {"logout":true}
+            // {"success": true}
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, cookieHeader)
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            val loggedIn : String = response.body()
+
+            return loggedIn.contains("success")
+        } else {
+            return false
+        }
     }
 }

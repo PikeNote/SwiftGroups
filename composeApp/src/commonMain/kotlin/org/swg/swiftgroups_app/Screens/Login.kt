@@ -12,30 +12,39 @@ import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewNavigator
 import com.multiplatform.webview.web.rememberWebViewState
 import androidx.compose.runtime.snapshotFlow
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.multiplatform.webview.cookie.Cookie
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebViewState
 import kotlinx.coroutines.flow.filter
 import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.SecureStorage.SecureStorage
+import org.swg.swiftgroups_app.SecureStorage.impl.SecureStorageImpl
 
 object Login : Screen {
 
+    private var screenModel : LoginViewModel? = null;
+
     @Composable
     override fun Content() {
+
         val navigator = LocalNavigator.currentOrThrow
 
-        val state = rememberWebViewState("https://www.campusgroups.com/shibboleth/login?idp=cwru")
+        screenModel = rememberScreenModel { LoginViewModel(navigator) }
 
-        val webViewNavigator = rememberWebViewNavigator()
+        val state = rememberWebViewState("https://www.campusgroups.com/shibboleth/login?idp=cwru")
 
         Column(
             Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            WebView(state = state, modifier = Modifier.fillMaxSize())
+            if(screenModel!!.requireLogin) {
+                WebView(state = state, modifier = Modifier.fillMaxSize())
+            }
         }
 
         LaunchedEffect(state) {
@@ -53,7 +62,19 @@ object Login : Screen {
         var cookies = state.cookieManager.getCookies("https://community.case.edu")
         cookies += state.cookieManager.getCookies("https://case.edu")
         //setScreenResult("cookies", test_cookies)
-        CGAPI.cookies = cookies
+        CGAPI.cookieHeader = generateCookieString(cookies)
+        screenModel?.secureVault?.set("cg_cookie",CGAPI.cookieHeader)
         navigator.replace(Home)
+    }
+
+    fun generateCookieString(cookieList : List<Cookie>): String {
+        var cookieString = ""
+
+        cookieList.forEach {
+            cookieString += "${it.name}:${it.value};"
+        }
+
+        return cookieString;
+
     }
 }
