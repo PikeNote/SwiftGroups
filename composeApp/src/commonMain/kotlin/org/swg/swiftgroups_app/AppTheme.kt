@@ -21,7 +21,7 @@ object AppTheme {
     )
 
     val profileColorStops = arrayOf(
-        0f to Color(0xFF6b86ac),
-        0.4f to Color(0xFF6b9ee4)
+        0f to Color(0xFF446BA0),
+        0.71f to Color(0xFF71AEFF)
     )
 }

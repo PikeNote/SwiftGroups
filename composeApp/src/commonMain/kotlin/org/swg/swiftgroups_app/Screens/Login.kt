@@ -35,7 +35,7 @@ object Login : Screen {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            WebView(state)
+            WebView(state = state, modifier = Modifier.fillMaxSize())
         }
 
         LaunchedEffect(state) {

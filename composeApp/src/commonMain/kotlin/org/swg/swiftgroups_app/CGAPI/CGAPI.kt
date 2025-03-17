@@ -3,7 +3,6 @@ package org.swg.swiftgroups_app.CGAPI
 import com.multiplatform.webview.cookie.Cookie
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -17,7 +16,7 @@ import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 
 
 object CGAPI {
-    val client = HttpClient(CIO) {
+    val client = HttpClient() {
         install(ContentNegotiation) {
             json(contentType = ContentType.Any, json = Json {
                 prettyPrint = true
