@@ -18,7 +18,6 @@ import platform.CoreFoundation.CFDictionaryCreateMutable
 import platform.CoreFoundation.CFDictionaryRef
 import platform.CoreFoundation.CFStringCreateWithCString
 import platform.CoreFoundation.CFStringRef
-import platform.CoreFoundation.CFTypeRef
 import platform.CoreFoundation.CFTypeRefVar
 import platform.CoreFoundation.kCFBooleanFalse
 import platform.CoreFoundation.kCFBooleanTrue
@@ -70,131 +69,78 @@ actual open class SecureStorageImpl(
         AfterFirstUnlockThisDeviceOnly(kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly)
     }
 
-    actual override fun clear(): Boolean {
-        val query = createBaseQuery()
-        val status = SecItemDelete(query)
-        return status == noErr.toInt()
-    }
+    actual override fun clear(): Boolean = SecItemDelete(createBaseQuery()) == noErr.toInt();
 
     actual override fun deleteObject(forKey: String): Boolean {
-        val query = createBaseQuery().apply {
-            CFDictionaryAddValue(this, kSecAttrAccount, forKey.toCFString())
-        }
-        val status = SecItemDelete(query)
-        return status == noErr.toInt()
+        val query = createBaseQuery().apply { CFDictionaryAddValue(this, kSecAttrAccount, forKey.toCFString()) }
+        return SecItemDelete(query) == noErr.toInt()
     }
 
     @OptIn(BetaInteropApi::class)
-    actual override fun set(key: String, stringValue: String): Boolean {
-        val data = stringValue.toNSData()
-        return addOrUpdate(key, data)
-    }
+    actual override fun set(key: String, stringValue: String): Boolean = addOrUpdate(key, stringValue.toNSData())
 
     actual override fun existsObject(forKey: String): Boolean {
         val query = createBaseQuery().apply {
             CFDictionaryAddValue(this, kSecAttrAccount, forKey.toCFString())
             CFDictionaryAddValue(this, kSecReturnData, kCFBooleanFalse)
         }
-
-        val status = SecItemCopyMatching(query, null)
-        return status == noErr.toInt()
+        return SecItemCopyMatching(query, null) == noErr.toInt();
     }
 
-    actual override fun getString(forKey: String, defValue: String?): String? {
+
+    actual override fun getString(forKey: String, defValue: String?): String? = memScoped {
         val query = createBaseQuery().apply {
             CFDictionaryAddValue(this, kSecAttrAccount, forKey.toCFString())
             CFDictionaryAddValue(this, kSecReturnData, kCFBooleanTrue)
             CFDictionaryAddValue(this, kSecMatchLimit, kSecMatchLimitOne)
         }
-
-        memScoped {
-            val result = alloc<CFTypeRefVar>()
-            val status = SecItemCopyMatching(query, result.ptr)
-            if (status == noErr.toInt()) {
-                val nsData = CFBridgingRelease(result.value) as? NSData
-                return nsData?.toByteArray().toString()
-            }
-        }
-        return null
+        val result = alloc<CFTypeRefVar>()
+        if (SecItemCopyMatching(query, result.ptr) == noErr.toInt()) {
+            (CFBridgingRelease(result.value) as? NSData)?.toByteArray()?.decodeToString()
+        } else null
     }
 
     // HELPERS
 
-    private fun addOrUpdate(key: String, data: NSData?): Boolean {
-        return if (existsObject(forKey = key)) {
-            update(key, data)
-        } else {
-            add(key, data)
-        }
-    }
+    private fun addOrUpdate(key: String, data: NSData?): Boolean =
+        if (existsObject(forKey = key)) update(key, data) else add(key, data)
 
     private fun update(key: String, data: NSData?): Boolean {
         if (data == null) return false
-
-        val query = createBaseQuery().apply {
-            CFDictionaryAddValue(this, kSecAttrAccount, key.toCFString())
-        }
-
+        val query = createBaseQuery().apply { CFDictionaryAddValue(this, kSecAttrAccount, key.toCFString()) }
         val attributesToUpdate = CFDictionaryCreateMutable(null, 1, null, null).apply {
-            val cfData: CFTypeRef? = CFBridgingRetain(data)
-            CFDictionaryAddValue(this, kSecValueData, cfData)
+            CFDictionaryAddValue(this, kSecValueData, CFBridgingRetain(data))
         }
-
-        val status = SecItemUpdate(query, attributesToUpdate)
-        return status == noErr.toInt()
+        return SecItemUpdate(query, attributesToUpdate) == noErr.toInt()
     }
 
     private fun add(key: String, data: NSData?): Boolean {
         if (data == null) return false
-
-        val query = createBaseQuery().apply {
-            CFDictionaryAddValue(this, kSecAttrAccount, key.toCFString())
-        }
-
+        val query = createBaseQuery().apply { CFDictionaryAddValue(this, kSecAttrAccount, key.toCFString()) }
         val attributesToAdd = CFDictionaryCreateMutable(null, 1, null, null)?.apply {
-            val cfData: CFTypeRef? = CFBridgingRetain(data)
-            CFDictionaryAddValue(this, kSecValueData, cfData)
+            CFDictionaryAddValue(this, kSecValueData, CFBridgingRetain(data))
         } ?: return false
-
-        val status = SecItemAdd(query, attributesToAdd.reinterpret())
-        return status == noErr.toInt()
+        return SecItemAdd(query, attributesToAdd.reinterpret()) == noErr.toInt()
     }
 
     private fun createBaseQuery(): CFDictionaryRef = memScoped {
         val dictionary = CFDictionaryCreateMutable(null, 0, null, null)
-            ?: error("Failed to create CFMutableDictionary")
-
         CFDictionaryAddValue(dictionary, kSecClass, kSecClassGenericPassword)
-
-        val cfServiceName = serviceName?.toCFString() ?: "default_service".toCFString()
-        CFDictionaryAddValue(dictionary, kSecAttrService, cfServiceName)
+        CFDictionaryAddValue(dictionary, kSecAttrService, serviceName?.toCFString() ?: "default_service".toCFString())
         CFDictionaryAddValue(dictionary, kSecAttrAccessible, accessibility.value)
-
-        accessGroup?.let {
-            val cfAccessGroup = it.toCFString()
-            CFDictionaryAddValue(dictionary, kSecAttrAccessGroup, cfAccessGroup)
-        }
-
+        accessGroup?.let { CFDictionaryAddValue(dictionary, kSecAttrAccessGroup, it.toCFString()) }
         CFAutorelease(dictionary)
-        return@memScoped dictionary
+        dictionary!!
     }
-
 
     private fun String.toCFString(): CFStringRef? = memScoped {
         CFStringCreateWithCString(null, this@toCFString, kCFStringEncodingUTF8)
     }
 
     @BetaInteropApi
-    private fun String.toNSData(): NSData? =
-        NSString.create(string = this).dataUsingEncoding(NSUTF8StringEncoding)
+    private fun String.toNSData(): NSData? = NSString.create(string = this).dataUsingEncoding(NSUTF8StringEncoding)
 
-
-    private fun NSData.toByteArray(): ByteArray =
-        ByteArray(length.toInt()).apply {
-            if (isNotEmpty()) {
-                usePinned {
-                    memcpy(it.addressOf(0), this@toByteArray.bytes, this@toByteArray.length)
-                }
-            }
-        }
+    private fun NSData.toByteArray(): ByteArray = ByteArray(length.toInt()).apply {
+        if (isNotEmpty()) usePinned { memcpy(it.addressOf(0), this@toByteArray.bytes, this@toByteArray.length) }
+    }
 }
