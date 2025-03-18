@@ -33,7 +33,7 @@ interface SecureStorage {
      * @param forKey The key to query
      * @return The stored bytes value
      */
-    fun data(forKey: String): ByteArray?
+    fun getString(forKey: String, defValue: String? = null): String?
 }
 
 expect fun SecureStorage() : SecureStorage

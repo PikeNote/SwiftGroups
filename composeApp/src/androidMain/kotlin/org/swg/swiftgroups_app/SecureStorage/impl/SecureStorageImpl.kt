@@ -3,7 +3,6 @@ package org.swg.swiftgroups_app.SecureStorage.impl
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Base64
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import org.swg.swiftgroups_app.SecureStorage.SecureStorage
@@ -18,7 +17,7 @@ actual open class SecureStorageImpl (
     init {
         val masterKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build();
+            .build()
 
         encSharedPrefs = EncryptedSharedPreferences.create(
                 context,
@@ -26,7 +25,7 @@ actual open class SecureStorageImpl (
                 masterKey,
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        );
+        )
 
     }
 
@@ -38,6 +37,7 @@ actual open class SecureStorageImpl (
             .commit()
     }
 
+    @SuppressLint("UseKtx")
     actual override fun deleteObject(forKey: String): Boolean {
         return encSharedPrefs
             .edit()
@@ -58,10 +58,8 @@ actual open class SecureStorageImpl (
             .contains(forKey)
     }
 
-    actual override fun data(forKey: String): ByteArray? {
+    actual override fun getString(forKey: String, defValue: String?): String? {
         return encSharedPrefs
-            .getString(forKey, null)?.let {
-                Base64.decode(it, Base64.DEFAULT)
-            }
+            .getString(forKey, null)
     }
 }

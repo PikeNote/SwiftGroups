@@ -11,5 +11,5 @@ expect open class SecureStorageImpl : SecureStorage {
 
     override fun existsObject(forKey: String): Boolean
 
-    override fun data(forKey: String): ByteArray?
+    override fun getString(forKey: String, defValue: String?): String?
 }

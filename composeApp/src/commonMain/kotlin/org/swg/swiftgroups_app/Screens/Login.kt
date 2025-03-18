@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import com.multiplatform.webview.web.WebView
-import com.multiplatform.webview.web.rememberWebViewNavigator
 import com.multiplatform.webview.web.rememberWebViewState
 import androidx.compose.runtime.snapshotFlow
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -21,12 +20,10 @@ import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebViewState
 import kotlinx.coroutines.flow.filter
 import org.swg.swiftgroups_app.CGAPI.CGAPI
-import org.swg.swiftgroups_app.SecureStorage.SecureStorage
-import org.swg.swiftgroups_app.SecureStorage.impl.SecureStorageImpl
 
 object Login : Screen {
 
-    private var screenModel : LoginViewModel? = null;
+    private var screenModel : LoginViewModel? = null
 
     @Composable
     override fun Content() {
@@ -67,14 +64,14 @@ object Login : Screen {
         navigator.replace(Home)
     }
 
-    fun generateCookieString(cookieList : List<Cookie>): String {
+    private fun generateCookieString(cookieList : List<Cookie>): String {
         var cookieString = ""
 
         cookieList.forEach {
-            cookieString += "${it.name}:${it.value};"
+            cookieString += "${it.name}=${it.value};"
         }
 
-        return cookieString;
+        return cookieString
 
     }
 }

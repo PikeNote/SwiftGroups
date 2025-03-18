@@ -6,8 +6,6 @@ import org.swg.swiftgroups_app.SecureStorage.SecureStorage
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
-import kotlinx.cinterop.allocArrayOf
-import kotlinx.cinterop.convert
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.usePinned
@@ -102,7 +100,7 @@ actual open class SecureStorageImpl(
         return status == noErr.toInt()
     }
 
-    actual override fun data(forKey: String): ByteArray? {
+    actual override fun getString(forKey: String, defValue: String?): String? {
         val query = createBaseQuery().apply {
             CFDictionaryAddValue(this, kSecAttrAccount, forKey.toCFString())
             CFDictionaryAddValue(this, kSecReturnData, kCFBooleanTrue)
@@ -114,7 +112,7 @@ actual open class SecureStorageImpl(
             val status = SecItemCopyMatching(query, result.ptr)
             if (status == noErr.toInt()) {
                 val nsData = CFBridgingRelease(result.value) as? NSData
-                return nsData?.toByteArray()
+                return nsData?.toByteArray().toString()
             }
         }
         return null
@@ -186,7 +184,7 @@ actual open class SecureStorageImpl(
         CFStringCreateWithCString(null, this@toCFString, kCFStringEncodingUTF8)
     }
 
-    @kotlinx.cinterop.BetaInteropApi
+    @BetaInteropApi
     private fun String.toNSData(): NSData? =
         NSString.create(string = this).dataUsingEncoding(NSUTF8StringEncoding)
 
