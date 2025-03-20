@@ -17,6 +17,7 @@ sqldelight {
             packageName.set("org.swg.swiftgroups_app.db")
         }
     }
+    linkSqlite.set(true)
 }
 
 kotlin {

@@ -27,7 +27,7 @@ class HomeViewModel : ScreenModel {
         CoroutineScope (Dispatchers.Default).launch {
             upcomingEvents = CGAPI.grabMyEvents()
             profileData = CGAPI.grabProfileData()
-            //CGAPI.fetchEventsData()
+            CGAPI.fetchEventsData()
             FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "image_cache"
         }
     }
