@@ -7,7 +7,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.UtcOffset
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.byUnicodePattern
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toInstant
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
 import org.swg.swiftgroups_app.CGAPI.Events.Club
@@ -17,7 +23,14 @@ object CalendarAPI {
     val organizerPattern = Regex("CN=\"([^\"]*)\":([a-zA-Z0-9:.\\\\/]*)")
     val caseURLPattern = Regex("https:\\/\\/community\\.case\\.edu\\/rsvp\\?id=([0-9]+)")
     val dateTimeFormat = LocalDateTime.Format {
-        byUnicodePattern("yyyyMMdd'T'HHmmss'Z'")
+        year()
+        monthNumber()
+        dayOfMonth()
+        chars("T")
+        hour()
+        minute()
+        second()
+        chars("Z")
     }
 
     private suspend fun downloadCalendar(url: String) : String? = withContext(Dispatchers.IO) {
@@ -44,10 +57,12 @@ object CalendarAPI {
             val lines = calendarFile.split("\n");
             var event = CGEvent()
             lines.forEach {
+                val lineString = it.replace("\r", "")
                 when {
-                    it.startsWith("BEGIN:VEVENT") -> event = CGEvent()
-                    it.startsWith("ORGANIZER;") -> {
-                        val organizerMatch = organizerPattern.find(it)
+
+                    lineString.startsWith("BEGIN:VEVENT") -> event = CGEvent()
+                    lineString.startsWith("ORGANIZER;") -> {
+                        val organizerMatch = organizerPattern.find(lineString)
                         val clubName = organizerMatch?.groupValues?.get(1);
                         val clubURL = organizerMatch?.groupValues?.get(2);
 
@@ -57,14 +72,14 @@ object CalendarAPI {
 
                     }
 
-                    it.startsWith("DTSTART:") -> event.startTime =
-                        dateTimeFormat.parse(it.substringAfter(":")).toString()
+                    lineString.startsWith("DTSTART:") -> event.startTime =
+                        dateTimeFormat.parse(lineString.substringAfter(":")).toInstant(UtcOffset.ZERO).toString()
 
-                    it.startsWith("DTEND:") -> event.endTime =
-                        dateTimeFormat.parse(it.substringAfter(":")).toString()
+                    lineString.startsWith("DTEND:") -> event.endTime =
+                        dateTimeFormat.parse(lineString.substringAfter(":")).toInstant(UtcOffset.ZERO).toString()
 
-                    it.startsWith("URL") -> {
-                        event.eventUrl = it.substringAfter(":")
+                    lineString.startsWith("URL") -> {
+                        event.eventUrl = lineString.substringAfter(":")
                         val urlMatch = caseURLPattern.find(event.eventUrl);
                         val eventID = urlMatch?.groupValues?.get(1)
 
@@ -74,13 +89,13 @@ object CalendarAPI {
 
                     }
 
-                    it.startsWith("DESCRIPTION:") -> event.eventDesc = it.substringAfter(":")
-                    it.startsWith("LOCATION:") -> event.eventLocation = it.substringAfter(":")
-                    it.startsWith("SUMMARY;") -> event.eventName = it.substringAfter(":")
-                    it.startsWith("CATEGORIES;X-CG-CATEGORY=event_tags") -> event.eventCategory =
-                        it.substringAfter(":").split(",")
+                    lineString.startsWith("DESCRIPTION:") -> event.eventDesc = lineString.substringAfter(":")
+                    lineString.startsWith("LOCATION:") -> event.eventLocation = lineString.substringAfter(":")
+                    lineString.startsWith("SUMMARY;") -> event.eventName = lineString.substringAfter(":")
+                    lineString.startsWith("CATEGORIES;X-CG-CATEGORY=event_tags") -> event.eventCategory =
+                        lineString.substringAfter(":").split(",")
 
-                    it.startsWith("END:VEVENT") -> {
+                    lineString.startsWith("END:VEVENT") -> {
                         if (event.selfValidate()) {
                             eventList[event.eventID] = event
                         }

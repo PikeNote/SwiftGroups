@@ -10,6 +10,15 @@ plugins {
     kotlin("plugin.serialization") version "2.1.0"
 }
 
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("org.swg.swiftgroups_app.db")
+        }
+    }
+}
+
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)

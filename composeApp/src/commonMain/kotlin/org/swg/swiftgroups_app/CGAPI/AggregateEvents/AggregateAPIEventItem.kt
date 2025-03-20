@@ -1,6 +1,6 @@
-package org.swg.swiftgroups_app.CGAPI.CGEvent
+package org.swg.swiftgroups_app.CGAPI.AggregateEvents
 
-data class CGAPIEventItem(
+data class AggregateAPIEventItem(
     val counter: String,
     val fields: String,
     val htmlFields: List<String>,

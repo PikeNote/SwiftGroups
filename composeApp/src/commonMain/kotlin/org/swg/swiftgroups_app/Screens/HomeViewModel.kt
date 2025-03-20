@@ -10,6 +10,9 @@ import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import okio.FileSystem
+import org.swg.swiftgroups_app.DatabaseDriver.provideDbDriver
+import org.swg.swiftgroups_app.db.Database
 
 class HomeViewModel : ScreenModel {
 
@@ -24,6 +27,8 @@ class HomeViewModel : ScreenModel {
         CoroutineScope (Dispatchers.Default).launch {
             upcomingEvents = CGAPI.grabMyEvents()
             profileData = CGAPI.grabProfileData()
+            //CGAPI.fetchEventsData()
+            FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "image_cache"
         }
     }
 }

@@ -49,6 +49,7 @@ object Login : Screen {
                 .filter { it is LoadingState.Finished && state.lastLoadedUrl?.contains("https://community.case.edu/web_app") == true }
                 .collect {
                     storeCookies(state, navigator)
+                    navigator.replace(Home)
                 }
         }
 

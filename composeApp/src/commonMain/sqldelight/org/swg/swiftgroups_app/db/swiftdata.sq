@@ -1,0 +1,35 @@
+CREATE TABLE IF NOT EXISTS events (
+        eventId INTEGER PRIMARY KEY,
+        start_time TEXT NOT NULL,
+        end_time TEXT NOT NULL,
+        eventName TEXT NOT NULL,
+        eventDesc TEXT NOT NULL,
+        eventAttendees INTEGER,
+        eventUrl TEXT NOT NULL,
+        eventLocation TEXT NOT NULL,
+        eventPicture TEXT NOT NULL,
+        clubURL TEXT NOT NULL,
+        eventCategory TEXT NOT NULL,
+        clubName TEXT NOT NULL,
+        FOREIGN KEY (clubName)
+               REFERENCES clubs (clubName),
+        UNIQUE(eventId)
+);
+
+CREATE TABLE IF NOT EXISTS clubs (
+        clubName TEXT PRIMARY KEY,
+        clubUrl TEXT NOT NULL,
+        UNIQUE(clubName)
+);
+
+insertEvent:
+INSERT OR REPLACE INTO events (eventId,start_time,end_time,eventName,eventDesc,eventAttendees,eventUrl,eventLocation, eventPicture,clubName,clubURL,eventCategory)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+
+insertClub:
+INSERT OR IGNORE INTO clubs (clubName, clubUrl)
+VALUES (?, ?);
+
+fetchEvent:
+SELECT * FROM events LIMIT 10;

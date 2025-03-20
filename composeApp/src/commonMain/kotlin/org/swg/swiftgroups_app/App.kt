@@ -29,7 +29,7 @@ fun App() {
             .diskCache {
                 DiskCache.Builder()
                     .directory(FileSystem.SYSTEM_TEMPORARY_DIRECTORY.resolve("image_cache"))
-                    .maxSizePercent(0.02)
+                    .maxSizePercent(1.0)
                     .build()
             }
             .build()

@@ -10,8 +10,14 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
+import org.swg.swiftgroups_app.CGAPI.EventProcessing.CalendarAPI
+import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
+import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
+import org.swg.swiftgroups_app.DatabaseDriver.provideDbDriver
+import org.swg.swiftgroups_app.db.Database
 
 
 object CGAPI {
@@ -84,6 +90,68 @@ object CGAPI {
             return loggedIn.contains("success")
         } else {
             return false
+        }
+    }
+
+    suspend fun fetchEventsData() {
+        val calendarEvents : HashMap<String,CGEvent> = CalendarAPI.processCalendar();
+        val eventAPIEvents : List<CGEvent> = EventsAPI.grabEvents();
+
+        eventAPIEvents.forEach {
+            if(calendarEvents.containsKey(it.eventID)) {
+                val event = calendarEvents[it.eventID]
+                if (event != null) {
+                    event.eventPicture = "https://community.case.edu${it.eventPicture}"
+                    event.eventName = it.eventName
+                    event.attendeeCount = it.attendeeCount
+                    event.eventLocation = it.eventLocation
+                }
+            }
+        }
+
+        val swiftdataQueries = Database(provideDbDriver(Database.Schema)).swiftdataQueries
+
+
+        swiftdataQueries.transaction {
+
+            calendarEvents.forEach {
+                swiftdataQueries.insertEvent(
+                    eventId = it.value.eventID.toLong(),
+                    eventName = it.value.eventName,
+                    eventDesc = it.value.eventDesc,
+                    eventUrl = it.value.eventUrl,
+                    eventLocation = it.value.eventLocation,
+                    eventPicture = it.value.eventPicture,
+                    eventCategory = it.value.eventCategory.joinToString(),
+                    start_time = it.value.startTime,
+                    end_time = it.value.endTime,
+                    eventAttendees = it.value.attendeeCount.toLong(),
+                    clubName = it.value.club?.clubName ?: "",
+                    clubURL = it.value.club?.clubUrl ?: ""
+                )
+            }
+            afterCommit {
+                println("Data added/updated to DB!");
+            }
+        }
+    }
+
+
+
+    suspend fun fetchEvent(eventID : String) : EventSpecificAPI? {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_event_new?id=${eventID}") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, cookieHeader)
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            val eventData : EventSpecificAPI = response.body()
+            return eventData
+        } else {
+            return null
         }
     }
 }
