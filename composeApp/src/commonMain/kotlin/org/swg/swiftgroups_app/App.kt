@@ -3,7 +3,6 @@ package org.swg.swiftgroups_app
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.navigator.Navigator
 import coil3.ImageLoader
@@ -13,7 +12,6 @@ import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import okio.FileSystem
 import org.swg.swiftgroups_app.Fonts.AppFont
-import org.swg.swiftgroups_app.Screens.Event.SingleEventScreen
 import org.swg.swiftgroups_app.Screens.Login
 
 @Composable
@@ -42,8 +40,7 @@ fun App() {
     MaterialTheme(
         typography = typography,
         colors = AppTheme.theme
-    ) {
-        Navigator(Login)
+    ) {Navigator(Login)
     }
 
 

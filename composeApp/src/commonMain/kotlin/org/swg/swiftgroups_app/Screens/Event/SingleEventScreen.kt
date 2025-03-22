@@ -1,6 +1,5 @@
 package org.swg.swiftgroups_app.Screens.Event
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.Divider
@@ -73,7 +73,7 @@ import org.swg.swiftgroups_app.Icons.PencilSquare
 
 class SingleEventScreen(eventID : Int) : Screen {
 
-    private val singleEventViewModel = SingleEventViewModel(eventID);
+    private val singleEventViewModel = SingleEventViewModel(eventID)
 
     @Composable
     @Preview
@@ -149,28 +149,41 @@ class SingleEventScreen(eventID : Int) : Screen {
 
                 Box (modifier = Modifier.padding(horizontal = 10.dp)) {
                     Spacer(modifier = Modifier.height(currentImgSize.value + 20.dp))
-                    AsyncImage(
-                        model = "https://community.case.edu${singleEventViewModel.eventSpecificAPI.photo_url}",
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds,
-                        modifier = Modifier
+                    if(singleEventViewModel.eventSpecificAPI == null) {
+                        Column (modifier = Modifier.height(currentImgSize.value)
+                            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center){
+                            CircularProgressIndicator(
+                                modifier = Modifier.width(64.dp),
+                                color = Color(0xFFd3d3da),
+                                backgroundColor = Color(0xFF003B7F),
+                            )
+                        }
 
-                            .height(currentImgSize.value)
-                            .fillMaxWidth()
-                            .shadow(3.dp, shape = RoundedCornerShape(35.dp))
-                            .padding(bottom = 5.dp)
-                            .padding(PaddingValues(start = 2.5.dp, end = 5.dp))
-                            .clip(RoundedCornerShape(35.dp))
+                    } else {
+                        AsyncImage(
+                            model = "https://community.case.edu${singleEventViewModel.eventSpecificAPI?.photo_url ?: ""}",
+                            contentDescription = null,
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+
+                                .height(currentImgSize.value)
+                                .fillMaxWidth()
+                                .shadow(3.dp, shape = RoundedCornerShape(35.dp))
+                                .padding(bottom = 5.dp)
+                                .padding(PaddingValues(start = 2.5.dp, end = 5.dp))
+                                .clip(RoundedCornerShape(35.dp))
 
 
 
-                            .graphicsLayer {
-                                this.alpha = imageAlpha
-                            }
+                                .graphicsLayer {
+                                    this.alpha = imageAlpha
+                                }
+                        )
+                    }
 
-                    )
                     Text(
-                        text = singleEventViewModel.eventSpecificAPI.event_name,
+                        text = singleEventViewModel.eventSpecificAPI?.event_name ?: "---",
                         style = AppFont.InterTypography.h3,
                         color = Color.White,
                         textAlign = TextAlign.Center,
@@ -200,16 +213,16 @@ class SingleEventScreen(eventID : Int) : Screen {
                    modifier = Modifier.fillMaxWidth()
                ) {
                    Text(
-                       singleEventViewModel.eventSpecificAPI.event_type,
+                       singleEventViewModel.eventSpecificAPI?.event_type ?: "...",
                        style = AppFont.InterTypography.h6,
                        color = Color(0xFF2C58A9)
                    )
                    Text(
-                       singleEventViewModel.eventSpecificAPI.event_name,
+                       singleEventViewModel.eventSpecificAPI?.event_name ?: "Loading...",
                        style = AppFont.InterTypography.h3,
                    )
                    Text(
-                       singleEventViewModel.eventSpecificAPI.event_group,
+                       singleEventViewModel.eventSpecificAPI?.event_group ?: "...",
                        style = AppFont.InterTypography.h6,
                        color = Color.Gray
                    )
@@ -217,8 +230,8 @@ class SingleEventScreen(eventID : Int) : Screen {
 
                 Spacer(modifier = Modifier.height(3.dp))
 
-                if(singleEventViewModel.eventSpecificAPI.tickets != null) {
-                    singleEventViewModel.eventSpecificAPI.tickets!!.forEach {
+                if(singleEventViewModel.eventSpecificAPI?.tickets != null) {
+                    singleEventViewModel.eventSpecificAPI!!.tickets!!.forEach {
                         QRCode(
                             name = it.name,
                             ticketName = "${it.ticketName} - ${it.amount}",
@@ -266,25 +279,25 @@ class SingleEventScreen(eventID : Int) : Screen {
                     logoText(
                         logo = FontAwesomeIcons.Regular.Calendar,
                         contentDesc = "Calendar Icon",
-                        text = "${singleEventViewModel.eventSpecificAPI.event_date} : ${singleEventViewModel.eventSpecificAPI.event_start_time}"
+                        text = "${singleEventViewModel.eventSpecificAPI?.event_date ?: "---"} : ${singleEventViewModel.eventSpecificAPI?.event_start_time  ?: "---"}"
                     )
 
                     logoText(
                         logo = FontAwesomeIcons.Regular.Clock,
                         contentDesc = "Clock  Icon",
-                        text = "${singleEventViewModel.eventSpecificAPI.event_start_time} - ${singleEventViewModel.eventSpecificAPI.event_end_time} ${singleEventViewModel.eventSpecificAPI.event_timezone}"
+                        text = "${singleEventViewModel.eventSpecificAPI?.event_start_time ?: "---"} - ${singleEventViewModel.eventSpecificAPI?.event_end_time  ?: "---"} ${singleEventViewModel.eventSpecificAPI?.event_timezone ?: "---" }"
                     )
 
                     logoText(
                         logo = MapPin,
                         contentDesc = "Map Pin Icon",
-                        text = singleEventViewModel.eventSpecificAPI.location
+                        text = singleEventViewModel.eventSpecificAPI?.location ?: "---"
                     )
                 }
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        "Attendees ${singleEventViewModel.eventSpecificAPI.attendees_count}",
+                        "Attendees (${singleEventViewModel.eventSpecificAPI?.attendees_count ?: "N/A"})",
                         style = AppFont.InterTypography.h3,
                         fontWeight = FontWeight.Bold
                     )
@@ -293,7 +306,7 @@ class SingleEventScreen(eventID : Int) : Screen {
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         runBlocking {
-                            singleEventViewModel.eventSpecificAPI.attendees.forEach {
+                            singleEventViewModel.eventSpecificAPI?.attendees?.forEach {
                                 item {
                                     AsyncImage(
                                         model = "https://community.case.edu${it.photo_url}",
@@ -324,7 +337,7 @@ class SingleEventScreen(eventID : Int) : Screen {
                         fontWeight = FontWeight.Bold
                     )
 
-                    Text(singleEventViewModel.eventSpecificAPI.event_description)
+                    Text(singleEventViewModel.eventSpecificAPI?.event_description ?:"")
 
                     Spacer(modifier = Modifier.height(230.dp))
                 }

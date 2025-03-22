@@ -22,9 +22,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import kotlinx.coroutines.runBlocking
 import org.swg.swiftgroups_app.Components.Home.EventHome
 import org.swg.swiftgroups_app.Components.Home.ProfileBar
 import org.swg.swiftgroups_app.Fonts.AppFont
@@ -38,8 +35,6 @@ object ScreenHome : Screen {
     @Composable
     override fun Content() {
         val viewModel: HomeViewModel = rememberScreenModel { HomeViewModel() }
-        val navigator = LocalNavigator.currentOrThrow
-
 
         Column (
             modifier = Modifier
@@ -76,11 +71,9 @@ object ScreenHome : Screen {
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     userScrollEnabled = true
                 ) {
-                    runBlocking  {
-                        viewModel.upcomingEvents.list.forEach { data ->
-                            item {
-                                EventHome(data).Content();
-                            }
+                    viewModel.upcomingEvents.list.forEach { data ->
+                        item {
+                            EventHome(data).Content()
                         }
                     }
                 }

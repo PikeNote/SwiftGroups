@@ -4,13 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import okio.FileSystem
 
 class HomeViewModel : ScreenModel {
 
@@ -22,15 +21,13 @@ class HomeViewModel : ScreenModel {
     var profileData by mutableStateOf(emptyList<ProfileDataItem>())
 
     private fun fetchData() {
-        CoroutineScope (Dispatchers.Default).launch {
-            upcomingEvents = CGAPI.grabMyEvents()
-            if(Home.profileDataItem.isNotEmpty()) {
-                profileData = Home.profileDataItem
-            } else {
-                profileData = CGAPI.grabProfileData()
+        screenModelScope.launch {
+            delay(30)
+            profileData = Home.profileDataItem.ifEmpty {
+                CGAPI.grabProfileData()
             }
+            upcomingEvents = CGAPI.grabMyEvents()
             CGAPI.fetchEventsData()
-            FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "image_cache"
         }
     }
 }
