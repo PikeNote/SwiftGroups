@@ -70,6 +70,7 @@ kotlin {
             implementation(libs.voyager.screenmodel)
             implementation(libs.kotlinx.datetime)
             implementation(libs.qrose)
+            implementation(libs.kachetor)
         }
         appleMain.dependencies {
             implementation(libs.ktor.client.darwin)

@@ -1,7 +1,9 @@
 package org.swg.swiftgroups_app.CGAPI
 
+import com.vipulasri.kachetor.KachetorStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -10,6 +12,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import okio.FileHandle
+import okio.FileSystem
 import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
 import org.swg.swiftgroups_app.CGAPI.EventProcessing.CalendarAPI
 import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
@@ -28,6 +32,9 @@ object CGAPI {
                 isLenient = true
                 ignoreUnknownKeys = true
             })
+        }
+        install(HttpCache) {
+            publicStorage(KachetorStorage(10 * 1024 * 1024))
         }
     }
 
