@@ -1,6 +1,5 @@
 package org.swg.swiftgroups_app.Components.Home.Button
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,17 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.swg.swiftgroups_app.Fonts.AppFont
 
 @Composable
-fun LogoButton (
+fun VerticalLogoButton (
     modifier: Modifier = Modifier,
     logo: ImageVector,
     text: String,
     size: Dp = 12.dp,
-    textStyle: TextStyle = AppFont.InterTypography().subtitle2,
+    textStyle: TextStyle = AppFont.InterTypography.subtitle2,
     onClick: ()-> Unit)
 {
     Column (
@@ -39,6 +39,6 @@ fun LogoButton (
             logo,  text,
             modifier = Modifier
                 .size(size))
-        Text(text, style = textStyle)
+        Text(text, style = textStyle, fontWeight = FontWeight.Bold)
     }
 }

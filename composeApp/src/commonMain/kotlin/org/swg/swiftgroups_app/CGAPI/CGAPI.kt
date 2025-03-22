@@ -73,10 +73,9 @@ object CGAPI {
 
     }
 
-    suspend fun checkLoggedIn() : Boolean {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_auto_login.aspx") {
+    suspend fun checkLoggedIn() : List<ProfileDataItem> {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_profile") {
             // {"logout":true}
-            // {"success": true}
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
@@ -87,9 +86,16 @@ object CGAPI {
         if (response.status.value in 200..299) {
             val loggedIn : String = response.body()
 
-            return loggedIn.contains("success")
+            if(loggedIn.contains("logout")) {
+                return emptyList();
+            }
+
+
+            val profileData : List<ProfileDataItem> = response.body()
+
+            return profileData
         } else {
-            return false
+            return emptyList()
         }
     }
 

@@ -23,6 +23,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
@@ -31,13 +34,19 @@ import compose.icons.fontawesomeicons.solid.LocationArrow
 import compose.icons.fontawesomeicons.solid.PencilAlt
 import compose.icons.fontawesomeicons.solid.Qrcode
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEventData
-import org.swg.swiftgroups_app.Components.Home.Button.LogoButton
+import org.swg.swiftgroups_app.Components.Home.Button.VerticalLogoButton
 import org.swg.swiftgroups_app.Fonts.AppFont
+import org.swg.swiftgroups_app.Screens.Event.SingleEventScreen
 
 class EventHome (private val eventDat : UpcomingEventData) {
 
+
+
+
     @Composable
     fun Content() {
+
+        val navigator = LocalNavigator.currentOrThrow
 
         Row(
             modifier = Modifier
@@ -78,8 +87,8 @@ class EventHome (private val eventDat : UpcomingEventData) {
                             .fillMaxWidth()
                             .padding(horizontal = 7.dp, vertical = 3.dp)
                     ) {
-                        Text(eventDat.event_date, fontWeight = FontWeight.Bold, style = AppFont.InterTypography().h4)
-                        Text("${eventDat.event_start_time} - ${eventDat.event_end_time}", style = AppFont.InterTypography().body2, fontWeight = FontWeight.Bold )
+                        Text(eventDat.event_date, fontWeight = FontWeight.Bold)
+                        Text("${eventDat.event_start_time} - ${eventDat.event_end_time}", style = AppFont.InterTypography.body2, fontWeight = FontWeight.Bold )
                         Row (
                             modifier = Modifier
                                 .padding(vertical = 2.dp)
@@ -95,7 +104,7 @@ class EventHome (private val eventDat : UpcomingEventData) {
                                     .size(10.dp)
 
                             )
-                            Text(eventDat.location, color = Color.Blue, style = AppFont.InterTypography().subtitle1)
+                            Text(eventDat.location, color = Color.Blue, style = AppFont.InterTypography.subtitle1)
                         }
                     }
                 }
@@ -108,15 +117,15 @@ class EventHome (private val eventDat : UpcomingEventData) {
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
-                LogoButton(modifier =
+                VerticalLogoButton(modifier =
                     Modifier.weight(1f),
                     logo = FontAwesomeIcons.Solid.Info,
                     text = "Info",
                     onClick = {
-
+                        navigator.push(SingleEventScreen(eventDat.event_id))
                     }
                 )
-                LogoButton(modifier =
+                VerticalLogoButton(modifier =
                     Modifier.weight(1f),
                     logo = FontAwesomeIcons.Solid.PencilAlt,
                     text = "Edit",
@@ -125,7 +134,7 @@ class EventHome (private val eventDat : UpcomingEventData) {
                     }
                 )
 
-                LogoButton(modifier =
+                VerticalLogoButton(modifier =
                     Modifier.weight(1f),
                     logo = FontAwesomeIcons.Solid.Qrcode,
                     text = "QR Code",

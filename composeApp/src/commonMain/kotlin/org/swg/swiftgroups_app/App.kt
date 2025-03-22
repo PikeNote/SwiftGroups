@@ -12,6 +12,8 @@ import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import okio.FileSystem
+import org.swg.swiftgroups_app.Fonts.AppFont
+import org.swg.swiftgroups_app.Screens.Event.SingleEventScreen
 import org.swg.swiftgroups_app.Screens.Login
 
 @Composable
@@ -34,7 +36,13 @@ fun App() {
             }
             .build()
     }
-    MaterialTheme() {
+
+    val typography = AppFont.InterTypography
+
+    MaterialTheme(
+        typography = typography,
+        colors = AppTheme.theme
+    ) {
         Navigator(Login)
     }
 

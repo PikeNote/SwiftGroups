@@ -22,6 +22,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.multiplatform.webview.cookie.Cookie
 import org.swg.swiftgroups_app.AppTheme
+import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.Fonts.AppFont.InterFontFamily
 import org.swg.swiftgroups_app.Fonts.AppFont.InterTypography
 import org.swg.swiftgroups_app.Tabs.TabEvents
@@ -33,6 +34,7 @@ import org.swg.swiftgroups_app.getScreenResult
 
 object Home : Screen {
 
+    var profileDataItem : List<ProfileDataItem> = emptyList()
     private var cookies : List<Cookie>? = null
 
     @Composable
@@ -42,7 +44,7 @@ object Home : Screen {
         cookies = getScreenResult("cookies")
 
 
-        MaterialTheme(colors = AppTheme.theme, typography = InterTypography()) {
+        MaterialTheme() {
 
             TabNavigator(TabHome) {
 
@@ -80,7 +82,7 @@ object Home : Screen {
                 }
             },
             label = {
-                Text(tab.options.title, fontFamily  = InterFontFamily(), fontWeight = FontWeight.Bold)
+                Text(tab.options.title, fontFamily  = InterFontFamily, fontWeight = FontWeight.Bold)
             },
             selectedContentColor = Color(0xFF0279fd),
             unselectedContentColor = Color(0xFF929292)

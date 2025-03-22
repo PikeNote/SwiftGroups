@@ -2,6 +2,7 @@ package org.swg.swiftgroups_app
 
 import androidx.compose.material.Colors
 import androidx.compose.ui.graphics.Color
+import org.swg.swiftgroups_app.Fonts.AppFont
 
 object AppTheme {
     val theme = Colors(
@@ -24,4 +25,20 @@ object AppTheme {
         0f to Color(0xFF446BA0),
         0.71f to Color(0xFF71AEFF)
     )
+
+    val eventPageImage = arrayOf(
+        0f  to Color(0xFFd3d3da),
+        0.2f to Color(0xFFb1b5d7),
+        0.8f to Color(0xFF3d5483),
+        1f to Color(0xFF003B7F)
+    )
+
+
+    val shadowBrush = listOf(
+        Color.Black.copy(alpha = 0.25f),  // Darker shadow at the base
+        Color.Black.copy(alpha = 0.15f),  // Soft transition
+        Color.Black.copy(alpha = 0.05f),  // Light fading effect
+        Color.Transparent                 // Full fade-out
+    )
+
 }

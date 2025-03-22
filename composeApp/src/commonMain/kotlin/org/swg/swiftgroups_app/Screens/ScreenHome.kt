@@ -28,7 +28,6 @@ import kotlinx.coroutines.runBlocking
 import org.swg.swiftgroups_app.Components.Home.EventHome
 import org.swg.swiftgroups_app.Components.Home.ProfileBar
 import org.swg.swiftgroups_app.Fonts.AppFont
-import androidx.compose.runtime.remember
 import androidx.compose.ui.text.font.FontWeight
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -49,7 +48,7 @@ object ScreenHome : Screen {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("SwiftGroups", style=AppFont.InterTypography().h2, fontWeight = FontWeight.Black)
+            Text("SwiftGroups", style=AppFont.InterTypography.h2, fontWeight = FontWeight.Black)
 
             Spacer(Modifier.height(10.dp))
 
@@ -64,7 +63,7 @@ object ScreenHome : Screen {
                     .offset(x = (10).dp),
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text("My Events", style= AppFont.InterTypography().h3)
+                Text("My Events", style= AppFont.InterTypography.h3)
                 Spacer(modifier = Modifier.height(10.dp))
                 LazyRow(
                     Modifier
@@ -95,7 +94,7 @@ object ScreenHome : Screen {
                     .offset(x = (10).dp),
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text("Events Hosted by My Groups", style= AppFont.InterTypography().h3)
+                Text("Events Hosted by My Groups", style= AppFont.InterTypography.h3)
                 Spacer(modifier = Modifier.height(10.dp))
                 LazyRow(
                     Modifier

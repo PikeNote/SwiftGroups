@@ -69,6 +69,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.voyager.screenmodel)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.qrose)
         }
         appleMain.dependencies {
             implementation(libs.ktor.client.darwin)

@@ -1,14 +1,12 @@
 package org.swg.swiftgroups_app.Components.Home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,7 +27,7 @@ import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.User
 import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
-import org.swg.swiftgroups_app.Components.Home.Button.LogoButton
+import org.swg.swiftgroups_app.Components.Home.Button.VerticalLogoButton
 import org.swg.swiftgroups_app.Fonts.AppFont
 
 class ProfileBar ( private val profileData : ProfileDataItem ) {
@@ -64,13 +61,13 @@ class ProfileBar ( private val profileData : ProfileDataItem ) {
 
             Spacer(Modifier.weight(1f))
             Column {
-                Text("Good evening, ", style = AppFont.InterTypography().h3, fontWeight = FontWeight.Medium)
-                Text("${profileData.firstName}!", style = AppFont.InterTypography().h3)
+                Text("Good evening, ", style = AppFont.InterTypography.h3, fontWeight = FontWeight.Medium)
+                Text("${profileData.firstName}!", style = AppFont.InterTypography.h3)
             }
 
-            LogoButton(logo = FontAwesomeIcons.Solid.User, text = "My Profile", onClick = {
+            VerticalLogoButton(logo = FontAwesomeIcons.Solid.User, text = "My Profile", onClick = {
 
-            }, size = 25.dp, textStyle = AppFont.InterTypography().h4, modifier = Modifier.width(110.dp))
+            }, size = 25.dp, textStyle = AppFont.InterTypography.h6, modifier = Modifier.width(110.dp))
         }
     }
 }

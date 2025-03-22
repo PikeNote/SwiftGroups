@@ -20,10 +20,9 @@ class LoginViewModel (navigator : Navigator?) : ScreenModel {
             CGAPI.cookieHeader = secureVault.getString("cg_cookie", null).toString()
             runBlocking {
                 val loggedIn = CGAPI.checkLoggedIn()
-                if(loggedIn) {
-                    if (navigator != null) {
-                        navigator.replace(Home)
-                    }
+                if(loggedIn.isNotEmpty()) {
+                    Home.profileDataItem = loggedIn
+                    navigator?.replace(Home)
                 } else {
                     requireLogin = true
                 }
