@@ -22,9 +22,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import compose.icons.FontAwesomeIcons
@@ -38,19 +38,25 @@ import org.swg.swiftgroups_app.Components.Home.Button.VerticalLogoButton
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Screens.Event.SingleEventScreen
 
-class EventHome (private val eventDat : UpcomingEventData) {
-
-
-
-
+class EventHome(
+    private val eventDat: UpcomingEventData,
+    private val cardWidth: Dp = 270.dp,
+    private val horizontalPadding: Dp = 0.dp
+) {
     @Composable
     fun Content() {
-
         val navigator = LocalNavigator.currentOrThrow
 
         Row(
             modifier = Modifier
-                .width(270.dp)
+                .width(cardWidth)
+                .padding(horizontal = horizontalPadding)
+                .shadow(
+                    elevation = 12.dp,
+                    shape = RoundedCornerShape(15.dp),
+                    spotColor = Color.Black.copy(alpha = 0.35f),
+                    ambientColor = Color.Black.copy(alpha = 0.35f)
+                )
                 .height(174.dp)
                 .clip(shape = RoundedCornerShape(15.dp))
                 .background(Color(0xFFf2f1f1)),
@@ -59,7 +65,7 @@ class EventHome (private val eventDat : UpcomingEventData) {
         ) {
             Column(
                 modifier = Modifier
-                    .width(208.dp)
+                    .weight(1f)
                     .shadow(
                         elevation = 1.dp,
                         shape = RoundedCornerShape(15.dp)
@@ -67,12 +73,12 @@ class EventHome (private val eventDat : UpcomingEventData) {
             ) {
                 Column(
                     modifier = Modifier
-                        .width(205.dp)
+                        .fillMaxWidth()
                         .clip(shape = RoundedCornerShape(15.dp))
                         .background(Color.White)
                         .fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     AsyncImage(
                         model = "https://community.case.edu${eventDat.photo_url}",
@@ -82,29 +88,33 @@ class EventHome (private val eventDat : UpcomingEventData) {
                             .height(120.dp)
                             .fillMaxWidth()
                     )
-                    Column (
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 7.dp, vertical = 3.dp)
                     ) {
                         Text(eventDat.event_date, fontWeight = FontWeight.Bold)
-                        Text("${eventDat.event_start_time} - ${eventDat.event_end_time}", style = AppFont.InterTypography.body2, fontWeight = FontWeight.Bold )
-                        Row (
+                        Text(
+                            "${eventDat.event_start_time} - ${eventDat.event_end_time}",
+                            style = AppFont.InterTypography.body2,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Row(
                             modifier = Modifier
                                 .padding(vertical = 2.dp)
-                                .clickable(onClick = {
-
-                                }),
+                                .clickable(onClick = {}),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
-
                         ) {
-                            Icon(FontAwesomeIcons.Solid.LocationArrow,  "Navigation Arrow",
-                                modifier = Modifier
-                                    .size(10.dp)
-
+                            Icon(
+                                FontAwesomeIcons.Solid.LocationArrow, "Navigation Arrow",
+                                modifier = Modifier.size(10.dp)
                             )
-                            Text(eventDat.location, color = Color.Blue, style = AppFont.InterTypography.subtitle1)
+                            Text(
+                                eventDat.location,
+                                color = Color.Blue,
+                                style = AppFont.InterTypography.subtitle1
+                            )
                         }
                     }
                 }
@@ -112,34 +122,31 @@ class EventHome (private val eventDat : UpcomingEventData) {
 
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.background(Color(0xFFf2f1f1))
+                modifier = Modifier
+                    .background(Color(0xFFf2f1f1))
                     .fillMaxHeight()
-                    .fillMaxWidth(),
+                    .width(60.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                VerticalLogoButton(modifier =
-                    Modifier.weight(1f),
+            ) {
+                VerticalLogoButton(
+                    modifier = Modifier.weight(1f),
                     logo = FontAwesomeIcons.Solid.Info,
                     text = "Info",
                     onClick = {
                         navigator.push(SingleEventScreen(eventDat.event_id))
                     }
                 )
-                VerticalLogoButton(modifier =
-                    Modifier.weight(1f),
+                VerticalLogoButton(
+                    modifier = Modifier.weight(1f),
                     logo = FontAwesomeIcons.Solid.PencilAlt,
                     text = "Edit",
-                    onClick = {
-
-                    }
+                    onClick = {}
                 )
-
-                VerticalLogoButton(modifier =
-                    Modifier.weight(1f),
+                VerticalLogoButton(
+                    modifier = Modifier.weight(1f),
                     logo = FontAwesomeIcons.Solid.Qrcode,
                     text = "QR Code",
-                    onClick = {
-                    }
+                    onClick = {}
                 )
             }
         }

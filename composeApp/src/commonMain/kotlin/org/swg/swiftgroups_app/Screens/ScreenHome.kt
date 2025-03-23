@@ -26,12 +26,10 @@ import org.swg.swiftgroups_app.Components.Home.EventHome
 import org.swg.swiftgroups_app.Components.Home.ProfileBar
 import org.swg.swiftgroups_app.Fonts.AppFont
 import androidx.compose.ui.text.font.FontWeight
-import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.model.rememberScreenModel
 
 object ScreenHome : Screen {
 
-    @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
         val viewModel: HomeViewModel = rememberScreenModel { HomeViewModel() }
@@ -66,9 +64,9 @@ object ScreenHome : Screen {
                         .height(195.dp)
                         .clip(shape = RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp))
                         .background(Color(0xFFd9d9d9)),
-                    contentPadding = PaddingValues(horizontal = 5.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(15.dp),
                     userScrollEnabled = true
                 ) {
                     viewModel.upcomingEvents.list.forEach { data ->
@@ -95,9 +93,9 @@ object ScreenHome : Screen {
                         .height(195.dp)
                         .clip(shape = RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp))
                         .background(Color(0xFFd9d9d9)),
-                    contentPadding = PaddingValues(horizontal = 5.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(15.dp),
                     userScrollEnabled = true
                 ) {
 
