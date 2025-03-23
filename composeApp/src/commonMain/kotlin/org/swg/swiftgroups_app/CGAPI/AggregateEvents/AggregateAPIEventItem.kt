@@ -1,5 +1,8 @@
 package org.swg.swiftgroups_app.CGAPI.AggregateEvents
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class AggregateAPIEventItem(
     val counter: String,
     val fields: String,

@@ -31,6 +31,7 @@ object CGAPI {
                 prettyPrint = true
                 isLenient = true
                 ignoreUnknownKeys = true
+                coerceInputValues = true
             })
         }
         install(HttpCache) {
@@ -106,9 +107,9 @@ object CGAPI {
         }
     }
 
-    suspend fun fetchEventsData() {
+    suspend fun fetchEventsData(fetchAll : Boolean = false) {
         val calendarEvents : HashMap<String,CGEvent> = CalendarAPI.processCalendar();
-        val eventAPIEvents : List<CGEvent> = EventsAPI.grabEvents();
+        val eventAPIEvents : List<CGEvent> = EventsAPI.grabEvents(fetchAll);
 
         eventAPIEvents.forEach {
             if(calendarEvents.containsKey(it.eventID)) {

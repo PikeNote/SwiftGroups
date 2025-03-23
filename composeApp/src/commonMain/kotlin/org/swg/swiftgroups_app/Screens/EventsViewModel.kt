@@ -3,15 +3,45 @@ package org.swg.swiftgroups_app.Screens
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import app.cash.sqldelight.Query
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEventData
+import org.swg.swiftgroups_app.DatabaseDriver.provideDbDriver
+import org.swg.swiftgroups_app.db.Database
+import org.swg.swiftgroupsapp.db.Events
 
 class EventsViewModel : ScreenModel {
     var upcomingEvents by mutableStateOf(UpcomingEvents(0, emptyList(), 0))
+    var events: List<Events> by mutableStateOf(emptyList())
+    lateinit var database: Database;
+    var offset = 0L;
 
     init {
         addTestEvents()
+        runBlocking {
+            database = Database(provideDbDriver(Database.Schema))
+            fetchData()
+        }
+    }
+
+    private fun fetchData() {
+        screenModelScope.launch {
+            getEvents()
+        }
+    }
+
+    suspend fun getEvents() {
+        screenModelScope.launch {
+            val eventsData = database.swiftdataQueries.fetchEvent(offset).executeAsList()
+            offset += eventsData.size
+            events += eventsData
+        }
     }
 
     private fun addTestEvents() {

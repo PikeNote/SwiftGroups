@@ -32,4 +32,4 @@ INSERT OR IGNORE INTO clubs (clubName, clubUrl)
 VALUES (?, ?);
 
 fetchEvent:
-SELECT * FROM events LIMIT 10;
+SELECT * FROM events ORDER BY start_time LIMIT ?, 50;

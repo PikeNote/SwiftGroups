@@ -1,8 +1,11 @@
 package org.swg.swiftgroups_app.CGAPI.EventProcessing
 
 import io.ktor.client.request.get
+import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -15,6 +18,7 @@ import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.CGAPI.CGAPI.cookieHeader
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
 import org.swg.swiftgroups_app.CGAPI.Events.Club
 
@@ -35,7 +39,13 @@ object CalendarAPI {
 
     private suspend fun downloadCalendar(url: String) : String? = withContext(Dispatchers.IO) {
         try {
-            val response: HttpResponse =  CGAPI.client.get(url)
+            val response: HttpResponse =  CGAPI.client.get(url)  {
+                method = HttpMethod.Get
+                headers {
+                    append(HttpHeaders.Host, "community.case.edu")
+                    append(HttpHeaders.Cookie, cookieHeader)
+                }
+            }
 
             if (response.status.value in 200..299) {
                 println("Calendar Fetched!")

@@ -2,7 +2,10 @@ package org.swg.swiftgroups_app.CGAPI.EventProcessing
 
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -16,6 +19,7 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.AggregateEvents.AggregateAPIEventItem
+import org.swg.swiftgroups_app.CGAPI.CGAPI.cookieHeader
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
 import org.swg.swiftgroups_app.CGAPI.Events.Club
 import org.swg.swiftgroups_app.db.Database
@@ -58,7 +62,13 @@ object EventsAPI {
             url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
         }
         try {
-            val response: HttpResponse =  CGAPI.client.get(url)
+            val response: HttpResponse =  CGAPI.client.get(url) {
+                method = HttpMethod.Get
+                headers {
+                    append(HttpHeaders.Host, "community.case.edu")
+                    append(HttpHeaders.Cookie, cookieHeader)
+                }
+            }
 
             if (response.status.value in 200..299) {
                 println("Events API Fetched!")
@@ -66,7 +76,6 @@ object EventsAPI {
                 val cgAPIItems : List<AggregateAPIEventItem> = response.body()
                 val eventItems : MutableList<CGEvent> = mutableListOf()
 
-                Database
                 cgAPIItems.forEach {
                     val convertedTime : List<String> = timeConverter(it.p4);
                     eventItems.add(CGEvent(
@@ -91,6 +100,7 @@ object EventsAPI {
                 return emptyList()
             }
         } catch (e: Exception) {
+            println("Error fetching events: ${e.message}")
             return emptyList()
         }
     }

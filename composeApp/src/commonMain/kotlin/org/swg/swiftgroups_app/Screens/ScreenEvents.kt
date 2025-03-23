@@ -40,6 +40,7 @@ import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Search
 import compose.icons.fontawesomeicons.solid.Microphone
 import org.swg.swiftgroups_app.Components.Home.EventHome
+import org.swg.swiftgroups_app.Components.Home.EventsCard
 import org.swg.swiftgroups_app.Fonts.AppFont
 
 object ScreenEvents : Screen {
@@ -136,8 +137,8 @@ object ScreenEvents : Screen {
                 ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(viewModel.upcomingEvents.list) { eventData ->
-                    EventHome(
+                items(viewModel.events) { eventData ->
+                    EventsCard(
                         eventData,
                         cardWidth = 500.dp,
                         horizontalPadding = 16.dp

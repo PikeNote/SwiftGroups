@@ -27,7 +27,7 @@ class HomeViewModel : ScreenModel {
                 CGAPI.grabProfileData()
             }
             upcomingEvents = CGAPI.grabMyEvents()
-            CGAPI.fetchEventsData()
+            CGAPI.fetchEventsData(true)
         }
     }
 }
