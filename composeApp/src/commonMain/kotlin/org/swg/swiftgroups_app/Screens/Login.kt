@@ -18,6 +18,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.multiplatform.webview.cookie.Cookie
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebViewState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 
@@ -47,7 +48,9 @@ object Login : Screen {
         LaunchedEffect(state) {
             snapshotFlow { state.loadingState }
                 .filter { it is LoadingState.Finished && state.lastLoadedUrl?.contains("https://community.case.edu/web_app") == true }
+
                 .collect {
+                    delay(300)
                     storeCookies(state, navigator)
                     navigator.replace(Home)
                 }
@@ -57,9 +60,10 @@ object Login : Screen {
 
     private suspend fun storeCookies(state : WebViewState, navigator : Navigator) {
 
-        var cookies = state.cookieManager.getCookies("https://community.case.edu")
+        val cookies = state.cookieManager.getCookies("https://community.case.edu").toMutableList()
         cookies += state.cookieManager.getCookies("https://case.edu")
-        //setScreenResult("cookies", test_cookies)
+        cookies += state.cookieManager.getCookies("https://campusgroups.com")
+
         CGAPI.cookieHeader = generateCookieString(cookies)
         screenModel?.secureVault?.set("cg_cookie",CGAPI.cookieHeader)
         navigator.replace(Home)

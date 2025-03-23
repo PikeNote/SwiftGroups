@@ -42,7 +42,7 @@ object CalendarAPI {
             val response: HttpResponse =  CGAPI.client.get(url)  {
                 method = HttpMethod.Get
                 headers {
-                    append(HttpHeaders.Host, "community.case.edu")
+                    //append(HttpHeaders.Host, "community.case.edu")
                     append(HttpHeaders.Cookie, cookieHeader)
                 }
             }

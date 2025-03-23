@@ -8,7 +8,6 @@ data class Attendee (
     val mutual_friends: Int,
     val connectionStatus : Int,
     val invited : Int,
-    val name : String,
     val photo_url : String,
     val subtitle : String?,
     val cover_url : String?,

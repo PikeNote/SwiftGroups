@@ -14,6 +14,7 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
@@ -27,16 +28,21 @@ import org.swg.swiftgroups_app.db.Database
 object EventsAPI {
 
     // Crazy? I was crazy once. They locked me in a rubber room, a rubber room full of rats, and the rats made me go crazy :D
-    val regexMultiDate = Regex("/[A-Za-z]+, ([A-Za-z]+) ([0-9]+), ([0-9]{4}) ([0-9]+):?([0-9]+)? ([A-Za-z]+)/gm");
-    private val regexOneDate = Regex("/[A-Za-z]+, ([A-Za-z]+) ([0-9]+), ([0-9]{4}) ([0-9]+):?([0-9]+)? ([A-Za-z]+) – ([0-9]+):?([0-9]+)? ([A-Za-z]+)/gm")
-    private val categoryRegex = Regex("/(<([^>]+)>)/ig");
+    val regexMultiDate = Regex("[A-Za-z]+, ([A-Za-z]+) ([0-9]+), ([0-9]{4}) ([0-9]+):?([0-9]+)? ([A-Za-z]+)", RegexOption.MULTILINE);
+    private val regexOneDate = Regex("[A-Za-z]+, ([A-Za-z]+) ([0-9]+), ([0-9]{4}) ([0-9]+):?([0-9]+)? ([A-Za-z]+) - ([0-9]+):?([0-9]+)? ([A-Za-z]+)", RegexOption.MULTILINE)
+    private val htmlRegex = Regex("(<([^>]+)>)", RegexOption.IGNORE_CASE );
 
     val dateTimeFormat = LocalDateTime.Format {
         monthName(MonthNames.ENGLISH_ABBREVIATED)
-        dayOfMonth()
+        chars(" ")
+        dayOfMonth(padding = Padding.NONE)
+        chars(" ")
         year()
-        hour()
-        minute()
+        chars(" ")
+        amPmHour(padding = Padding.NONE)
+        chars(" ")
+        minute(padding = Padding.NONE)
+        chars(" ")
         amPmMarker("AM", "PM")
     }
 
@@ -77,20 +83,24 @@ object EventsAPI {
                 val eventItems : MutableList<CGEvent> = mutableListOf()
 
                 cgAPIItems.forEach {
-                    val convertedTime : List<String> = timeConverter(it.p4);
-                    eventItems.add(CGEvent(
-                        eventName = it.p3,
-                        eventDesc = "",
-                        eventUrl = it.p18,
-                        eventPicture = it.p11.replace("r2_image_upload", "r3_image_upload"),
-                        eventID = it.p1,
-                        eventLocation = it.p6,
-                        eventCategory = it.p5.replace(categoryRegex, "\n").split('\n').filterNotNull(),
-                        club = Club(clubName = it.p9, clubUrl = ""),
-                        attendeeCount = it.p10,
-                        startTime = convertedTime[0],
-                        endTime = convertedTime[1]
-                    ))
+                    if(it.p2 != "separator" && it.p4 != "") {
+                        val fixedTime = htmlRegex.replace(it.p4, " ").replace("&ndash;", "-").replace("  ", " ")
+                        val convertedTime : List<String> = timeConverter(fixedTime);
+
+                        eventItems.add(CGEvent(
+                            eventName = it.p3,
+                            eventDesc = "",
+                            eventUrl = it.p18,
+                            eventPicture = it.p11.replace("r2_image_upload", "r3_image_upload"),
+                            eventID = it.p1,
+                            eventLocation = it.p6,
+                            eventCategory = it.p5.replace(htmlRegex, "\n").split('\n').filterNotNull(),
+                            club = Club(clubName = it.p9, clubUrl = ""),
+                            attendeeCount = it.p10,
+                            startTime = convertedTime[0],
+                            endTime = convertedTime[1]
+                        ))
+                    }
                 }
 
 
@@ -101,8 +111,8 @@ object EventsAPI {
             }
         } catch (e: Exception) {
             println("Error fetching events: ${e.message}")
-            return emptyList()
-        }
+             return emptyList()
+         }
     }
 
     suspend fun timeConverter(time : String) : List<String> {
@@ -111,8 +121,8 @@ object EventsAPI {
         if(matches.any()) {
             val singleMatch = matches.first().groupValues
             return listOf(
-                dateTimeFormat.parse("${singleMatch[1]}${singleMatch[2]}${singleMatch[3]}${singleMatch[4]}${singleMatch[5].ifEmpty{"00"}}${singleMatch[6]}").toInstant(TimeZone.UTC).toString(),
-                dateTimeFormat.parse("${singleMatch[1]}${singleMatch[2]}${singleMatch[3]}${singleMatch[7]}${singleMatch[8].ifEmpty{"00"}}${singleMatch[9]}").toInstant(TimeZone.UTC).toString()
+                dateTimeFormat.parse("${singleMatch[1]} ${singleMatch[2]} ${singleMatch[3]} ${singleMatch[4]} ${singleMatch[5].ifEmpty{"00"}} ${singleMatch[6]}").toInstant(TimeZone.UTC).toString(),
+                dateTimeFormat.parse("${singleMatch[1]} ${singleMatch[2]} ${singleMatch[3]} ${singleMatch[7]} ${singleMatch[8].ifEmpty{"00"}} ${singleMatch[9]}").toInstant(TimeZone.UTC).toString()
             )
         } else {
             val multiMatch = regexMultiDate.findAll(time)
