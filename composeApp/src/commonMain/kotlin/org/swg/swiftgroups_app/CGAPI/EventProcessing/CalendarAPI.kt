@@ -100,12 +100,13 @@ object CalendarAPI {
                     }
 
                     lineString.startsWith("DESCRIPTION:") -> event.eventDesc = lineString.substringAfter(":")
-                    lineString.startsWith("LOCATION:") -> event.eventLocation = lineString.substringAfter(":")
+                    lineString.startsWith("LOCATION:") -> event.eventLocation = ""
                     lineString.startsWith("SUMMARY;") -> event.eventName = lineString.substringAfter(":")
                     lineString.startsWith("CATEGORIES;X-CG-CATEGORY=event_tags") -> event.eventCategory =
                         lineString.substringAfter(":").split(",")
 
                     lineString.startsWith("END:VEVENT") -> {
+                        event.eventPicture = "/images/listing-default.png"
                         if (event.selfValidate()) {
                             eventList[event.eventID] = event
                         }

@@ -108,40 +108,43 @@ object CGAPI {
     }
 
     suspend fun fetchEventsData(fetchAll : Boolean = false) {
-        val calendarEvents : HashMap<String,CGEvent> = CalendarAPI.processCalendar();
+        //val calendarEvents : HashMap<String,CGEvent> = CalendarAPI.processCalendar();
         val eventAPIEvents : List<CGEvent> = EventsAPI.grabEvents(fetchAll);
 
+        /*
         eventAPIEvents.forEach {
             if(calendarEvents.containsKey(it.eventID)) {
                 val event = calendarEvents[it.eventID]
                 if (event != null) {
-                    event.eventPicture = "https://community.case.edu${it.eventPicture}"
+                    event.eventPicture = it.eventPicture
                     event.eventName = it.eventName
                     event.attendeeCount = it.attendeeCount
                     event.eventLocation = it.eventLocation
                 }
+            } else {
+                calendarEvents[it.eventID] = it
             }
-        }
+        }*/
 
         val swiftdataQueries = Database(provideDbDriver(Database.Schema)).swiftdataQueries
 
 
         swiftdataQueries.transaction {
 
-            calendarEvents.forEach {
+            eventAPIEvents.forEach {
                 swiftdataQueries.insertEvent(
-                    eventId = it.value.eventID.toLong(),
-                    eventName = it.value.eventName,
-                    eventDesc = it.value.eventDesc,
-                    eventUrl = it.value.eventUrl,
-                    eventLocation = it.value.eventLocation,
-                    eventPicture = it.value.eventPicture,
-                    eventCategory = it.value.eventCategory.joinToString(),
-                    start_time = it.value.startTime,
-                    end_time = it.value.endTime,
-                    eventAttendees = it.value.attendeeCount.toLong(),
-                    clubName = it.value.club?.clubName ?: "",
-                    clubURL = it.value.club?.clubUrl ?: ""
+                    eventId = it.eventID.toLong(),
+                    eventName = it.eventName,
+                    eventDesc = it.eventDesc,
+                    eventUrl = it.eventUrl,
+                    eventLocation = it.eventLocation,
+                    eventPicture = "https://community.case.edu${it.eventPicture}",
+                    eventCategory = it.eventCategory.joinToString(),
+                    start_time = it.startTime,
+                    end_time = it.endTime,
+                    eventAttendees = it.attendeeCount.toLong(),
+                    clubName = it.club?.clubName ?: "",
+                    clubURL = it.club?.clubUrl ?: ""
                 )
             }
             afterCommit {
