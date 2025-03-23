@@ -39,7 +39,7 @@ class EventsViewModel : ScreenModel {
                 event_type = "Social",
                 friends_more_going = 0,
                 interested = 5,
-                isLive = 0,
+                isLive = if (index == 0) 1 else 0, // First test event is live
                 isOnGoing = 0,
                 location = "Test Location $index",
                 manage = 0,
@@ -50,7 +50,7 @@ class EventsViewModel : ScreenModel {
                 register_url = null,
                 registered = null,
                 share_url = null,
-                showRegisterButton = null
+                showRegisterButton = 1
             )
         }
 

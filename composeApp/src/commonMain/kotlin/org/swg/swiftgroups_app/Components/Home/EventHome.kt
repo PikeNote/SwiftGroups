@@ -1,6 +1,7 @@
 package org.swg.swiftgroups_app.Components.Home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -59,7 +60,18 @@ class EventHome(
                 )
                 .height(174.dp)
                 .clip(shape = RoundedCornerShape(15.dp))
-                .background(Color(0xFFf2f1f1)),
+                .background(Color(0xFFf2f1f1))
+                .then(
+                    if (eventDat.isLive == 1) {
+                        Modifier.border(
+                            width = 2.dp,
+                            color = Color.Red,
+                            shape = RoundedCornerShape(15.dp)
+                        )
+                    } else {
+                        Modifier
+                    }
+                ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -93,7 +105,21 @@ class EventHome(
                             .fillMaxWidth()
                             .padding(horizontal = 7.dp, vertical = 3.dp)
                     ) {
-                        Text(eventDat.event_date, fontWeight = FontWeight.Bold)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(eventDat.event_date, fontWeight = FontWeight.Bold)
+                            if (eventDat.isLive == 1) {
+                                Text(
+                                    "LIVE",
+                                    color = Color.Red,
+                                    fontWeight = FontWeight.Bold,
+                                    style = AppFont.InterTypography.body2
+                                )
+                            }
+                        }
                         Text(
                             "${eventDat.event_start_time} - ${eventDat.event_end_time}",
                             style = AppFont.InterTypography.body2,
