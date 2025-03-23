@@ -81,6 +81,8 @@ class SingleEventScreen(eventID : Int) : Screen {
 
         val navigator = LocalNavigator.currentOrThrow
 
+        val eventAPI = singleEventViewModel.eventSpecificAPI.value
+
         val maxImageHeight = 210.dp
         val currentImgSize : MutableState<Dp> = remember { mutableStateOf(maxImageHeight) }
         val maxImageSizePx = with(LocalDensity.current) { 100.dp.toPx() }
@@ -149,7 +151,7 @@ class SingleEventScreen(eventID : Int) : Screen {
 
                 Box (modifier = Modifier.padding(horizontal = 10.dp)) {
                     Spacer(modifier = Modifier.height(currentImgSize.value + 20.dp))
-                    if(singleEventViewModel.eventSpecificAPI == null) {
+                    if(eventAPI == null) {
                         Column (modifier = Modifier.height(currentImgSize.value)
                             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center){
@@ -162,7 +164,7 @@ class SingleEventScreen(eventID : Int) : Screen {
 
                     } else {
                         AsyncImage(
-                            model = "https://community.case.edu${singleEventViewModel.eventSpecificAPI?.photo_url ?: ""}",
+                            model = "https://community.case.edu${eventAPI.photo_url}",
                             contentDescription = null,
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
@@ -183,7 +185,7 @@ class SingleEventScreen(eventID : Int) : Screen {
                     }
 
                     Text(
-                        text = singleEventViewModel.eventSpecificAPI?.event_name ?: "---",
+                        text = eventAPI?.event_name ?: "---",
                         style = AppFont.InterTypography.h3,
                         color = Color.White,
                         textAlign = TextAlign.Center,
@@ -213,16 +215,16 @@ class SingleEventScreen(eventID : Int) : Screen {
                    modifier = Modifier.fillMaxWidth()
                ) {
                    Text(
-                       singleEventViewModel.eventSpecificAPI?.event_type ?: "...",
+                       eventAPI?.event_type ?: "...",
                        style = AppFont.InterTypography.h6,
                        color = Color(0xFF2C58A9)
                    )
                    Text(
-                       singleEventViewModel.eventSpecificAPI?.event_name ?: "Loading...",
+                       eventAPI?.event_name ?: "Loading...",
                        style = AppFont.InterTypography.h3,
                    )
                    Text(
-                       singleEventViewModel.eventSpecificAPI?.event_group ?: "...",
+                       eventAPI?.event_group ?: "...",
                        style = AppFont.InterTypography.h6,
                        color = Color.Gray
                    )
@@ -230,8 +232,8 @@ class SingleEventScreen(eventID : Int) : Screen {
 
                 Spacer(modifier = Modifier.height(3.dp))
 
-                if(singleEventViewModel.eventSpecificAPI?.tickets != null) {
-                    singleEventViewModel.eventSpecificAPI!!.tickets!!.forEach {
+                if(eventAPI?.tickets != null) {
+                    eventAPI.tickets.forEach {
                         QRCode(
                             name = it.name,
                             ticketName = "${it.ticketName} - ${it.amount}",
@@ -279,25 +281,25 @@ class SingleEventScreen(eventID : Int) : Screen {
                     logoText(
                         logo = FontAwesomeIcons.Regular.Calendar,
                         contentDesc = "Calendar Icon",
-                        text = "${singleEventViewModel.eventSpecificAPI?.event_date ?: "---"} : ${singleEventViewModel.eventSpecificAPI?.event_start_time  ?: "---"}"
+                        text = "${eventAPI?.event_date ?: "---"} : ${eventAPI?.event_start_time  ?: "---"}"
                     )
 
                     logoText(
                         logo = FontAwesomeIcons.Regular.Clock,
                         contentDesc = "Clock  Icon",
-                        text = "${singleEventViewModel.eventSpecificAPI?.event_start_time ?: "---"} - ${singleEventViewModel.eventSpecificAPI?.event_end_time  ?: "---"} ${singleEventViewModel.eventSpecificAPI?.event_timezone ?: "---" }"
+                        text = "${eventAPI?.event_start_time ?: "---"} - ${eventAPI?.event_end_time  ?: "---"} ${eventAPI?.event_timezone ?: "---" }"
                     )
 
                     logoText(
                         logo = MapPin,
                         contentDesc = "Map Pin Icon",
-                        text = singleEventViewModel.eventSpecificAPI?.location ?: "---"
+                        text = eventAPI?.location ?: "---"
                     )
                 }
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        "Attendees (${singleEventViewModel.eventSpecificAPI?.attendees_count ?: "N/A"})",
+                        "Attendees (${eventAPI?.attendees_count ?: "N/A"})",
                         style = AppFont.InterTypography.h3,
                         fontWeight = FontWeight.Bold
                     )
@@ -306,7 +308,7 @@ class SingleEventScreen(eventID : Int) : Screen {
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         runBlocking {
-                            singleEventViewModel.eventSpecificAPI?.attendees?.forEach {
+                            eventAPI?.attendees?.forEach {
                                 item {
                                     AsyncImage(
                                         model = "https://community.case.edu${it.photo_url}",
@@ -337,7 +339,7 @@ class SingleEventScreen(eventID : Int) : Screen {
                         fontWeight = FontWeight.Bold
                     )
 
-                    Text(singleEventViewModel.eventSpecificAPI?.event_description ?:"")
+                    Text(eventAPI?.event_description ?:"")
 
                     Spacer(modifier = Modifier.height(230.dp))
                 }

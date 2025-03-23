@@ -1,5 +1,6 @@
 package org.swg.swiftgroups_app.CGAPI.EventAPI
 
+import androidx.compose.runtime.MutableState
 import kotlinx.serialization.Serializable
 
 @Serializable
