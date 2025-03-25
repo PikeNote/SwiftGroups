@@ -39,7 +39,7 @@ class HomeViewModel : ScreenModel {
                     start_time = it.event_start_utc,
                     end_time = it.event_end_utc,
                     eventDesc = "",
-                    eventAttendees = it.attending.toLong(),
+                    eventAttendees = it.attendees_count.toLong(),
                     eventUrl = "",
                     clubURL = "",
                     eventLocation = it.location,

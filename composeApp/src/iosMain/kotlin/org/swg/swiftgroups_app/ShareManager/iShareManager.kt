@@ -15,6 +15,7 @@ actual fun shareLink(text: String, subject: String) {
 
     if (viewController != null) {
         activityController.popoverPresentationController?.sourceView = viewController.view
+        viewController.presentViewController(activityController, animated = true, completion = null)
     }
     activityController.setTitle(subject)
 }
