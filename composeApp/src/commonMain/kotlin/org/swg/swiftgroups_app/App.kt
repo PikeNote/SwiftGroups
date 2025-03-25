@@ -40,7 +40,7 @@ fun App() {
     MaterialTheme(
         typography = typography,
         colors = AppTheme.theme
-    ) {Navigator(Login)
+    ) {Navigator(Login, onBackPressed = null)
     }
 
 

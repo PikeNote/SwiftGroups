@@ -69,9 +69,9 @@ object ScreenHome : Screen {
                     horizontalArrangement = Arrangement.spacedBy(15.dp),
                     userScrollEnabled = true
                 ) {
-                    viewModel.upcomingEvents.list.forEach { data ->
+                    viewModel.upcomingEvents.forEach { data ->
                         item {
-                            EventHome(data).Content()
+                            EventHome(data, enableQR = true).Content()
                         }
                     }
                 }
@@ -99,6 +99,11 @@ object ScreenHome : Screen {
                     userScrollEnabled = true
                 ) {
 
+                    viewModel.upcomingGroupEvents.forEach { data ->
+                        item {
+                            EventHome(data).Content()
+                        }
+                    }
 
                 }
             }

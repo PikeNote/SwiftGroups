@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -34,18 +35,32 @@ import compose.icons.fontawesomeicons.solid.Info
 import compose.icons.fontawesomeicons.solid.LocationArrow
 import compose.icons.fontawesomeicons.solid.PencilAlt
 import compose.icons.fontawesomeicons.solid.Qrcode
-import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEventData
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.Components.Home.Button.VerticalLogoButton
+import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat.home_event_date_format
+import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat.home_event_time_format
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Screens.Event.SingleEventScreen
+import org.swg.swiftgroupsapp.db.Events
 
 class EventHome(
-    private val eventDat: UpcomingEventData,
+    private val eventData: Events,
     private val cardWidth: Dp = 270.dp,
-    private val horizontalPadding: Dp = 0.dp
+    private val horizontalPadding: Dp = 0.dp,
+    private val enableQR: Boolean = false
 ) {
+
+    private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    private val eventStartTime = Instant.parse(eventData.start_time).toLocalDateTime(TimeZone.currentSystemDefault())
+    private val eventEndTime = Instant.parse(eventData.end_time).toLocalDateTime(TimeZone.currentSystemDefault())
+
     @Composable
     fun Content() {
+
         val navigator = LocalNavigator.currentOrThrow
 
         Row(
@@ -62,7 +77,7 @@ class EventHome(
                 .clip(shape = RoundedCornerShape(15.dp))
                 .background(Color(0xFFf2f1f1))
                 .then(
-                    if (eventDat.isLive == 1) {
+                    if (currentTime > eventStartTime) {
                         Modifier.border(
                             width = 2.dp,
                             color = Color.Red,
@@ -93,9 +108,9 @@ class EventHome(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     AsyncImage(
-                        model = "https://community.case.edu${eventDat.photo_url}",
+                        model = eventData.eventPicture,
                         contentDescription = null,
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.FillHeight,
                         modifier = Modifier
                             .height(120.dp)
                             .fillMaxWidth()
@@ -110,8 +125,10 @@ class EventHome(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(eventDat.event_date, fontWeight = FontWeight.Bold)
-                            if (eventDat.isLive == 1) {
+                            Text(eventData.eventName , fontWeight = FontWeight.Bold,
+                                overflow= TextOverflow.Ellipsis,
+                                maxLines = 1)
+                            if (currentTime > eventStartTime) {
                                 Text(
                                     "LIVE",
                                     color = Color.Red,
@@ -121,7 +138,8 @@ class EventHome(
                             }
                         }
                         Text(
-                            "${eventDat.event_start_time} - ${eventDat.event_end_time}",
+                            "${eventStartTime.format(home_event_date_format)} | ${eventStartTime.format(home_event_time_format)} - ${eventEndTime.format(
+                                home_event_time_format)}",
                             style = AppFont.InterTypography.body2,
                             fontWeight = FontWeight.Bold
                         )
@@ -137,7 +155,7 @@ class EventHome(
                                 modifier = Modifier.size(10.dp)
                             )
                             Text(
-                                eventDat.location,
+                                eventData.eventLocation,
                                 color = Color.Blue,
                                 style = AppFont.InterTypography.subtitle1
                             )
@@ -159,7 +177,7 @@ class EventHome(
                     logo = FontAwesomeIcons.Solid.Info,
                     text = "Info",
                     onClick = {
-                        navigator.push(SingleEventScreen(eventDat.event_id))
+                        navigator.push(SingleEventScreen(eventData.eventId.toInt()))
                     }
                 )
                 VerticalLogoButton(
@@ -168,12 +186,14 @@ class EventHome(
                     text = "Edit",
                     onClick = {}
                 )
-                VerticalLogoButton(
-                    modifier = Modifier.weight(1f),
-                    logo = FontAwesomeIcons.Solid.Qrcode,
-                    text = "QR Code",
-                    onClick = {}
-                )
+                if(enableQR){
+                    VerticalLogoButton(
+                        modifier = Modifier.weight(1f),
+                        logo = FontAwesomeIcons.Solid.Qrcode,
+                        text = "QR Code",
+                        onClick = {}
+                    )
+                }
             }
         }
     }

@@ -12,12 +12,10 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import okio.FileHandle
-import okio.FileSystem
 import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
-import org.swg.swiftgroups_app.CGAPI.EventProcessing.CalendarAPI
 import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
+import org.swg.swiftgroups_app.CGAPI.Groups.GroupItem
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 import org.swg.swiftgroups_app.DatabaseDriver.provideDbDriver
@@ -169,6 +167,24 @@ object CGAPI {
             return eventData
         } else {
             return null
+        }
+    }
+
+    suspend fun fetchGroups() : List<GroupItem> {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v17/mobile_header_groups?search=&all=false") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, cookieHeader)
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            println("Group fetched successfully!")
+            val groupHome : List<GroupItem> = response.body()
+            return groupHome
+        } else {
+            return emptyList()
         }
     }
 }

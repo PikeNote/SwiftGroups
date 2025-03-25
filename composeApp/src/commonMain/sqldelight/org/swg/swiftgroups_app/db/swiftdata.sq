@@ -33,3 +33,6 @@ VALUES (?, ?);
 
 fetchEvent:
 SELECT * FROM events ORDER BY start_time LIMIT ?, 50;
+
+fetchEventClub:
+SELECT * FROM events WHERE clubName = ? AND end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') ORDER BY start_time LIMIT 5;
