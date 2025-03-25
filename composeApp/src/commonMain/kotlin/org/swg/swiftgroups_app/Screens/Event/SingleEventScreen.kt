@@ -70,6 +70,8 @@ import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.MapPin
 import org.swg.swiftgroups_app.Icons.PencilSquare
+import org.swg.swiftgroups_app.Screens.Webview.WebviewScreen
+import org.swg.swiftgroups_app.ShareManager.shareLink
 
 class SingleEventScreen(eventID : Int) : Screen {
 
@@ -254,25 +256,44 @@ class SingleEventScreen(eventID : Int) : Screen {
                     horizontalArrangement = Arrangement.Center
                 ) {
 
-                    HorizontalLogoButton(
-                        text = "Share",
-                        onClick = {},
-                        size = 20.dp,
-                        logo = FontAwesomeIcons.Regular.ShareSquare,
-                        textStyle = AppFont.InterTypography.h5,
-                        backgroundColor = Color(0xFFD9D9D9),
-                        textColor = Color.Black
-                    )
+                    if (eventAPI != null) {
+                        HorizontalLogoButton(
+                            text = "Share",
+                            onClick = {
+                                shareLink(eventAPI.share_url, eventAPI.event_name)
+                            },
+                            size = 20.dp,
+                            logo = FontAwesomeIcons.Regular.ShareSquare,
+                            textStyle = AppFont.InterTypography.h5,
+                            backgroundColor = Color(0xFFD9D9D9),
+                            textColor = Color.Black
+                        )
 
-                    Spacer(modifier = Modifier.width(20.dp))
+                        Spacer(modifier = Modifier.width(20.dp))
 
-                    HorizontalLogoButton(
-                        text = "Registration",
-                        onClick = {},
-                        size = 20.dp,
-                        logo = PencilSquare,
-                        textStyle = AppFont.InterTypography.h5
-                    )
+                        if(eventAPI.registered  == 0) {
+                            HorizontalLogoButton(
+                                text = "Registration",
+                                onClick = {
+                                    navigator.push(WebviewScreen(eventAPI.register_url, "Registration"))
+                                },
+                                size = 20.dp,
+                                logo = PencilSquare,
+                                textStyle = AppFont.InterTypography.h5
+                            )
+                        } else {
+                            HorizontalLogoButton(
+                                text = "Edit",
+                                onClick = {
+                                    navigator.push(WebviewScreen(eventAPI.register_url, "Edit Registration"))
+                                },
+                                size = 20.dp,
+                                logo = PencilSquare,
+                                textStyle = AppFont.InterTypography.h5
+                            )
+                        }
+                    }
+
                 }
 
                 Column(modifier = Modifier.padding(10.dp).fillMaxWidth()) {

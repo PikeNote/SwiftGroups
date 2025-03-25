@@ -16,7 +16,7 @@ class SingleEventViewModel ( val eventID : Int) : ScreenModel {
 
     init {
         screenModelScope.launch {
-            eventSpecificAPI.value = CGAPI.fetchEvent(eventID.toString())!!
+            eventSpecificAPI.value = CGAPI.fetchEvent(eventID.toString())
         }
     }
 }
