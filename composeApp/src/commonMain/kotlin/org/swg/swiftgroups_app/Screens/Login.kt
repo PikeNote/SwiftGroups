@@ -15,12 +15,15 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.multiplatform.webview.cookie.Cookie
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebViewState
+import io.ktor.util.date.GMTDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.CGAPI.CGAPI.convertCookie
 
 object Login : Screen {
 
@@ -34,6 +37,14 @@ object Login : Screen {
         screenModel = rememberScreenModel { LoginViewModel(navigator) }
 
         val state = rememberWebViewState("https://www.campusgroups.com/shibboleth/login?idp=cwru")
+
+
+        runBlocking {
+            CGAPI.cookieHeader.forEach {
+                state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
+            }
+
+        }
 
         Column(
             Modifier.fillMaxSize(),
@@ -64,19 +75,24 @@ object Login : Screen {
         cookies += state.cookieManager.getCookies("https://case.edu")
         cookies += state.cookieManager.getCookies("https://campusgroups.com")
 
-        CGAPI.cookieHeader = generateCookieString(cookies)
-        screenModel?.secureVault?.set("cg_cookie",CGAPI.cookieHeader)
-        navigator.replace(Home)
-    }
+        val ktorCookies : MutableList<io.ktor.http.Cookie> = mutableListOf()
 
-    private fun generateCookieString(cookieList : List<Cookie>): String {
-        var cookieString = ""
-
-        cookieList.forEach {
-            cookieString += "${it.name}=${it.value};"
+        cookies.forEach {
+            ktorCookies.add(io.ktor.http.Cookie(
+                name = it.name,
+                value = it.value,
+                expires = GMTDate(it.expiresDate),
+                maxAge = it.maxAge?.toInt(),
+                domain = it.domain,
+                path = it.path,
+            ))
         }
+        val cookieData : String = Json.encodeToString(ktorCookies)
 
-        return cookieString
 
+
+        CGAPI.cookieHeader = ktorCookies
+        screenModel?.secureVault?.set("cg_cookie", cookieData)
+        navigator.replace(Home)
     }
 }

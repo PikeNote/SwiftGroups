@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS events (
         clubURL TEXT NOT NULL,
         eventCategory TEXT NOT NULL,
         clubName TEXT NOT NULL,
+        userCacheData TEXT NOT NULL DEFAULT '',
         FOREIGN KEY (clubName)
                REFERENCES clubs (clubName),
         UNIQUE(eventId)
@@ -36,3 +37,9 @@ SELECT * FROM events ORDER BY start_time LIMIT ?, 50;
 
 fetchEventClub:
 SELECT * FROM events WHERE clubName = ? AND end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') ORDER BY start_time LIMIT 5;
+
+fetchSpecificEvent:
+SELECT * FROM events WHERE eventId = ?;
+
+updateCache:
+UPDATE events SET userCacheData = ? WHERE eventId = ?;

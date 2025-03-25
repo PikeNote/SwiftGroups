@@ -1,5 +1,6 @@
 package org.swg.swiftgroups_app.CGAPI
 
+import com.multiplatform.webview.cookie.Cookie
 import com.vipulasri.kachetor.KachetorStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -34,17 +35,18 @@ object CGAPI {
         }
         install(HttpCache) {
             publicStorage(KachetorStorage(10 * 1024 * 1024))
+
         }
     }
 
-    var cookieHeader = ""
+    var cookieHeader : List<io.ktor.http.Cookie> = emptyList()
 
     suspend fun grabMyEvents(): UpcomingEvents {
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_events_new?view=events_i_am_attending&limit=15&range=0") {
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, cookieHeader)
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
             }
         }
 
@@ -55,6 +57,7 @@ object CGAPI {
 
             return upcomingEventData
         } else {
+            println("Bad response! Code: ${response.status.value}")
             return UpcomingEvents(0, emptyList(), 0)
         }
 
@@ -65,7 +68,7 @@ object CGAPI {
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, cookieHeader)
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
             }
         }
 
@@ -85,7 +88,7 @@ object CGAPI {
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, cookieHeader)
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
             }
         }
 
@@ -93,7 +96,7 @@ object CGAPI {
             val loggedIn : String = response.body()
 
             if(loggedIn.contains("logout")) {
-                return emptyList();
+                return emptyList()
             }
 
 
@@ -106,23 +109,7 @@ object CGAPI {
     }
 
     suspend fun fetchEventsData(fetchAll : Boolean = false) {
-        //val calendarEvents : HashMap<String,CGEvent> = CalendarAPI.processCalendar();
-        val eventAPIEvents : List<CGEvent> = EventsAPI.grabEvents(fetchAll);
-
-        /*
-        eventAPIEvents.forEach {
-            if(calendarEvents.containsKey(it.eventID)) {
-                val event = calendarEvents[it.eventID]
-                if (event != null) {
-                    event.eventPicture = it.eventPicture
-                    event.eventName = it.eventName
-                    event.attendeeCount = it.attendeeCount
-                    event.eventLocation = it.eventLocation
-                }
-            } else {
-                calendarEvents[it.eventID] = it
-            }
-        }*/
+        val eventAPIEvents : List<CGEvent> = EventsAPI.grabEvents(fetchAll)
 
         val swiftdataQueries = Database(provideDbDriver(Database.Schema)).swiftdataQueries
 
@@ -146,7 +133,7 @@ object CGAPI {
                 )
             }
             afterCommit {
-                println("Data added/updated to DB!");
+                println("Data added/updated to DB!")
             }
         }
     }
@@ -158,7 +145,7 @@ object CGAPI {
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, cookieHeader)
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
             }
         }
 
@@ -175,7 +162,7 @@ object CGAPI {
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, cookieHeader)
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
             }
         }
 
@@ -186,5 +173,27 @@ object CGAPI {
         } else {
             return emptyList()
         }
+    }
+
+    fun generateCookieString(cookieList : List<io.ktor.http.Cookie>): String {
+        var cookieString = ""
+
+        cookieList.forEach {
+            cookieString += "${it.name}=${it.value};"
+        }
+
+        return cookieString
+
+    }
+
+    fun convertCookie(ktorCookie : io.ktor.http.Cookie) : Cookie {
+        return Cookie(
+            name = ktorCookie.name,
+            value = ktorCookie.value,
+            expiresDate = ktorCookie.expires?.timestamp,
+            maxAge = ktorCookie.maxAge?.toLong(),
+            domain = ktorCookie.domain,
+            path = ktorCookie.path,
+        )
     }
 }

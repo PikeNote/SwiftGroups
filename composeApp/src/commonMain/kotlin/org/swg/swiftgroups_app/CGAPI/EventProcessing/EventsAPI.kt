@@ -11,26 +11,22 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
-import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
-import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.AggregateEvents.AggregateAPIEventItem
 import org.swg.swiftgroups_app.CGAPI.CGAPI.cookieHeader
+import org.swg.swiftgroups_app.CGAPI.CGAPI.generateCookieString
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
 import org.swg.swiftgroups_app.CGAPI.Events.Club
-import org.swg.swiftgroups_app.db.Database
-
 object EventsAPI {
 
     // Crazy? I was crazy once. They locked me in a rubber room, a rubber room full of rats, and the rats made me go crazy :D
-    val regexMultiDate = Regex("[A-Za-z]+, ([A-Za-z]+) ([0-9]+), ([0-9]{4}) ([0-9]+):?([0-9]+)? ([A-Za-z]+)", RegexOption.MULTILINE);
+    val regexMultiDate = Regex("[A-Za-z]+, ([A-Za-z]+) ([0-9]+), ([0-9]{4}) ([0-9]+):?([0-9]+)? ([A-Za-z]+)", RegexOption.MULTILINE)
     private val regexOneDate = Regex("[A-Za-z]+, ([A-Za-z]+) ([0-9]+), ([0-9]{4}) ([0-9]+):?([0-9]+)? ([A-Za-z]+) - ([0-9]+):?([0-9]+)? ([A-Za-z]+)", RegexOption.MULTILINE)
-    private val htmlRegex = Regex("(<([^>]+)>)", RegexOption.IGNORE_CASE );
+    private val htmlRegex = Regex("(<([^>]+)>)", RegexOption.IGNORE_CASE )
 
     val dateTimeFormat = LocalDateTime.Format {
         monthName(MonthNames.ENGLISH_ABBREVIATED)
@@ -50,19 +46,13 @@ object EventsAPI {
         monthName(MonthNames.ENGLISH_ABBREVIATED)
     }
 
-
-
-    suspend fun processEvents() {
-
-    }
-
     suspend fun grabEvents(grabEntire : Boolean = false) : List<CGEvent> {
 
         val timestamp = Clock.System.now()
         val tz = TimeZone.currentSystemDefault()
         val dateToday = timestamp.toLocalDateTime(tz).date
 
-        var url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter8=${dateToday.dayOfMonth} ${dateToday.format(monthShortFormat).toString()} ${dateToday.year}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
+        var url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter8=${dateToday.dayOfMonth} ${dateToday.format(monthShortFormat)} ${dateToday.year}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
 
         if(grabEntire) {
             url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
@@ -72,7 +62,7 @@ object EventsAPI {
                 method = HttpMethod.Get
                 headers {
                     append(HttpHeaders.Host, "community.case.edu")
-                    append(HttpHeaders.Cookie, cookieHeader)
+                    append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
                 }
             }
 
@@ -85,7 +75,7 @@ object EventsAPI {
                 cgAPIItems.forEach {
                     if(it.p2 != "separator" && it.p4 != "") {
                         val fixedTime = htmlRegex.replace(it.p4, " ").replace("&ndash;", "-").replace("  ", " ")
-                        val convertedTime : List<String> = timeConverter(fixedTime);
+                        val convertedTime : List<String> = timeConverter(fixedTime)
 
                         eventItems.add(CGEvent(
                             eventName = it.p3,
@@ -94,7 +84,7 @@ object EventsAPI {
                             eventPicture = it.p11.replace("r2_image_upload", "r3_image_upload"),
                             eventID = it.p1,
                             eventLocation = it.p6,
-                            eventCategory = it.p5.replace(htmlRegex, "\n").split('\n').filterNotNull(),
+                            eventCategory = it.p5.replace(htmlRegex, "\n").split('\n'),
                             club = Club(clubName = it.p9, clubUrl = ""),
                             attendeeCount = it.p10,
                             startTime = convertedTime[0],
@@ -105,7 +95,7 @@ object EventsAPI {
 
 
 
-                return eventItems;
+                return eventItems
             } else {
                 return emptyList()
             }
@@ -115,7 +105,7 @@ object EventsAPI {
          }
     }
 
-    suspend fun timeConverter(time : String) : List<String> {
+    private fun timeConverter(time : String) : List<String> {
         val matches = regexOneDate.findAll(time)
 
         if(matches.any()) {

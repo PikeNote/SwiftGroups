@@ -8,9 +8,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.swg.swiftgroups_app.CGAPI.CGAPI
-import org.swg.swiftgroups_app.CGAPI.Groups.GroupItem
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
-import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 import org.swg.swiftgroupsapp.db.Events
 
@@ -45,18 +43,19 @@ class HomeViewModel : ScreenModel {
                     eventUrl = "",
                     clubURL = "",
                     eventLocation = it.location,
-                    eventPicture = "https://community.case.edu${it.photo_url}" ?: "",
+                    eventPicture = "https://community.case.edu${it.photo_url}",
                     clubName = it.event_group,
-                    eventCategory = ""
+                    eventCategory = "",
+                    userCacheData = ""
                 )
             }
 
-            upcomingEvents = upcomingEventStaging;
+            upcomingEvents = upcomingEventStaging
 
-            val groupData = CGAPI.fetchGroups();
+            val groupData = CGAPI.fetchGroups()
 
             if(groupData.isNotEmpty()) {
-                val myGroups = groupData[1];
+                val myGroups = groupData[1]
                 val groupEvents : MutableList<Events> = mutableListOf()
                 myGroups.groups.forEach {
                     groupEvents += DBObject.db.swiftdataQueries.fetchEventClub(it.groupName).executeAsList()

@@ -25,7 +25,10 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
+import kotlinx.coroutines.runBlocking
 import org.swg.swiftgroups_app.AppTheme
+import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.CGAPI.CGAPI.convertCookie
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 
@@ -64,6 +67,12 @@ class WebviewScreen(val url : String, val text : String) : Screen {
             }
 
             val state = rememberWebViewState(url)
+
+            runBlocking {
+                CGAPI.cookieHeader.forEach {
+                    state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
+                }
+            }
 
             WebView(state = state, modifier = Modifier.fillMaxWidth().weight(9f))
         }
