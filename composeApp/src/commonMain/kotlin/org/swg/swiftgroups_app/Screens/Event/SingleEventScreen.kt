@@ -80,10 +80,9 @@ class SingleEventScreen(eventID : Int) : Screen {
     @Composable
     @Preview
     override fun Content() {
-
         val navigator = LocalNavigator.currentOrThrow
-
         val eventAPI = singleEventViewModel.eventSpecificAPI.value
+        val isLoading = singleEventViewModel.isLoading
 
         val maxImageHeight = 210.dp
         val currentImgSize : MutableState<Dp> = remember { mutableStateOf(maxImageHeight) }
@@ -105,36 +104,27 @@ class SingleEventScreen(eventID : Int) : Screen {
                     val newImageSize = currentImgSize.value + delta
                     val previousImageSize = currentImgSize.value
 
-                    // Ensure the new image size stays within the bounds
                     currentImgSize.value = newImageSize.coerceIn(0.dp, maxImageHeight)
 
                     val consumedY = currentImgSize.value - previousImageSize
 
-                    return Offset(0f, consumedY.value) // Return the consumed offset
+                    return Offset(0f, consumedY.value)
                 }
-
             }
         }
 
         val imageAlpha: Float = ((currentImgSize.value) / (maxImageHeight)).coerceIn(0f, 1f)
 
-
         Box(modifier = Modifier.nestedScroll(nestedScrollConnection)) {
-
             Column(
                 modifier = Modifier
-
-
                     .align(Alignment.TopCenter)
                     .fillMaxWidth()
-
                     .shadow(3.dp, shape=RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
                     .padding(bottom = 3.dp)
                     .clip(RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
                     .background(Brush.verticalGradient(colorStops = AppTheme.eventPageImage))
-
             ) {
-
                 TextButton(
                     onClick = {navigator.pop()},
                     colors = ButtonDefaults.buttonColors(
@@ -145,41 +135,39 @@ class SingleEventScreen(eventID : Int) : Screen {
                 ) {
                     Icon(
                         ArrowLeft, "",
-                        modifier = Modifier
-                            .size(30.dp),
+                        modifier = Modifier.size(30.dp),
                         tint = Color.Black
                     )
                 }
 
                 Box (modifier = Modifier.padding(horizontal = 10.dp)) {
                     Spacer(modifier = Modifier.height(currentImgSize.value + 20.dp))
-                    if(eventAPI == null) {
-                        Column (modifier = Modifier.height(currentImgSize.value)
-                            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center){
+                    if(isLoading) {
+                        Column (
+                            modifier = Modifier
+                                .height(currentImgSize.value)
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.width(64.dp),
                                 color = Color(0xFFd3d3da),
                                 backgroundColor = Color(0xFF003B7F),
                             )
                         }
-
-                    } else {
+                    } else if(eventAPI != null) {
                         AsyncImage(
                             model = "https://community.case.edu${eventAPI.photo_url}",
                             contentDescription = null,
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
-
                                 .height(currentImgSize.value)
                                 .fillMaxWidth()
                                 .shadow(3.dp, shape = RoundedCornerShape(35.dp))
                                 .padding(bottom = 5.dp)
                                 .padding(PaddingValues(start = 2.5.dp, end = 5.dp))
                                 .clip(RoundedCornerShape(35.dp))
-
-
-
                                 .graphicsLayer {
                                     this.alpha = imageAlpha
                                 }

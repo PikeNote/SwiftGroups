@@ -14,6 +14,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -25,7 +26,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.CGAPI.convertCookie
@@ -68,7 +69,7 @@ class WebviewScreen(val url : String, val text : String) : Screen {
 
             val state = rememberWebViewState(url)
 
-            runBlocking {
+            LaunchedEffect(state) {
                 CGAPI.cookieHeader.forEach {
                     state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
                 }

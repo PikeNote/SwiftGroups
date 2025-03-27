@@ -38,12 +38,10 @@ object Login : Screen {
 
         val state = rememberWebViewState("https://www.campusgroups.com/shibboleth/login?idp=cwru")
 
-
-        runBlocking {
+        LaunchedEffect(state) {
             CGAPI.cookieHeader.forEach {
                 state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
             }
-
         }
 
         Column(
