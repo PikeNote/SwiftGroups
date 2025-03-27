@@ -15,7 +15,6 @@ import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 class SingleEventViewModel (private val eventID : Int) : ScreenModel {
 
     var eventSpecificAPI : MutableState<EventSpecificAPI?> = mutableStateOf(null)
-    var isLoading by mutableStateOf(true)
 
     init {
         screenModelScope.launch {
@@ -28,26 +27,17 @@ class SingleEventViewModel (private val eventID : Int) : ScreenModel {
                     }
                     updateData()
                 }
-            } catch (e: Exception) {
-                // Keep loading state true on error
-                isLoading = true
+            } catch (_: Exception) {
             }
         }
     }
 
     suspend fun updateData() {
-        try {
-            val cgData = CGAPI.fetchEvent(eventID.toString())
+        val cgData = CGAPI.fetchEvent(eventID.toString())
 
-            if (eventSpecificAPI.value != cgData) {
-                eventSpecificAPI.value = cgData
-                DBObject.db.swiftdataQueries.updateCache(Json.encodeToString(cgData), eventID.toLong())
-            }
-            // Only set loading to false after data is successfully loaded
-            isLoading = false
-        } catch (e: Exception) {
-            // Keep loading state true on error
-            isLoading = true
+        if (eventSpecificAPI.value != cgData) {
+            eventSpecificAPI.value = cgData
+            DBObject.db.swiftdataQueries.updateCache(Json.encodeToString(cgData), eventID.toLong())
         }
     }
 }

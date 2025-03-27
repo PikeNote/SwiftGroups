@@ -82,7 +82,6 @@ class SingleEventScreen(eventID : Int) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val eventAPI = singleEventViewModel.eventSpecificAPI.value
-        val isLoading = singleEventViewModel.isLoading
 
         val maxImageHeight = 210.dp
         val currentImgSize : MutableState<Dp> = remember { mutableStateOf(maxImageHeight) }
@@ -142,21 +141,7 @@ class SingleEventScreen(eventID : Int) : Screen {
 
                 Box (modifier = Modifier.padding(horizontal = 10.dp)) {
                     Spacer(modifier = Modifier.height(currentImgSize.value + 20.dp))
-                    if(isLoading) {
-                        Column (
-                            modifier = Modifier
-                                .height(currentImgSize.value)
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.width(64.dp),
-                                color = Color(0xFFd3d3da),
-                                backgroundColor = Color(0xFF003B7F),
-                            )
-                        }
-                    } else if(eventAPI != null) {
+                    if(eventAPI != null) {
                         AsyncImage(
                             model = "https://community.case.edu${eventAPI.photo_url}",
                             contentDescription = null,
@@ -172,6 +157,20 @@ class SingleEventScreen(eventID : Int) : Screen {
                                     this.alpha = imageAlpha
                                 }
                         )
+                    } else {
+                        Column (
+                            modifier = Modifier
+                                .height(currentImgSize.value)
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.width(64.dp),
+                                color = Color(0xFFd3d3da),
+                                backgroundColor = Color(0xFF003B7F),
+                            )
+                        }
                     }
 
                     Text(
