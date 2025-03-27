@@ -19,22 +19,16 @@ class LoginViewModel (navigator : Navigator?) : ScreenModel {
     init {
         try {
             val storedCookie = secureVault.getString("cg_cookie", null)
-            if (storedCookie != null && storedCookie.isNotEmpty()) {
-                try {
-                    CGAPI.cookieHeader = Json.decodeFromString(storedCookie)
-                    runBlocking {
-                        val loggedIn = CGAPI.checkLoggedIn()
-                        if (loggedIn.isNotEmpty()) {
-                            Home.profileDataItem = loggedIn
-                            navigator?.replace(Home)
-                        } else {
-                            requireLogin = true
-                        }
+            if (!storedCookie.isNullOrEmpty()) {
+                CGAPI.cookieHeader = Json.decodeFromString(storedCookie)
+                runBlocking {
+                    val loggedIn = CGAPI.checkLoggedIn()
+                    if (loggedIn.isNotEmpty()) {
+                        Home.profileDataItem = loggedIn
+                        navigator?.replace(Home)
+                    } else {
+                        requireLogin = true
                     }
-                } catch (e: Exception) {
-                    // If there's an error decoding the cookie, clear it and require login
-                    secureVault.deleteObject("cg_cookie")
-                    requireLogin = true
                 }
             } else {
                 requireLogin = true
