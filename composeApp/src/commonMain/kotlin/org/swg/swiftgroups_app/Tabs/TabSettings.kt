@@ -6,9 +6,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
-import compose.icons.FontAwesomeIcons
-import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.solid.Circle
+import org.swg.swiftgroups_app.Icons.Gear
 import org.swg.swiftgroups_app.Screens.ScreenEvents
 
 object TabSettings : Tab {
@@ -22,7 +20,7 @@ object TabSettings : Tab {
     override val options : TabOptions
         @Composable
         get() {
-            val icon = rememberVectorPainter(FontAwesomeIcons.Solid.Circle)
+            val icon = rememberVectorPainter(Gear)
             val title = "Settings"
             val index: UShort = 1u
 

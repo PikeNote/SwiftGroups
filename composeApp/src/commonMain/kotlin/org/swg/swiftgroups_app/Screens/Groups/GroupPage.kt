@@ -102,12 +102,13 @@ class GroupPage (private val groupID : String) : Screen {
                 Text(group?.name ?: "---", style = AppFont.InterTypography.h3, modifier = Modifier.align(Alignment.CenterHorizontally))
                 Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.CenterHorizontally)) {
                     Text(group?.group_type ?:  "---", modifier = Modifier.widthIn(min=80.dp).clip(
-                        RoundedCornerShape(10.dp)
-                    ).background(Color(0xFFD9D9D9)), style=AppFont.InterTypography.body1, textAlign = TextAlign.Center)
+                        RoundedCornerShape(10.dp))
+                        .background(Color(0xFFD9D9D9))
+                        .padding(horizontal = 1.dp), style=AppFont.InterTypography.body1, textAlign = TextAlign.Center)
 
                     group?.group_categories?.forEach {
                         Text(it.name, modifier = Modifier.widthIn(min=80.dp).clip(
-                            RoundedCornerShape(10.dp)).background(Color(0xFFD9D9D9)), style=AppFont.InterTypography.body1, textAlign = TextAlign.Center)
+                            RoundedCornerShape(10.dp)).background(Color(0xFFD9D9D9)).padding(horizontal = 1.dp), style=AppFont.InterTypography.body1, textAlign = TextAlign.Center)
                     }
                 }
                 Spacer(modifier = Modifier.height(10.dp))

@@ -384,7 +384,7 @@ class SingleEventScreen(eventID : Int) : Screen {
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column (verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight()) {
-                Text(text)
+                Text(text, textAlign = TextAlign.Center)
             }
         }
     }
