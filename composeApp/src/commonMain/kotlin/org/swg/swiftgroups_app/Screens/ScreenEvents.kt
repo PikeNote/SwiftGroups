@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -42,6 +43,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Search
 import compose.icons.fontawesomeicons.solid.Microphone
+import compose.icons.fontawesomeicons.solid.Times
 import org.swg.swiftgroups_app.Components.Home.EventHome
 import org.swg.swiftgroups_app.Components.Home.EventsCard
 import org.swg.swiftgroups_app.Fonts.AppFont
@@ -70,12 +72,15 @@ object ScreenEvents : Screen {
             // Search Bar
             TextField(
                 value = searchText,
-                onValueChange = { searchText = it },
+                onValueChange = { 
+                    searchText = it
+                    viewModel.filterEvents(it)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .clip(RoundedCornerShape(8.dp)),
-                placeholder = { Text("Search") },
+                placeholder = { Text("Search events...") },
                 leadingIcon = {
                     Icon(
                         FontAwesomeIcons.Solid.Search,
@@ -84,11 +89,26 @@ object ScreenEvents : Screen {
                     )
                 },
                 trailingIcon = {
-                    Icon(
-                        FontAwesomeIcons.Solid.Microphone,
-                        contentDescription = "Voice Search",
-                        modifier = Modifier.size(20.dp)
-                    )
+                    if (searchText.isNotEmpty()) {
+                        IconButton(
+                            onClick = {
+                                searchText = ""
+                                viewModel.filterEvents("")
+                            }
+                        ) {
+                            Icon(
+                                FontAwesomeIcons.Solid.Times,
+                                contentDescription = "Clear search",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    } else {
+                        Icon(
+                            FontAwesomeIcons.Solid.Microphone,
+                            contentDescription = "Voice Search",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 },
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color(0xFFF5F5F5),
@@ -140,7 +160,7 @@ object ScreenEvents : Screen {
                 ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(viewModel.events) { eventData ->
+                items(viewModel.filteredEvents) { eventData ->
                     EventsCard(
                         eventData,
                         cardWidth = 500.dp,

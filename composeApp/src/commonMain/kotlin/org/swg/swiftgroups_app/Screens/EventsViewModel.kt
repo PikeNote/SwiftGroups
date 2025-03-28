@@ -19,6 +19,7 @@ import org.swg.swiftgroupsapp.db.Events
 class EventsViewModel : ScreenModel {
     var upcomingEvents by mutableStateOf(UpcomingEvents(0, emptyList(), 0))
     var events: List<Events> by mutableStateOf(emptyList())
+    var filteredEvents: List<Events> by mutableStateOf(emptyList())
     var isLoading by mutableStateOf(false)
     var hasMoreEvents by mutableStateOf(true)
     lateinit var database: Database;
@@ -55,10 +56,25 @@ class EventsViewModel : ScreenModel {
             if (eventsData.isNotEmpty()) {
                 offset += eventsData.size
                 events += eventsData
+                filteredEvents = events
                 hasMoreEvents = eventsData.size >= pageSize
             } else {
                 hasMoreEvents = false
             }
+        }
+    }
+
+    fun filterEvents(searchQuery: String) {
+        if (searchQuery.isBlank()) {
+            filteredEvents = events
+            return
+        }
+        
+        filteredEvents = events.filter { event ->
+            event.eventName.contains(searchQuery, ignoreCase = true) ||
+            event.eventDesc.contains(searchQuery, ignoreCase = true) ||
+            event.eventLocation.contains(searchQuery, ignoreCase = true) ||
+            event.clubName.contains(searchQuery, ignoreCase = true)
         }
     }
 
