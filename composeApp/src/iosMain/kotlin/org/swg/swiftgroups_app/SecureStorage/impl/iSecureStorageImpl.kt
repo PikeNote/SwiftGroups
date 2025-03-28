@@ -4,27 +4,21 @@ import kotlinx.cinterop.BetaInteropApi
 import org.swg.swiftgroups_app.SecureStorage.SecureStorage
 
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
-import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.value
-import kotlinx.cinterop.reinterpret
 
 import platform.CoreFoundation.CFAutorelease
 import platform.CoreFoundation.CFDictionaryAddValue
 import platform.CoreFoundation.CFDictionaryCreateMutable
-import platform.CoreFoundation.CFDictionaryRef
 import platform.CoreFoundation.CFMutableDictionaryRef
-import platform.CoreFoundation.CFStringCreateWithCString
 import platform.CoreFoundation.CFStringRef
 import platform.CoreFoundation.CFTypeRef
 import platform.CoreFoundation.CFTypeRefVar
 import platform.CoreFoundation.kCFBooleanFalse
 import platform.CoreFoundation.kCFBooleanTrue
-import platform.CoreFoundation.kCFStringEncodingUTF8
 import platform.Foundation.CFBridgingRelease
 
 import platform.Foundation.CFBridgingRetain
@@ -37,13 +31,7 @@ import platform.Foundation.dataUsingEncoding
 import platform.Security.SecItemAdd
 import platform.Security.SecItemCopyMatching
 import platform.Security.SecItemDelete
-import platform.Security.SecItemUpdate
 import platform.Security.kSecAttrAccessGroup
-import platform.Security.kSecAttrAccessibleAfterFirstUnlock
-import platform.Security.kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-import platform.Security.kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly
-import platform.Security.kSecAttrAccessibleWhenUnlocked
-import platform.Security.kSecAttrAccessibleWhenUnlockedThisDeviceOnly
 import platform.Security.kSecAttrAccount
 import platform.Security.kSecAttrService
 import platform.Security.kSecClass
@@ -54,7 +42,6 @@ import platform.Security.kSecReturnData
 import platform.Security.kSecValueData
 
 import platform.darwin.noErr
-import platform.posix.memcpy
 
 @OptIn(ExperimentalForeignApi::class)
 actual open class SecureStorageImpl(
