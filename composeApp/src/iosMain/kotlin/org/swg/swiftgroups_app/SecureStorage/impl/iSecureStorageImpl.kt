@@ -6,6 +6,7 @@ import org.swg.swiftgroups_app.SecureStorage.SecureStorage
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
+import kotlinx.cinterop.convert
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.usePinned
@@ -16,8 +17,10 @@ import platform.CoreFoundation.CFAutorelease
 import platform.CoreFoundation.CFDictionaryAddValue
 import platform.CoreFoundation.CFDictionaryCreateMutable
 import platform.CoreFoundation.CFDictionaryRef
+import platform.CoreFoundation.CFMutableDictionaryRef
 import platform.CoreFoundation.CFStringCreateWithCString
 import platform.CoreFoundation.CFStringRef
+import platform.CoreFoundation.CFTypeRef
 import platform.CoreFoundation.CFTypeRefVar
 import platform.CoreFoundation.kCFBooleanFalse
 import platform.CoreFoundation.kCFBooleanTrue
@@ -36,7 +39,6 @@ import platform.Security.SecItemCopyMatching
 import platform.Security.SecItemDelete
 import platform.Security.SecItemUpdate
 import platform.Security.kSecAttrAccessGroup
-import platform.Security.kSecAttrAccessible
 import platform.Security.kSecAttrAccessibleAfterFirstUnlock
 import platform.Security.kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
 import platform.Security.kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly
@@ -58,89 +60,74 @@ import platform.posix.memcpy
 actual open class SecureStorageImpl(
     private val serviceName: String? = null,
     private val accessGroup: String? = null,
-    private val accessibility: Accessible = Accessible.WhenUnlocked
 ) : SecureStorage {
 
-    enum class Accessible(val value: CFStringRef?) {
-        WhenPasscodeSetThisDeviceOnly(kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly),
-        WhenUnlockedThisDeviceOnly(kSecAttrAccessibleWhenUnlockedThisDeviceOnly),
-        WhenUnlocked(kSecAttrAccessibleWhenUnlocked),
-        AfterFirstUnlock(kSecAttrAccessibleAfterFirstUnlock),
-        AfterFirstUnlockThisDeviceOnly(kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly)
+    @OptIn(ExperimentalForeignApi::class)
+    private fun query(vararg pairs: Pair<CFStringRef?, CFTypeRef?>): CFMutableDictionaryRef? {
+        val map = pairs.toMap()
+        return CFDictionaryCreateMutable(null, map.size.convert(), null, null).apply {
+            map.forEach { (key, value) ->
+                CFDictionaryAddValue(this, key, value)
+            }
+        }.also {
+            CFAutorelease(it)
+        }
     }
 
-    actual override fun clear(): Boolean = SecItemDelete(createBaseQuery()) == noErr.toInt();
+    @OptIn(ExperimentalForeignApi::class)
+    private fun baseQuery(): CFMutableDictionaryRef? {
+        val base = query(
+            kSecClass to kSecClassGenericPassword,
+            kSecAttrService to CFBridgingRetain(serviceName ?: "default_service")
+        )
+        base?.apply {
+            accessGroup?.let {
+                CFDictionaryAddValue(this, kSecAttrAccessGroup, CFBridgingRetain(it))
+            }
+        }
+        return base
+    }
+
+    actual override fun clear(): Boolean {
+        val query = baseQuery() ?: throw Exception("Failed to create query")
+        return if (SecItemDelete(query) == noErr.toInt()) true else throw Exception("Failed to clear storage")
+    }
 
     actual override fun deleteObject(forKey: String): Boolean {
-        val query = createBaseQuery().apply { CFDictionaryAddValue(this, kSecAttrAccount, forKey.toCFString()) }
-        return SecItemDelete(query) == noErr.toInt()
+        val query = baseQuery() ?: throw Exception("Failed to create query")
+        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(forKey))
+        return if (SecItemDelete(query) == noErr.toInt()) true else throw Exception("Failed to delete object for key: $forKey")
+    }
+
+    actual override fun existsObject(forKey: String): Boolean {
+        val query = baseQuery() ?: throw Exception("Failed to create query")
+        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(forKey))
+        CFDictionaryAddValue(query, kSecReturnData, kCFBooleanFalse)
+        return SecItemCopyMatching(query, null) == noErr.toInt()
+    }
+
+    actual override fun getString(forKey: String, defValue: String?): String? = memScoped {
+        val query = baseQuery() ?: throw Exception("Failed to create query")
+        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(forKey))
+        CFDictionaryAddValue(query, kSecReturnData, kCFBooleanTrue)
+        CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne)
+        val result = alloc<CFTypeRefVar>()
+        return when (SecItemCopyMatching(query, result.ptr)) {
+            noErr.toInt() -> (CFBridgingRelease(result.value) as? NSData)?.let { NSString.create(data = it, encoding = NSUTF8StringEncoding).toString() }
+            else -> defValue
+        }
     }
 
     @OptIn(BetaInteropApi::class)
-    actual override fun set(key: String, stringValue: String): Boolean = addOrUpdate(key, stringValue.toNSData())
-
-    actual override fun existsObject(forKey: String): Boolean {
-        val query = createBaseQuery().apply {
-            CFDictionaryAddValue(this, kSecAttrAccount, forKey.toCFString())
-            CFDictionaryAddValue(this, kSecReturnData, kCFBooleanFalse)
+    actual override fun set(key: String, stringValue: String): Boolean {
+        val valueNSData = NSString.create(string = stringValue).dataUsingEncoding(NSUTF8StringEncoding)
+        val query = baseQuery() ?: throw Exception("Failed to create query")
+        CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(key))
+        CFDictionaryAddValue(query, kSecValueData, CFBridgingRetain(valueNSData))
+        SecItemDelete(query) // Attempt to delete if it exists
+        return when (SecItemAdd(query, null) == noErr.toInt()) {
+            true -> true
+            false -> throw Exception("Duplicate item for key: $key")
         }
-        return SecItemCopyMatching(query, null) == noErr.toInt();
-    }
-
-
-    actual override fun getString(forKey: String, defValue: String?): String? = memScoped {
-        val query = createBaseQuery().apply {
-            CFDictionaryAddValue(this, kSecAttrAccount, forKey.toCFString())
-            CFDictionaryAddValue(this, kSecReturnData, kCFBooleanTrue)
-            CFDictionaryAddValue(this, kSecMatchLimit, kSecMatchLimitOne)
-        }
-        val result = alloc<CFTypeRefVar>()
-        if (SecItemCopyMatching(query, result.ptr) == noErr.toInt()) {
-            (CFBridgingRelease(result.value) as? NSData)?.toByteArray()?.decodeToString()
-        } else null
-    }
-
-    // HELPERS
-
-    private fun addOrUpdate(key: String, data: NSData?): Boolean =
-        if (existsObject(forKey = key)) update(key, data) else add(key, data)
-
-    private fun update(key: String, data: NSData?): Boolean {
-        if (data == null) return false
-        val query = createBaseQuery().apply { CFDictionaryAddValue(this, kSecAttrAccount, key.toCFString()) }
-        val attributesToUpdate = CFDictionaryCreateMutable(null, 1, null, null).apply {
-            CFDictionaryAddValue(this, kSecValueData, CFBridgingRetain(data))
-        }
-        return SecItemUpdate(query, attributesToUpdate) == noErr.toInt()
-    }
-
-    private fun add(key: String, data: NSData?): Boolean {
-        if (data == null) return false
-        val query = createBaseQuery().apply { CFDictionaryAddValue(this, kSecAttrAccount, key.toCFString()) }
-        val attributesToAdd = CFDictionaryCreateMutable(null, 1, null, null)?.apply {
-            CFDictionaryAddValue(this, kSecValueData, CFBridgingRetain(data))
-        } ?: return false
-        return SecItemAdd(query, attributesToAdd.reinterpret()) == noErr.toInt()
-    }
-
-    private fun createBaseQuery(): CFDictionaryRef = memScoped {
-        val dictionary = CFDictionaryCreateMutable(null, 0, null, null)
-        CFDictionaryAddValue(dictionary, kSecClass, kSecClassGenericPassword)
-        CFDictionaryAddValue(dictionary, kSecAttrService, serviceName?.toCFString() ?: "default_service".toCFString())
-        CFDictionaryAddValue(dictionary, kSecAttrAccessible, accessibility.value)
-        accessGroup?.let { CFDictionaryAddValue(dictionary, kSecAttrAccessGroup, it.toCFString()) }
-        CFAutorelease(dictionary)
-        dictionary!!
-    }
-
-    private fun String.toCFString(): CFStringRef? = memScoped {
-        CFStringCreateWithCString(null, this@toCFString, kCFStringEncodingUTF8)
-    }
-
-    @BetaInteropApi
-    private fun String.toNSData(): NSData? = NSString.create(string = this).dataUsingEncoding(NSUTF8StringEncoding)
-
-    private fun NSData.toByteArray(): ByteArray = ByteArray(length.toInt()).apply {
-        if (isNotEmpty()) usePinned { memcpy(it.addressOf(0), this@toByteArray.bytes, this@toByteArray.length) }
     }
 }
