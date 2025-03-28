@@ -7,7 +7,7 @@ data class Group(
     val events_count: String,
     val friends_joined: String? = "",
     val friends_more_joined: Int,
-    val group_categories: List<GroupCategory>,
+    val group_categories: List<GroupCategory>?,
     val group_cover_url: String,
     val group_logo_url: String,
     val group_type: String,
