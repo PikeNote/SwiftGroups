@@ -19,8 +19,11 @@ import org.swg.swiftgroupsapp.db.Events
 class EventsViewModel : ScreenModel {
     var upcomingEvents by mutableStateOf(UpcomingEvents(0, emptyList(), 0))
     var events: List<Events> by mutableStateOf(emptyList())
+    var isLoading by mutableStateOf(false)
+    var hasMoreEvents by mutableStateOf(true)
     lateinit var database: Database;
     var offset = 0L;
+    private val pageSize = 50L;
 
     init {
         addTestEvents()
@@ -36,11 +39,26 @@ class EventsViewModel : ScreenModel {
         }
     }
 
-    suspend fun getEvents() {
+    fun loadMoreEvents() {
+        if (!isLoading && hasMoreEvents) {
+            screenModelScope.launch {
+                isLoading = true
+                getEvents()
+                isLoading = false
+            }
+        }
+    }
+
+    private fun getEvents() {
         screenModelScope.launch {
             val eventsData = database.swiftdataQueries.fetchEvent(offset).executeAsList()
-            offset += eventsData.size
-            events += eventsData
+            if (eventsData.isNotEmpty()) {
+                offset += eventsData.size
+                events += eventsData
+                hasMoreEvents = eventsData.size >= pageSize
+            } else {
+                hasMoreEvents = false
+            }
         }
     }
 
