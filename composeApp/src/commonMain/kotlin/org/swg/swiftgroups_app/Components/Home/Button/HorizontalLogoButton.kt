@@ -22,7 +22,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.swg.swiftgroups_app.Fonts.AppFont
-import org.swg.swiftgroups_app.Icons.PencilSquare
 
 @Composable
 fun HorizontalLogoButton (
@@ -33,12 +32,14 @@ fun HorizontalLogoButton (
     textStyle: TextStyle = AppFont.InterTypography.subtitle2,
     onClick: ()-> Unit,
     backgroundColor : Color = Color(0xFF2850A6),
-    textColor : Color = Color.White
+    textColor : Color = Color.White,
+    width: Dp = 170.dp,
+    height: Dp = 45.dp
 ) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(backgroundColor = backgroundColor),
-        modifier = Modifier.width(170.dp).height(45.dp).clip(RoundedCornerShape(25.dp))
+        modifier = Modifier.width(width).height(height).clip(RoundedCornerShape(25.dp))
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

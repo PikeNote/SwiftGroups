@@ -45,13 +45,14 @@ import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat.home_event_date_fo
 import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat.home_event_time_format
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Screens.Event.SingleEventScreen
+import org.swg.swiftgroups_app.ShareManager.openMapLocationQuery
 import org.swg.swiftgroupsapp.db.Events
 
 class EventHome(
     private val eventData: Events,
     private val cardWidth: Dp = 270.dp,
     private val horizontalPadding: Dp = 0.dp,
-    private val enableQR: Boolean = false
+    private val enableButton: Boolean = false
 ) {
 
     private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
@@ -75,7 +76,9 @@ class EventHome(
                 )
                 .height(174.dp)
                 .clip(shape = RoundedCornerShape(15.dp))
-                .background(Color(0xFFf2f1f1))
+                .background(Color(0xFFf2f1f1)).clickable {
+                    navigator.push(SingleEventScreen(eventData.eventId.toInt()))
+                }
                 .then(
                     if (currentTime > eventStartTime) {
                         Modifier.border(
@@ -110,7 +113,7 @@ class EventHome(
                     AsyncImage(
                         model = eventData.eventPicture,
                         contentDescription = null,
-                        contentScale = ContentScale.FillHeight,
+                        contentScale = ContentScale.FillBounds,
                         modifier = Modifier
                             .height(120.dp)
                             .fillMaxWidth()
@@ -157,44 +160,48 @@ class EventHome(
                             Text(
                                 eventData.eventLocation,
                                 color = Color.Blue,
-                                style = AppFont.InterTypography.subtitle1
+                                style = AppFont.InterTypography.subtitle1,
+                                modifier = Modifier.clickable {
+                                    openMapLocationQuery(eventData.eventLocation)
+                                }
                             )
                         }
                     }
                 }
             }
 
-            Column(
-                verticalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .background(Color(0xFFf2f1f1))
-                    .fillMaxHeight()
-                    .width(60.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                VerticalLogoButton(
-                    modifier = Modifier.weight(1f),
-                    logo = FontAwesomeIcons.Solid.Info,
-                    text = "Info",
-                    onClick = {
-                        navigator.push(SingleEventScreen(eventData.eventId.toInt()))
+            if(enableButton) {
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .background(Color(0xFFf2f1f1))
+                        .fillMaxHeight()
+                        .width(60.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                        VerticalLogoButton(
+                            modifier = Modifier.weight(1f),
+                            logo = FontAwesomeIcons.Solid.Info,
+                            text = "Info",
+                            onClick = {
+                                navigator.push(SingleEventScreen(eventData.eventId.toInt()))
+                            }
+                        )
+                        VerticalLogoButton(
+                            modifier = Modifier.weight(1f),
+                            logo = FontAwesomeIcons.Solid.PencilAlt,
+                            text = "Edit",
+                            onClick = {}
+                        )
+                        VerticalLogoButton(
+                            modifier = Modifier.weight(1f),
+                            logo = FontAwesomeIcons.Solid.Qrcode,
+                            text = "QR Code",
+                            onClick = {}
+                        )
                     }
-                )
-                VerticalLogoButton(
-                    modifier = Modifier.weight(1f),
-                    logo = FontAwesomeIcons.Solid.PencilAlt,
-                    text = "Edit",
-                    onClick = {}
-                )
-                if(enableQR){
-                    VerticalLogoButton(
-                        modifier = Modifier.weight(1f),
-                        logo = FontAwesomeIcons.Solid.Qrcode,
-                        text = "QR Code",
-                        onClick = {}
-                    )
                 }
-            }
         }
     }
 }

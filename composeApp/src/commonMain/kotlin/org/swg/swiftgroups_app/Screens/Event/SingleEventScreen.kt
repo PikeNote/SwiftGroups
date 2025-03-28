@@ -1,6 +1,7 @@
 package org.swg.swiftgroups_app.Screens.Event
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -60,6 +61,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Regular
 import compose.icons.fontawesomeicons.regular.Calendar
 import compose.icons.fontawesomeicons.regular.Clock
+import compose.icons.fontawesomeicons.regular.Eye
 import compose.icons.fontawesomeicons.regular.ShareSquare
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -70,6 +72,7 @@ import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.MapPin
 import org.swg.swiftgroups_app.Icons.PencilSquare
+import org.swg.swiftgroups_app.Screens.Groups.GroupPage
 import org.swg.swiftgroups_app.Screens.Webview.WebviewScreen
 import org.swg.swiftgroups_app.ShareManager.shareLink
 
@@ -215,7 +218,11 @@ class SingleEventScreen(eventID : Int) : Screen {
                    Text(
                        eventAPI?.event_group ?: "...",
                        style = AppFont.InterTypography.h6,
-                       color = Color.Gray
+                       color = Color.Gray, modifier = Modifier.clickable {
+                           if(eventAPI!= null) {
+                               navigator.push(GroupPage(eventAPI.event_group_id.toString()))
+                           }
+                       }
                    )
                }
 
@@ -284,6 +291,14 @@ class SingleEventScreen(eventID : Int) : Screen {
                 }
 
                 Column(modifier = Modifier.padding(10.dp).fillMaxWidth()) {
+
+                    if(!eventAPI?.registration_status.isNullOrEmpty()) {
+                        logoText(
+                            logo = FontAwesomeIcons.Regular.Eye,
+                            contentDesc = "Registration Status",
+                            text = eventAPI?.registration_status ?: "---"
+                        )
+                    }
 
 
                     logoText(
@@ -359,7 +374,7 @@ class SingleEventScreen(eventID : Int) : Screen {
     @Composable
     fun logoText(logo : ImageVector, contentDesc : String, text : String) {
         Row(
-            modifier = Modifier.padding(5.dp).height(30.dp),
+            modifier = Modifier.padding(5.dp),
         ) {
             Icon(
                 logo, contentDesc,

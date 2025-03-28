@@ -71,7 +71,7 @@ object ScreenHome : Screen {
                 ) {
                     viewModel.upcomingEvents.forEach { data ->
                         item {
-                            EventHome(data, enableQR = true).Content()
+                            EventHome(data, enableButton = true).Content()
                         }
                     }
                 }

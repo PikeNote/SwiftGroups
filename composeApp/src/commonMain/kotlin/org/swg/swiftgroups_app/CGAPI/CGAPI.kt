@@ -8,6 +8,7 @@ import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -16,7 +17,9 @@ import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
 import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
-import org.swg.swiftgroups_app.CGAPI.Groups.GroupItem
+import org.swg.swiftgroups_app.CGAPI.Groups.Group
+import org.swg.swiftgroups_app.CGAPI.Groups.GroupList
+import org.swg.swiftgroups_app.CGAPI.Groups.HomeGroup.ProfileGroupItem
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 import org.swg.swiftgroups_app.DatabaseDriver.provideDbDriver
@@ -89,6 +92,7 @@ object CGAPI {
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
                 append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+                append(HttpHeaders.CacheControl, CacheControl.MaxAge(maxAgeSeconds = 3600).toString())
             }
         }
 
@@ -157,7 +161,7 @@ object CGAPI {
         }
     }
 
-    suspend fun fetchGroups() : List<GroupItem> {
+    suspend fun fetchGroups() : List<ProfileGroupItem> {
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v17/mobile_header_groups?search=&all=false") {
             method = HttpMethod.Get
             headers {
@@ -168,10 +172,28 @@ object CGAPI {
 
         if (response.status.value in 200..299) {
             println("Group fetched successfully!")
-            val groupHome : List<GroupItem> = response.body()
+            val groupHome : List<ProfileGroupItem> = response.body()
             return groupHome
         } else {
             return emptyList()
+        }
+    }
+
+    suspend fun fetchGroup(groupID : String) : Group? {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_group_new?id=${groupID}") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            println("Group fetched successfully!")
+            val groupList : GroupList = response.body()
+            return groupList.group.first()
+        } else {
+            return null
         }
     }
 
