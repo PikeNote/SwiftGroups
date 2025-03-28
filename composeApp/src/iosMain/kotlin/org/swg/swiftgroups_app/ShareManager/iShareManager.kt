@@ -1,16 +1,23 @@
 package org.swg.swiftgroups_app.ShareManager
 
-import kotlinx.cinterop.CValue
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.useContents
-import platform.CoreLocation.CLGeocoder
-import platform.CoreLocation.CLLocationCoordinate2D
-import platform.CoreLocation.CLPlacemark
+
+import platform.Foundation.NSBundle
 import platform.Foundation.NSURL
 import platform.UIKit.UIActivityViewController
 import platform.UIKit.UIApplication
 import platform.UIKit.popoverPresentationController
-import platform.Foundation.NSLocale
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
+
 
 val viewController = UIApplication.sharedApplication.keyWindow?.rootViewController
 
@@ -19,7 +26,6 @@ actual fun shareLink(text: String, subject: String) {
         activityItems = listOf(text),
         applicationActivities = null
     )
-
     if (viewController != null) {
         activityController.popoverPresentationController?.sourceView = viewController.view
         viewController.presentViewController(activityController, animated = true, completion = null)
@@ -27,40 +33,69 @@ actual fun shareLink(text: String, subject: String) {
     activityController.setTitle(subject)
 }
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalSerializationApi::class)
+@JsonIgnoreUnknownKeys
+@Serializable
+data class GoogleGeocodeResponse(
+    val results: List<Result>,
+    val status: String
+)
+
+@Serializable
+data class Result(
+    val geometry: Geometry
+)
+
+@Serializable
+data class Geometry(
+    val location: Location
+)
+
+@Serializable
+data class Location(
+    val lat: Double,
+    val lng: Double
+)
+
+@OptIn(DelicateCoroutinesApi::class)
 actual fun openMapLocationQuery(query: String) {
-    val geocoder = CLGeocoder()
-    val locale = NSLocale(localeIdentifier = "en_US")
+    val googleApiKey: String =
+        NSBundle.mainBundle.objectForInfoDictionaryKey("GoogleApiKey") as? String ?: ""
 
-    geocoder.geocodeAddressString(query, null, locale) { placemarks, error ->
-        if (error != null) {
-            println("Geocoding error: $error")
-            return@geocodeAddressString
-        }
+    val client = HttpClient()
 
-        val placemarkList = placemarks as? List<CLPlacemark>
-        val location = placemarkList?.firstOrNull()?.location
+    GlobalScope.launch {
+        try {
+            val url = "https://maps.googleapis.com/maps/api/geocode/json?" +
+                    "address=${query.replace(" ", "+")}&key=$googleApiKey"
 
-        if (location != null) {
-            val locationLatLong = getCoordinate(location.coordinate)
-            val latitude = locationLatLong.first
-            val longitude = locationLatLong.second
-            val urlString = "http://maps.apple.com/?ll=$latitude,$longitude&q=${query.replace(" ", "+")}"
-            val nsUrl = NSURL.URLWithString(urlString)
-            if (nsUrl != null) {
-                UIApplication.sharedApplication.openURL(nsUrl, options = emptyMap<Any?, Any>(), completionHandler = null)
+            val response: HttpResponse = client.get(url)
+            val jsonBody = response.bodyAsText()
+
+            val geocodeResponse =  Json {
+                ignoreUnknownKeys = true
+            }.decodeFromString<GoogleGeocodeResponse>(jsonBody)
+
+            if (geocodeResponse.status == "OK" && geocodeResponse.results.isNotEmpty()) {
+                val location = geocodeResponse.results.first().geometry.location
+                val mapsUrlString = "http://maps.apple.com/?ll=${location.lat},${location.lng}&q=${query.replace(" ", "+")}"
+                val nsUrl = NSURL.URLWithString(mapsUrlString)
+
+                if (nsUrl != null) {
+                    UIApplication.sharedApplication.openURL(
+                        nsUrl,
+                        options = emptyMap<Any?, Any?>(),
+                        completionHandler = null
+                    )                } else {
+                    println("Failed to create valid Apple Maps URL.")
+                }
             } else {
-                println("Failed to create URL from string: $urlString")
+                println("No location found or invalid response from Google Geocoding.")
             }
-        } else {
-            println("No location found for the given address: $query")
+        } catch (e: Exception) {
+            println("Geocoding error: ${e.message}")
+        } finally {
+            client.close()
         }
-    }
-}
-
-@OptIn(ExperimentalForeignApi::class)
-fun getCoordinate(coordinateValue: CValue<CLLocationCoordinate2D>): Pair<Double, Double> {
-    return coordinateValue.useContents {
-        Pair(latitude, longitude)
     }
 }
