@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -34,9 +35,14 @@ import compose.icons.fontawesomeicons.solid.Info
 import compose.icons.fontawesomeicons.solid.LocationArrow
 import compose.icons.fontawesomeicons.solid.PencilAlt
 import compose.icons.fontawesomeicons.solid.Qrcode
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.Components.Home.Button.VerticalLogoButton
+import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Screens.Event.SingleEventScreen
+import org.swg.swiftgroups_app.ShareManager.openMapLocationQuery
 import org.swg.swiftgroupsapp.db.Events
 
 class EventsCard(
@@ -110,7 +116,12 @@ class EventsCard(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(eventDat.eventName, fontWeight = FontWeight.Bold)
+                            Text(
+                                eventDat.eventName,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
 //                            if (eventDat.isLive == 1) {
 //                                Text(
 //                                    "LIVE",
@@ -120,15 +131,21 @@ class EventsCard(
 //                                )
 //                            }
                         }
+                        
+                        val startDateTime = Instant.parse(eventDat.start_time)
+                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                        val endDateTime = Instant.parse(eventDat.end_time)
+                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                        
                         Text(
-                            "${eventDat.start_time} - ${eventDat.end_time}",
+                            "${DateTimeFormat.home_event_date_format.format(startDateTime)} | ${DateTimeFormat.home_event_time_format.format(startDateTime)} - ${DateTimeFormat.home_event_time_format.format(endDateTime)}",
                             style = AppFont.InterTypography.body2,
                             fontWeight = FontWeight.Bold
                         )
                         Row(
                             modifier = Modifier
                                 .padding(vertical = 2.dp)
-                                .clickable(onClick = {}),
+                                .clickable { openMapLocationQuery(eventDat.eventLocation) },
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
