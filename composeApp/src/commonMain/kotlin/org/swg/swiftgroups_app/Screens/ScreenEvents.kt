@@ -42,9 +42,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Search
-import compose.icons.fontawesomeicons.solid.Microphone
 import compose.icons.fontawesomeicons.solid.Times
-import org.swg.swiftgroups_app.Components.Home.EventHome
 import org.swg.swiftgroups_app.Components.Home.EventsCard
 import org.swg.swiftgroups_app.Fonts.AppFont
 
@@ -76,11 +74,12 @@ object ScreenEvents : Screen {
                     searchText = it
                     viewModel.filterEvents(it)
                 },
+                textStyle = AppFont.InterTypography.h4,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .clip(RoundedCornerShape(8.dp)),
-                placeholder = { Text("Search events...") },
+                placeholder = { Text("Search events...", style = AppFont.InterTypography.h4) },
                 leadingIcon = {
                     Icon(
                         FontAwesomeIcons.Solid.Search,
