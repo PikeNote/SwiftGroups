@@ -8,14 +8,14 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Regular
 import compose.icons.fontawesomeicons.regular.User
-import org.swg.swiftgroups_app.Screens.ScreenEvents
+import org.swg.swiftgroups_app.Screens.Groups.GroupScreen
 
 object TabGroups : TabWithNavigator {
     override var nav: Navigator? = null
 
     @Composable
     override fun Content() {
-        Navigator(screen = ScreenEvents) { navigator ->
+        Navigator(screen = GroupScreen) { navigator ->
             SlideTransition(navigator = navigator)
             nav = navigator
         }

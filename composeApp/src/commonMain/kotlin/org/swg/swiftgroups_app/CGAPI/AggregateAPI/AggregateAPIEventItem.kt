@@ -1,4 +1,4 @@
-package org.swg.swiftgroups_app.CGAPI.AggregateEvents
+package org.swg.swiftgroups_app.CGAPI.AggregateAPI
 
 import kotlinx.serialization.Serializable
 

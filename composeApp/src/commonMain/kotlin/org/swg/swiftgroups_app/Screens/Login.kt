@@ -24,6 +24,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.CGAPI.convertCookie
+import org.swg.swiftgroups_app.DatabaseDriver.DBObject
+import org.swg.swiftgroups_app.Screens.DBLoading.DatabaseLoading
 
 object Login : Screen {
 
@@ -38,7 +40,7 @@ object Login : Screen {
 
         val state = rememberWebViewState("https://www.campusgroups.com/shibboleth/login?idp=cwru")
 
-        LaunchedEffect(state) {
+        runBlocking {
             CGAPI.cookieHeader.forEach {
                 state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
             }
@@ -61,7 +63,11 @@ object Login : Screen {
                 .collect {
                     delay(300)
                     storeCookies(state, navigator)
-                    navigator.replace(Home)
+                    if(DBObject.db.swiftdataQueries.eventsEmpty().executeAsOne()) {
+                        navigator.replace(Home)
+                    } else {
+                        navigator.replace(DatabaseLoading)
+                    }
                 }
         }
 

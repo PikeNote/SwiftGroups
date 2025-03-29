@@ -16,7 +16,7 @@ import kotlinx.datetime.format.Padding
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.CGAPI.CGAPI
-import org.swg.swiftgroups_app.CGAPI.AggregateEvents.AggregateAPIEventItem
+import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateAPIEventItem
 import org.swg.swiftgroups_app.CGAPI.CGAPI.cookieHeader
 import org.swg.swiftgroups_app.CGAPI.CGAPI.generateCookieString
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent

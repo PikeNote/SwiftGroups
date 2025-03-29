@@ -14,6 +14,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroups
 import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
 import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
@@ -22,11 +23,10 @@ import org.swg.swiftgroups_app.CGAPI.Groups.GroupList
 import org.swg.swiftgroups_app.CGAPI.Groups.HomeGroup.ProfileGroupItem
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
-import org.swg.swiftgroups_app.DatabaseDriver.provideDbDriver
-import org.swg.swiftgroups_app.db.Database
-
+import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 
 object CGAPI {
+    var databaseFetched = false
     val client = HttpClient() {
         install(ContentNegotiation) {
             json(contentType = ContentType.Any, json = Json {
@@ -115,7 +115,7 @@ object CGAPI {
     suspend fun fetchEventsData(fetchAll : Boolean = false) {
         val eventAPIEvents : List<CGEvent> = EventsAPI.grabEvents(fetchAll)
 
-        val swiftdataQueries = Database(provideDbDriver(Database.Schema)).swiftdataQueries
+        val swiftdataQueries = DBObject.db.swiftdataQueries
 
 
         swiftdataQueries.transaction {
@@ -161,7 +161,7 @@ object CGAPI {
         }
     }
 
-    suspend fun fetchGroups() : List<ProfileGroupItem> {
+    suspend fun fetchMyGroups() : List<ProfileGroupItem> {
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v17/mobile_header_groups?search=&all=false") {
             method = HttpMethod.Get
             headers {
@@ -172,8 +172,8 @@ object CGAPI {
 
         if (response.status.value in 200..299) {
             println("Group fetched successfully!")
-            val groupHome : List<ProfileGroupItem> = response.body()
-            return groupHome
+            val groupList : List<ProfileGroupItem> = response.body()
+            return groupList
         } else {
             return emptyList()
         }
@@ -194,6 +194,44 @@ object CGAPI {
             return groupList.group.first()
         } else {
             return null
+        }
+    }
+
+    suspend fun fetchAllGroups() {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?limit=1000") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            println("All Group fetched successfully!")
+            val groupList : AggregateGroups = response.body()
+
+            val swiftdataQueries = DBObject.db.swiftdataQueries
+
+            swiftdataQueries.transaction {
+
+
+                groupList.groups.list.forEach {
+                    val groupCategories : List<String> = (it.categories.map { it.name } + it.groupType)
+                    swiftdataQueries.insertClub(
+                        clubName = it.groupName,
+                        clubID = it.clubId,
+                        clubUrl = it.clubUrl,
+                        clubCategories = groupCategories.joinToString(","),
+                        clubBanner = it.coverURL,
+                        clubLogo = it.logoUrl,
+                        clubStatus = it.status,
+                        clubJoinURL = it.join_group_url
+                    )
+                }
+                afterCommit {
+                    println("Groups added/updated to DB!")
+                }
+            }
         }
     }
 

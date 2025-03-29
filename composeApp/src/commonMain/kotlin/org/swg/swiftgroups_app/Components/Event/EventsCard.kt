@@ -39,6 +39,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
 import org.swg.swiftgroups_app.Fonts.AppFont
+import org.swg.swiftgroups_app.Screens.Event.SingleEventScreen
 import org.swg.swiftgroups_app.ShareManager.openMapLocationQuery
 import org.swg.swiftgroupsapp.db.Events
 
@@ -69,7 +70,7 @@ class EventsCard(
                 .clip(shape = RoundedCornerShape(15.dp))
                 .background(Color(0xFFf2f1f1))
                 .then(
-                    if (currentTime >= eventStartTime && currentTime <= eventEndTime) {
+                    if (currentTime in eventStartTime..eventEndTime) {
                         Modifier.border(
                             width = 2.dp,
                             color = Color.Red,
@@ -78,7 +79,9 @@ class EventsCard(
                     } else {
                         Modifier
                     }
-                ),
+                ).clickable {
+                    navigator.push(SingleEventScreen(eventDat.eventId.toInt()))
+                },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -101,14 +104,14 @@ class EventsCard(
                 ) {
                     Box(modifier = Modifier.fillMaxWidth()) {
                         AsyncImage(
-                            model = "${eventDat.eventPicture}",
+                            model = eventDat.eventPicture,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .height(130.dp)
                                 .fillMaxWidth()
                         )
-                        if (currentTime >= eventStartTime && currentTime <= eventEndTime) {
+                        if (currentTime in eventStartTime..eventEndTime) {
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
@@ -158,11 +161,20 @@ class EventsCard(
                             )
                         }
 
-                        Text(
-                            "${DateTimeFormat.home_event_date_format.format(eventStartTime)} | ${DateTimeFormat.home_event_time_format.format(eventStartTime)} - ${DateTimeFormat.home_event_time_format.format(eventEndTime)}",
-                            style = AppFont.InterTypography.body2,
-                            fontWeight = FontWeight.Bold
-                        )
+                        if(eventStartTime.date != eventEndTime.date) {
+                            Text(
+                                "${DateTimeFormat.home_event_date_format.format(eventStartTime)} - ${DateTimeFormat.home_event_date_format.format(eventEndTime)} | ${DateTimeFormat.home_event_time_format.format(eventStartTime)} - ${DateTimeFormat.home_event_time_format.format(eventEndTime)}",
+                                style = AppFont.InterTypography.body2,
+                                fontWeight = FontWeight.Bold
+                            )
+                        } else {
+                            Text(
+                                "${DateTimeFormat.home_event_date_format.format(eventStartTime)} | ${DateTimeFormat.home_event_time_format.format(eventStartTime)} - ${DateTimeFormat.home_event_time_format.format(eventEndTime)}",
+                                style = AppFont.InterTypography.body2,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
                         Row(
                             modifier = Modifier
                                 .padding(vertical = 2.dp)

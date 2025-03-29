@@ -6,13 +6,14 @@ import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 import org.swg.swiftgroupsapp.db.Events
 
-class HomeViewModel : ScreenModel {
+class HomeViewModel () : ScreenModel {
 
     init {
         fetchData()
@@ -23,13 +24,13 @@ class HomeViewModel : ScreenModel {
     var upcomingGroupEvents by mutableStateOf(emptyList<Events>())
 
     private fun fetchData() {
-        screenModelScope.launch {
+        val dataFetchTaskList = mutableListOf(screenModelScope.launch {
             delay(30)
             profileData = Home.profileDataItem.ifEmpty {
                 CGAPI.grabProfileData()
             }
 
-            val upcomingEventStaging : MutableList<Events> = mutableListOf()
+            val upcomingEventStaging: MutableList<Events> = mutableListOf()
             val upcomingEventsData = CGAPI.grabMyEvents()
 
             upcomingEventsData.list.forEach {
@@ -51,19 +52,39 @@ class HomeViewModel : ScreenModel {
             }
 
             upcomingEvents = upcomingEventStaging
+        }
+        )
+        screenModelScope.launch {
+            val groupData = CGAPI.fetchMyGroups()
 
-            val groupData = CGAPI.fetchGroups()
-
-            if(groupData.isNotEmpty()) {
+            if (groupData.isNotEmpty()) {
                 val myGroups = groupData[1]
-                val groupEvents : MutableList<Events> = mutableListOf()
+                val groupEvents: MutableList<Events> = mutableListOf()
                 myGroups.groups.forEach {
-                    groupEvents += DBObject.db.swiftdataQueries.fetchEventClub(it.groupName).executeAsList()
+                    groupEvents += DBObject.db.swiftdataQueries.fetchEventClub(it.groupName)
+                        .executeAsList()
                 }
                 upcomingGroupEvents = groupEvents
             }
-
-            CGAPI.fetchEventsData(true)
         }
+
+        if(!CGAPI.databaseFetched) {
+            dataFetchTaskList += screenModelScope.launch {
+                CGAPI.fetchEventsData()
+            }
+
+            dataFetchTaskList += screenModelScope.launch {
+                CGAPI.fetchAllGroups()
+
+            }
+        }
+
+        screenModelScope.launch {
+            dataFetchTaskList.joinAll()
+        }
+
+
+
+
     }
 }

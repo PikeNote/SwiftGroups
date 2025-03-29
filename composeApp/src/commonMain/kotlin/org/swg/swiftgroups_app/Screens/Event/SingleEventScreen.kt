@@ -375,6 +375,7 @@ class SingleEventScreen(eventID : Int) : Screen {
     fun logoText(logo : ImageVector, contentDesc : String, text : String) {
         Row(
             modifier = Modifier.padding(5.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 logo, contentDesc,
@@ -384,7 +385,7 @@ class SingleEventScreen(eventID : Int) : Screen {
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column (verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight()) {
-                Text(text, textAlign = TextAlign.Center)
+                Text(text)
             }
         }
     }

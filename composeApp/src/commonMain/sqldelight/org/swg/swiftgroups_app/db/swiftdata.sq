@@ -19,27 +19,73 @@ CREATE TABLE IF NOT EXISTS events (
 
 CREATE TABLE IF NOT EXISTS clubs (
         clubName TEXT PRIMARY KEY,
+        clubID TEXT NOT NULL,
         clubUrl TEXT NOT NULL,
-        UNIQUE(clubName)
+        clubLogo TEXT NOT NULL,
+        clubBanner TEXT NOT NULL,
+        clubCategories TEXT NOT NULL,
+        clubStatus TEXT NOT NULL,
+        clubJoinURL TEXT NOT NULL,
+        clubCacheData TEXT NOT NULL DEFAULT ''
 );
 
-insertEvent:
-INSERT OR REPLACE INTO events (eventId,start_time,end_time,eventName,eventDesc,eventAttendees,eventUrl,eventLocation, eventPicture,clubName,clubURL,eventCategory)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+insertEvent {
+  UPDATE events
+  SET start_time = :start_time,
+      end_time = :end_time,
+      eventName = :eventName,
+      eventDesc = :eventDesc,
+      eventAttendees = :eventAttendees,
+      eventUrl = :eventUrl,
+      eventLocation = :eventLocation,
+      eventPicture = :eventPicture,
+      clubName = :clubName,
+      clubURL = :clubURL,
+      eventCategory = :eventCategory
+  WHERE eventId = :eventId;
 
+  INSERT OR IGNORE INTO events (eventId,start_time,end_time,eventName,eventDesc,eventAttendees,eventUrl,eventLocation, eventPicture,clubName,clubURL,eventCategory)
+  VALUES (:eventId,:start_time,:end_time,:eventName,:eventDesc,:eventAttendees,:eventUrl,:eventLocation, :eventPicture,:clubName,:clubURL,:eventCategory);
+}
 
-insertClub:
-INSERT OR IGNORE INTO clubs (clubName, clubUrl)
-VALUES (?, ?);
+insertClub {
+  UPDATE clubs
+  SET clubName = :clubName,
+      clubUrl = :clubUrl,
+      clubLogo = :clubLogo,
+      clubBanner = :clubBanner,
+      clubCategories = :clubCategories,
+      clubStatus = :clubStatus,
+      clubJoinURL = :clubJoinURL
+  WHERE clubID = :clubID;
+
+  INSERT OR IGNORE INTO clubs (clubName, clubID, clubUrl, clubLogo, clubBanner, clubCategories, clubStatus, clubJoinURL)
+  VALUES (:clubName, :clubID, :clubUrl, :clubLogo, :clubBanner, :clubCategories, :clubStatus, :clubJoinURL);
+}
 
 fetchEvent:
-SELECT * FROM events ORDER BY start_time LIMIT ?, 50;
+SELECT * FROM events WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') ORDER BY start_time LIMIT ?, 50;
 
 fetchEventClub:
 SELECT * FROM events WHERE clubName = ? AND end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') ORDER BY start_time LIMIT 5;
+
+fetchClubCache:
+SELECT clubCacheData FROM clubs WHERE clubID = ?;
+
+fetchClubs:
+SELECT * FROM clubs WHERE clubName LIKE ('%' || :filter || '%') > 0 ORDER BY clubName LIMIT ?, 50;
 
 fetchSpecificEvent:
 SELECT * FROM events WHERE eventId = ?;
 
 updateCache:
 UPDATE events SET userCacheData = ? WHERE eventId = ?;
+
+updateClubCache:
+UPDATE clubs SET clubCacheData = ? WHERE clubID = ?;
+
+eventsEmpty:
+SELECT EXISTS (SELECT 1 FROM events);
+
+clubsEmpty:
+SELECT EXISTS (SELECT 1 FROM clubs);
