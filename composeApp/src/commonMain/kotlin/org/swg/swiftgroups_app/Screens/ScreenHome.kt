@@ -101,7 +101,7 @@ object ScreenHome : Screen {
 
                     viewModel.upcomingGroupEvents.forEach { data ->
                         item {
-                            EventHome(data).Content()
+                            EventHome(data, enableButton = true).Content()
                         }
                     }
 

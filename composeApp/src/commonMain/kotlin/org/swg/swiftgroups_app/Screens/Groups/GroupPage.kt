@@ -168,6 +168,8 @@ class GroupPage (private val groupID : String) : Screen {
                     }
                 }
             }
+            // Add bottom padding to account for tab bar
+            Spacer(modifier = Modifier.height(70.dp))
         }
     }
 }

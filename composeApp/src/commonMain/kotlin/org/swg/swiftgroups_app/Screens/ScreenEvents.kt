@@ -102,12 +102,6 @@ object ScreenEvents : Screen {
                                 modifier = Modifier.size(20.dp)
                             )
                         }
-                    } else {
-                        Icon(
-                            FontAwesomeIcons.Solid.Microphone,
-                            contentDescription = "Voice Search",
-                            modifier = Modifier.size(20.dp)
-                        )
                     }
                 },
                 colors = TextFieldDefaults.textFieldColors(

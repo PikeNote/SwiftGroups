@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -35,6 +36,7 @@ import compose.icons.fontawesomeicons.solid.Info
 import compose.icons.fontawesomeicons.solid.LocationArrow
 import compose.icons.fontawesomeicons.solid.PencilAlt
 import compose.icons.fontawesomeicons.solid.Qrcode
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -50,6 +52,10 @@ class EventsCard(
     private val cardWidth: Dp = 270.dp,
     private val horizontalPadding: Dp = 0.dp
 ) {
+    private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    private val eventStartTime = Instant.parse(eventDat.start_time).toLocalDateTime(TimeZone.currentSystemDefault())
+    private val eventEndTime = Instant.parse(eventDat.end_time).toLocalDateTime(TimeZone.currentSystemDefault())
+
     @Composable
     fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -66,18 +72,18 @@ class EventsCard(
                 )
                 .height(174.dp)
                 .clip(shape = RoundedCornerShape(15.dp))
-                .background(Color(0xFFf2f1f1)),
-//                .then(
-//                    if (eventDat.isLive == 1) {
-//                        Modifier.border(
-//                            width = 2.dp,
-//                            color = Color.Red,
-//                            shape = RoundedCornerShape(15.dp)
-//                        )
-//                    } else {
-//                        Modifier
-//                    }
-//                ),
+                .background(Color(0xFFf2f1f1))
+                .then(
+                    if (currentTime >= eventStartTime && currentTime <= eventEndTime) {
+                        Modifier.border(
+                            width = 2.dp,
+                            color = Color.Red,
+                            shape = RoundedCornerShape(15.dp)
+                        )
+                    } else {
+                        Modifier
+                    }
+                ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -98,14 +104,45 @@ class EventsCard(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AsyncImage(
-                        model = "${eventDat.eventPicture}",
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .height(120.dp)
-                            .fillMaxWidth()
-                    )
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        AsyncImage(
+                            model = "${eventDat.eventPicture}",
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .height(120.dp)
+                                .fillMaxWidth()
+                        )
+                        if (currentTime >= eventStartTime && currentTime <= eventEndTime) {
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .width(70.dp)
+                                        .height(24.dp)
+                                        .background(
+                                            color = Color(0xFFFF0000),
+                                            shape = RoundedCornerShape(
+                                                topStart = 0.dp,
+                                                topEnd = 15.dp,
+                                                bottomStart = 20.dp,
+                                                bottomEnd = 0.dp
+                                            )
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        "LIVE",
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold,
+                                        style = AppFont.InterTypography.body2
+                                    )
+                                }
+                            }
+                        }
+                    }
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -122,23 +159,10 @@ class EventsCard(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-//                            if (eventDat.isLive == 1) {
-//                                Text(
-//                                    "LIVE",
-//                                    color = Color.Red,
-//                                    fontWeight = FontWeight.Bold,
-//                                    style = AppFont.InterTypography.body2
-//                                )
-//                            }
                         }
                         
-                        val startDateTime = Instant.parse(eventDat.start_time)
-                            .toLocalDateTime(TimeZone.currentSystemDefault())
-                        val endDateTime = Instant.parse(eventDat.end_time)
-                            .toLocalDateTime(TimeZone.currentSystemDefault())
-                        
                         Text(
-                            "${DateTimeFormat.home_event_date_format.format(startDateTime)} | ${DateTimeFormat.home_event_time_format.format(startDateTime)} - ${DateTimeFormat.home_event_time_format.format(endDateTime)}",
+                            "${DateTimeFormat.home_event_date_format.format(eventStartTime)} | ${DateTimeFormat.home_event_time_format.format(eventStartTime)} - ${DateTimeFormat.home_event_time_format.format(eventEndTime)}",
                             style = AppFont.InterTypography.body2,
                             fontWeight = FontWeight.Bold
                         )
