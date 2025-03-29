@@ -32,18 +32,13 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.solid.Info
 import compose.icons.fontawesomeicons.solid.LocationArrow
-import compose.icons.fontawesomeicons.solid.PencilAlt
-import compose.icons.fontawesomeicons.solid.Qrcode
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.swg.swiftgroups_app.Components.Home.Button.VerticalLogoButton
 import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
 import org.swg.swiftgroups_app.Fonts.AppFont
-import org.swg.swiftgroups_app.Screens.Event.SingleEventScreen
 import org.swg.swiftgroups_app.ShareManager.openMapLocationQuery
 import org.swg.swiftgroupsapp.db.Events
 
@@ -70,7 +65,7 @@ class EventsCard(
                     spotColor = Color.Black.copy(alpha = 0.35f),
                     ambientColor = Color.Black.copy(alpha = 0.35f)
                 )
-                .height(174.dp)
+                .height(200.dp)
                 .clip(shape = RoundedCornerShape(15.dp))
                 .background(Color(0xFFf2f1f1))
                 .then(
@@ -110,7 +105,7 @@ class EventsCard(
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .height(120.dp)
+                                .height(130.dp)
                                 .fillMaxWidth()
                         )
                         if (currentTime >= eventStartTime && currentTime <= eventEndTime) {
@@ -146,7 +141,8 @@ class EventsCard(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 7.dp, vertical = 3.dp)
+                        .padding(start = 7.dp, top = 4.dp, end = 7.dp, bottom = 10.dp),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -155,12 +151,13 @@ class EventsCard(
                         ) {
                             Text(
                                 eventDat.eventName,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.ExtraBold,
+                                style = AppFont.InterTypography.h4,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
                         }
-                        
+
                         Text(
                             "${DateTimeFormat.home_event_date_format.format(eventStartTime)} | ${DateTimeFormat.home_event_time_format.format(eventStartTime)} - ${DateTimeFormat.home_event_time_format.format(eventEndTime)}",
                             style = AppFont.InterTypography.body2,
@@ -179,42 +176,14 @@ class EventsCard(
                             )
                             Text(
                                 eventDat.eventLocation,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                                 color = Color.Blue,
                                 style = AppFont.InterTypography.subtitle1
                             )
                         }
                     }
                 }
-            }
-
-            Column(
-                verticalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .background(Color(0xFFf2f1f1))
-                    .fillMaxHeight()
-                    .width(60.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                VerticalLogoButton(
-                    modifier = Modifier.weight(1f),
-                    logo = FontAwesomeIcons.Solid.Info,
-                    text = "Info",
-                    onClick = {
-                        navigator.push(SingleEventScreen(eventDat.eventId.toInt()))
-                    }
-                )
-                VerticalLogoButton(
-                    modifier = Modifier.weight(1f),
-                    logo = FontAwesomeIcons.Solid.PencilAlt,
-                    text = "Edit",
-                    onClick = {}
-                )
-                VerticalLogoButton(
-                    modifier = Modifier.weight(1f),
-                    logo = FontAwesomeIcons.Solid.Qrcode,
-                    text = "QR Code",
-                    onClick = {}
-                )
             }
         }
     }
