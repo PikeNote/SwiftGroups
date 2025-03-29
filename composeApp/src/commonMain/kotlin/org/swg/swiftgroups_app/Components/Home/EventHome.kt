@@ -78,17 +78,6 @@ class EventHome(
                 .height(174.dp)
                 .clip(shape = RoundedCornerShape(15.dp))
                 .background(Color(0xFFf2f1f1))
-                .then(
-                    if (currentTime >= eventStartTime && currentTime <= eventEndTime) {
-                        Modifier.border(
-                            width = 2.dp,
-                            color = Color.Red,
-                            shape = RoundedCornerShape(15.dp)
-                        )
-                    } else {
-                        Modifier
-                    }
-                )
                 .clickable {
                     navigator.push(SingleEventScreen(eventData.eventId.toInt()))
                 },
@@ -103,93 +92,107 @@ class EventHome(
                         shape = RoundedCornerShape(15.dp)
                     )
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(shape = RoundedCornerShape(15.dp))
-                        .background(Color.White)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        AsyncImage(
-                            model = eventData.eventPicture,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillBounds,
-                            modifier = Modifier
-                                .height(120.dp)
-                                .fillMaxWidth()
-                        )
+                Box(
+                    modifier = Modifier.then(
                         if (currentTime >= eventStartTime && currentTime <= eventEndTime) {
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(70.dp)
-                                        .height(24.dp)
-                                        .background(
-                                            color = Color(0xFFFF0000),
-                                            shape = RoundedCornerShape(
-                                                topStart = 0.dp,
-                                                topEnd = 15.dp,
-                                                bottomStart = 20.dp,
-                                                bottomEnd = 0.dp
-                                            )
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        "LIVE",
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Bold,
-                                        style = AppFont.InterTypography.body2
-                                    )
-                                }
-                            }
+                            Modifier.border(
+                                width = 2.dp,
+                                color = Color.Red,
+                                shape = RoundedCornerShape(15.dp)
+                            )
+                        } else {
+                            Modifier
                         }
-                    }
+                    )
+                ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 7.dp, vertical = 3.dp)
+                            .clip(shape = RoundedCornerShape(15.dp))
+                            .background(Color.White)
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(eventData.eventName, fontWeight = FontWeight.Bold,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1)
-                        }
-                        Text(
-                            "${eventStartTime.format(home_event_date_format)} | ${eventStartTime.format(home_event_time_format)} - ${eventEndTime.format(
-                                home_event_time_format)}",
-                            style = AppFont.InterTypography.body2,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Row(
-                            modifier = Modifier
-                                .padding(vertical = 2.dp)
-                                .clickable(onClick = {}),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                FontAwesomeIcons.Solid.LocationArrow, "Navigation Arrow",
-                                modifier = Modifier.size(10.dp)
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            AsyncImage(
+                                model = eventData.eventPicture,
+                                contentDescription = null,
+                                contentScale = ContentScale.FillBounds,
+                                modifier = Modifier
+                                    .height(120.dp)
+                                    .fillMaxWidth()
                             )
-                            Text(
-                                eventData.eventLocation,
-                                color = Color.Blue,
-                                style = AppFont.InterTypography.subtitle1,
-                                modifier = Modifier.clickable {
-                                    openMapLocationQuery(eventData.eventLocation)
+                            if (currentTime >= eventStartTime && currentTime <= eventEndTime) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .height(24.dp)
+                                            .background(
+                                                color = Color(0xFFFF0000),
+                                                shape = RoundedCornerShape(
+                                                    topStart = 0.dp,
+                                                    topEnd = 15.dp,
+                                                    bottomStart = 20.dp,
+                                                    bottomEnd = 0.dp
+                                                )
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            "LIVE",
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold,
+                                            style = AppFont.InterTypography.body2
+                                        )
+                                    }
                                 }
+                            }
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 7.dp, vertical = 3.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(eventData.eventName, fontWeight = FontWeight.Bold,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1)
+                            }
+                            Text(
+                                "${eventStartTime.format(home_event_date_format)} | ${eventStartTime.format(home_event_time_format)} - ${eventEndTime.format(
+                                    home_event_time_format)}",
+                                style = AppFont.InterTypography.body2,
+                                fontWeight = FontWeight.Bold
                             )
+                            Row(
+                                modifier = Modifier
+                                    .padding(vertical = 2.dp)
+                                    .clickable(onClick = {}),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    FontAwesomeIcons.Solid.LocationArrow, "Navigation Arrow",
+                                    modifier = Modifier.size(10.dp)
+                                )
+                                Text(
+                                    eventData.eventLocation,
+                                    color = Color.Blue,
+                                    style = AppFont.InterTypography.subtitle1,
+                                    modifier = Modifier.clickable {
+                                        openMapLocationQuery(eventData.eventLocation)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
