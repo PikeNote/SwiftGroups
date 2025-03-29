@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,13 +28,19 @@ import org.swg.swiftgroups_app.Components.Home.ProfileBar
 import org.swg.swiftgroups_app.Fonts.AppFont
 import androidx.compose.ui.text.font.FontWeight
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import org.swg.swiftgroups_app.CGAPI.CGAPI
 
 object ScreenHome : Screen {
 
     @Composable
     override fun Content() {
         val viewModel: HomeViewModel = rememberScreenModel { HomeViewModel() }
+        val refetchProfile by  CGAPI.refetchProfile
 
+        if(refetchProfile) {
+            CGAPI.refetchProfile.value = false
+            viewModel.fetchData()
+        }
         Column (
             modifier = Modifier
                 .fillMaxSize()

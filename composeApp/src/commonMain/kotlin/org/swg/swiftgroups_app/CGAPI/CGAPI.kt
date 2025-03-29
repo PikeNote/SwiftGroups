@@ -1,5 +1,6 @@
 package org.swg.swiftgroups_app.CGAPI
 
+import androidx.compose.runtime.mutableStateOf
 import com.multiplatform.webview.cookie.Cookie
 import com.vipulasri.kachetor.KachetorStorage
 import io.ktor.client.HttpClient
@@ -27,6 +28,7 @@ import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 
 object CGAPI {
     var databaseFetched = false
+    var refetchProfile = mutableStateOf(false)
     val client = HttpClient() {
         install(ContentNegotiation) {
             json(contentType = ContentType.Any, json = Json {

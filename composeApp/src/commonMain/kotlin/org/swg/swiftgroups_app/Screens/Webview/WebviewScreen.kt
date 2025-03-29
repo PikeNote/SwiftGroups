@@ -19,21 +19,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material.Text
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.runBlocking
 import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.CGAPI.convertCookie
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 
-class WebviewScreen(val url : String, val text : String) : Screen {
+class WebviewScreen(val url : String, val text : String, val callback : ()->Unit = {}, val urlMatch : String = "") : Screen {
 
     @Composable
     override fun Content() {
@@ -69,13 +72,24 @@ class WebviewScreen(val url : String, val text : String) : Screen {
 
             val state = rememberWebViewState(url)
 
-            LaunchedEffect(state) {
+            runBlocking {
                 CGAPI.cookieHeader.forEach {
                     state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
                 }
             }
 
             WebView(state = state, modifier = Modifier.fillMaxWidth().weight(9f))
+
+            LaunchedEffect(state) {
+                snapshotFlow { state.loadingState }
+                    .filter { it is LoadingState.Finished && state.lastLoadedUrl?.contains(urlMatch) == true }
+
+                    .collect {
+                        callback()
+                        CGAPI.refetchProfile.value=true
+                        navigator.pop()
+                    }
+            }
         }
     }
 }

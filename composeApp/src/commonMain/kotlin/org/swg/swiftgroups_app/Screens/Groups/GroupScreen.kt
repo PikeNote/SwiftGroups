@@ -173,8 +173,8 @@ object GroupScreen : Screen {
                                         modifier = Modifier.padding(horizontal = 10.dp).width(190.dp)
                                     )
 
-                                    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                                        it.clubCategories.split(",").forEach {
+                                    Column(verticalArrangement = Arrangement.spacedBy(3.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                        it.clubCategories.split(",").filter { it != "" }.forEach {
                                             Text(
                                                 it,
                                                 modifier = Modifier.widthIn(min = 80.dp).clip(

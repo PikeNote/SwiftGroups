@@ -269,7 +269,10 @@ class SingleEventScreen(eventID : Int) : Screen {
                             HorizontalLogoButton(
                                 text = "Registration",
                                 onClick = {
-                                    navigator.push(WebviewScreen(eventAPI.register_url, "Registration"))
+                                    navigator.push(WebviewScreen(eventAPI.register_url,
+                                        "Registration",
+                                        { singleEventViewModel.updateData() },
+                                        "https://community.case.edu/confirmation?type=rsvp&"))
                                 },
                                 size = 20.dp,
                                 logo = PencilSquare,
@@ -279,7 +282,8 @@ class SingleEventScreen(eventID : Int) : Screen {
                             HorizontalLogoButton(
                                 text = "Edit",
                                 onClick = {
-                                    navigator.push(WebviewScreen(eventAPI.register_url, "Edit Registration"))
+                                    navigator.push(WebviewScreen(eventAPI.register_url, "Edit Registration", { singleEventViewModel.updateData() },
+                                        "/rsvp_boot?id=" ))
                                 },
                                 size = 20.dp,
                                 logo = PencilSquare,
@@ -300,11 +304,16 @@ class SingleEventScreen(eventID : Int) : Screen {
                         )
                     }
 
+                    val text: String = if(eventAPI?.event_date != eventAPI?.event_end_date) {
+                        "${eventAPI?.event_date ?: "---"} - ${eventAPI?.event_end_date  ?: "---"}"
+                    } else {
+                        eventAPI?.event_date ?: "---"
+                    }
 
                     logoText(
                         logo = FontAwesomeIcons.Regular.Calendar,
                         contentDesc = "Calendar Icon",
-                        text = "${eventAPI?.event_date ?: "---"} : ${eventAPI?.event_start_time  ?: "---"}"
+                        text = text
                     )
 
                     logoText(
