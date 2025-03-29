@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AggregateGroups(
-    val groups: GroupList,
+    val groups: AggregateGroupList,
 )
