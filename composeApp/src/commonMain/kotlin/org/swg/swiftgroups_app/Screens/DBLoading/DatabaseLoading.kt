@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -63,7 +64,13 @@ object DatabaseLoading : Screen {
 
                 Spacer(modifier=Modifier.height(50.dp))
 
-
+                TextButton (onClick = {
+                    viewModel.showButton = false
+                    viewModel.failed = false
+                    viewModel.fetchAPIBatch()
+                }) {
+                    Text("Retry Request")
+                }
             }
 
             Column (modifier = Modifier.fillMaxWidth().height(200.dp).offset(y=600.dp).padding(horizontal = 10.dp)) {
