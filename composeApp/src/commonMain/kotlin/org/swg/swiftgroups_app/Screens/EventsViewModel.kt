@@ -25,6 +25,7 @@ class EventsViewModel : ScreenModel {
     lateinit var database: Database;
     var offset = 0L;
     private val pageSize = 50L;
+    private var currentSearchQuery = ""
 
     init {
         addTestEvents()
@@ -52,7 +53,12 @@ class EventsViewModel : ScreenModel {
 
     private fun getEvents() {
         screenModelScope.launch {
-            val eventsData = database.swiftdataQueries.fetchEvent(offset).executeAsList()
+            val eventsData = if (currentSearchQuery.isBlank()) {
+                database.swiftdataQueries.fetchEvent(offset).executeAsList()
+            } else {
+                database.swiftdataQueries.filterEvents(currentSearchQuery, offset).executeAsList()
+            }
+            
             if (eventsData.isNotEmpty()) {
                 offset += eventsData.size
                 events += eventsData
@@ -65,16 +71,33 @@ class EventsViewModel : ScreenModel {
     }
 
     fun filterEvents(searchQuery: String) {
-        if (searchQuery.isBlank()) {
-            filteredEvents = events
+        if (searchQuery == currentSearchQuery) {
             return
         }
         
-        filteredEvents = events.filter { event ->
-            event.eventName.contains(searchQuery, ignoreCase = true) ||
-            event.eventDesc.contains(searchQuery, ignoreCase = true) ||
-            event.eventLocation.contains(searchQuery, ignoreCase = true) ||
-            event.clubName.contains(searchQuery, ignoreCase = true)
+        screenModelScope.launch {
+            isLoading = true
+            currentSearchQuery = searchQuery
+            offset = 0
+            events = emptyList()
+            filteredEvents = emptyList()
+            hasMoreEvents = true
+            
+            val eventsData = if (searchQuery.isBlank()) {
+                database.swiftdataQueries.fetchEvent(offset).executeAsList()
+            } else {
+                database.swiftdataQueries.filterEvents(searchQuery, offset).executeAsList()
+            }
+            
+            if (eventsData.isNotEmpty()) {
+                offset += eventsData.size
+                events = eventsData
+                filteredEvents = eventsData
+                hasMoreEvents = eventsData.size >= pageSize
+            } else {
+                hasMoreEvents = false
+            }
+            isLoading = false
         }
     }
 

@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.swg.swiftgroups_app.CGAPI.CGAPI
@@ -25,14 +27,14 @@ class HomeViewModel () : ScreenModel {
     fun fetchData() {
         screenModelScope.launch {
             delay(30)
-            launch {
+            launch (Dispatchers.IO) {
                 profileData = Home.profileDataItem.ifEmpty {
                     CGAPI.grabProfileData()
                 }
             }
 
 
-            launch {
+            launch (Dispatchers.IO) {
                 val upcomingEventStaging: MutableList<Events> = mutableListOf()
                 val upcomingEventsData = CGAPI.grabMyEvents()
 
@@ -57,24 +59,33 @@ class HomeViewModel () : ScreenModel {
                 upcomingEvents = upcomingEventStaging
             }
 
-
-            launch {
-                val groupData = CGAPI.fetchMyGroups()
-
-                if (groupData.isNotEmpty()) {
-                    val myGroups = groupData[1]
-                    val groupEvents: MutableList<Events> = mutableListOf()
-                    myGroups.groups.forEach {
-                        groupEvents += DBObject.db.swiftdataQueries.fetchEventClub(it.groupName)
-                            .executeAsList()
+            launch (Dispatchers.IO) {
+                try {
+                    val groupData = CGAPI.fetchMyGroups()
+                    if (groupData.isNotEmpty()) {
+                        val myGroups = groupData[1]
+                        val groupEvents: MutableList<Events> = mutableListOf()
+                        myGroups.groups.forEach {
+                            groupEvents += DBObject.db.swiftdataQueries.fetchEventClub(it.groupName)
+                                .executeAsList()
+                        }
+                        upcomingGroupEvents = groupEvents
                     }
-                    upcomingGroupEvents = groupEvents
                 }
+                catch (e : Exception) {
+                    //
+                }
+
             }
 
             if (!CGAPI.databaseFetched) {
-                launch { CGAPI.fetchEventsData() }
-                launch { CGAPI.fetchAllGroups() }
+                    launch (Dispatchers.IO) { try {
+                        CGAPI.fetchEventsData()
+                        CGAPI.fetchAllGroups()
+                    }
+                    catch (e: Exception) {
+                        //
+                    }}
             }
 
         }

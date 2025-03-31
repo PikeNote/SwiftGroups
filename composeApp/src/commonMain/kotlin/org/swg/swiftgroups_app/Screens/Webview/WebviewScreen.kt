@@ -72,7 +72,7 @@ class WebviewScreen(val url : String, val text : String, val callback : ()->Unit
 
             val state = rememberWebViewState(url)
 
-            runBlocking {
+            LaunchedEffect(state) {
                 CGAPI.cookieHeader.forEach {
                     state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
                 }
