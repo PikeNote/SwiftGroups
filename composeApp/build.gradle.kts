@@ -124,6 +124,7 @@ android {
 dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.ui.graphics.android)
+    implementation("org.jetbrains.compose.material3:material3:1.8.0-beta01")
     debugImplementation(compose.uiTooling)
 }
 

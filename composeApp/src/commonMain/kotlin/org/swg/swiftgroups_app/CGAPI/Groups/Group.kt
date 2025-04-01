@@ -15,7 +15,7 @@ data class Group(
     val is_officer: Int,
     val join_group_url: String,
     val members_count: String,
-    val mission: String,
+    val mission: String = "",
     val module_counts: List<ModuleCount>,
     val name: String,
     val newsletters_count: String,
