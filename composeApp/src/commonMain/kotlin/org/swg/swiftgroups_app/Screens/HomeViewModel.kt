@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
+import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 import org.swg.swiftgroupsapp.db.Events
 
@@ -22,6 +23,7 @@ class HomeViewModel () : ScreenModel {
     var upcomingEvents by mutableStateOf(emptyList<Events>())
     var profileData by mutableStateOf(emptyList<ProfileDataItem>())
     var upcomingGroupEvents by mutableStateOf(emptyList<Events>())
+    var userQrCode : UserProfileQRCode? by mutableStateOf(null)
 
     fun fetchData() {
         screenModelScope.launch {
@@ -51,6 +53,10 @@ class HomeViewModel () : ScreenModel {
             }
 
             upcomingEvents = upcomingEventStaging
+
+            yield()
+
+            userQrCode = CGAPI.fetchProfileQR()
 
             yield()
 

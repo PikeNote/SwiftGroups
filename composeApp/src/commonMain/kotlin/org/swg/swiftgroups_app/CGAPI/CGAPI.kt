@@ -23,6 +23,7 @@ import org.swg.swiftgroups_app.CGAPI.Groups.Group
 import org.swg.swiftgroups_app.CGAPI.Groups.GroupList
 import org.swg.swiftgroups_app.CGAPI.Groups.HomeGroup.ProfileGroupItem
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
+import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 
@@ -180,6 +181,25 @@ object CGAPI {
             return emptyList()
         }
     }
+
+    suspend fun fetchProfileQR() : UserProfileQRCode? {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_qrcode") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            println("Group fetched successfully!")
+            val profileQR : UserProfileQRCode = response.body()
+            return profileQR
+        } else {
+            return null
+        }
+    }
+
 
     suspend fun fetchGroup(groupID : String) : Group? {
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_group_new?id=${groupID}") {

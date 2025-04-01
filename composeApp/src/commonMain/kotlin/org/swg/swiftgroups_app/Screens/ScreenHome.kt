@@ -61,8 +61,8 @@ object ScreenHome : Screen {
                 Text("SwiftGroups", style=AppFont.InterTypography.h2, fontWeight = FontWeight.Black, modifier = Modifier.align(
                     Alignment.Center))
                 Icon(QrCodeScan, "Personal QR Code", modifier = Modifier.clickable {
-                    if(viewModel.profileData.isNotEmpty()) {
-                        navigator.push(QRScreen(viewModel.profileData[0].uid))
+                    if(viewModel.userQrCode != null) {
+                        navigator.push(QRScreen(viewModel.userQrCode!!.qrcodeNumber))
                     }
                 }.align(Alignment.CenterEnd).size(30.dp))
             }
