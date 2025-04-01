@@ -74,7 +74,17 @@ fun DatePickerModal(
         )
     ) {
         DatePicker(
-            state = datePickerState
-        )
+            state = datePickerState,
+            showModeToggle = false,
+            colors = DatePickerDefaults.colors(
+                containerColor = Color.White,
+                selectedDayContainerColor = Color(0xFF1A73E8),
+                todayDateBorderColor = Color(0xFF1A73E8),
+                todayContentColor = Color(0xFF1A73E8),
+                selectedDayContentColor = Color.White,
+                currentYearContentColor = Color(0xFF1A73E8),
+                selectedYearContainerColor = Color(0xFF1A73E8).copy(alpha = 0.12f),
+                weekdayContentColor = Color(0xFF666666)
+        ))
     }
 }
