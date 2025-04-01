@@ -87,6 +87,32 @@ AND (
     OR lower(eventLocation) LIKE lower('%' || :searchQuery || '%')
     OR lower(clubName) LIKE lower('%' || :searchQuery || '%')
 )
+AND (
+    julianday(end_time) - julianday(start_time) <= 3
+)
+ORDER BY start_time LIMIT ?, 50;
+
+filterEventsWithLongEvents:
+SELECT * FROM events 
+WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') 
+AND (
+    lower(eventName) LIKE lower('%' || :searchQuery || '%')
+    OR lower(eventDesc) LIKE lower('%' || :searchQuery || '%')
+    OR lower(eventLocation) LIKE lower('%' || :searchQuery || '%')
+    OR lower(clubName) LIKE lower('%' || :searchQuery || '%')
+)
+ORDER BY start_time LIMIT ?, 50;
+
+filterEventsByDate:
+SELECT * FROM events 
+WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') 
+AND (
+    lower(eventName) LIKE lower('%' || :searchQuery || '%')
+    OR lower(eventDesc) LIKE lower('%' || :searchQuery || '%')
+    OR lower(eventLocation) LIKE lower('%' || :searchQuery || '%')
+    OR lower(clubName) LIKE lower('%' || :searchQuery || '%')
+)
+AND date(start_time) = date(:selectedDate)
 ORDER BY start_time LIMIT ?, 50;
 
 updateCache:

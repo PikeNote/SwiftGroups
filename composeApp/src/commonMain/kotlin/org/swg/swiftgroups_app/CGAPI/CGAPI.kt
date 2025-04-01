@@ -43,10 +43,10 @@ object CGAPI {
             publicStorage(KachetorStorage(10 * 1024 * 1024))
 
         }
-        request { timeout {
-            requestTimeoutMillis = 0
-            socketTimeoutMillis = 0
-        } }
+//        request { timeout {
+//            requestTimeoutMillis = 0
+//            socketTimeoutMillis = 0
+//        } }
     }
 
     var cookieHeader : List<io.ktor.http.Cookie> = emptyList()

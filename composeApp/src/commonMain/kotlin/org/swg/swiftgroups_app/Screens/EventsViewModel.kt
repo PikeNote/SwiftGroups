@@ -3,13 +3,11 @@ package org.swg.swiftgroups_app.Screens
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import app.cash.sqldelight.Query
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.swg.swiftgroups_app.CGAPI.CGAPI
+import kotlinx.datetime.LocalDate
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEventData
 import org.swg.swiftgroups_app.DatabaseDriver.provideDbDriver
@@ -22,13 +20,14 @@ class EventsViewModel : ScreenModel {
     var filteredEvents: List<Events> by mutableStateOf(emptyList())
     var isLoading by mutableStateOf(false)
     var hasMoreEvents by mutableStateOf(true)
+    var showLongEvents by mutableStateOf(true)
+    var selectedDate by mutableStateOf<LocalDate?>(null)
     lateinit var database: Database;
     var offset = 0L;
     private val pageSize = 50L;
     private var currentSearchQuery = ""
 
     init {
-        addTestEvents()
         runBlocking {
             database = Database(provideDbDriver(Database.Schema))
             fetchData()
@@ -53,10 +52,26 @@ class EventsViewModel : ScreenModel {
 
     private fun getEvents() {
         screenModelScope.launch {
-            val eventsData = if (currentSearchQuery.isBlank()) {
-                database.swiftdataQueries.fetchEvent(offset).executeAsList()
+            val eventsData = if (currentSearchQuery.isBlank() && selectedDate == null) {
+                if (showLongEvents) {
+                    database.swiftdataQueries.filterEventsWithLongEvents("", offset).executeAsList()
+                } else {
+                    database.swiftdataQueries.filterEvents("", offset).executeAsList()
+                }
             } else {
-                database.swiftdataQueries.filterEvents(currentSearchQuery, offset).executeAsList()
+                if (selectedDate != null) {
+                    database.swiftdataQueries.filterEventsByDate(
+                        currentSearchQuery,
+                        selectedDate.toString(),
+                        offset
+                    ).executeAsList()
+                } else {
+                    if (showLongEvents) {
+                        database.swiftdataQueries.filterEventsWithLongEvents(currentSearchQuery, offset).executeAsList()
+                    } else {
+                        database.swiftdataQueries.filterEvents(currentSearchQuery, offset).executeAsList()
+                    }
+                }
             }
             
             if (eventsData.isNotEmpty()) {
@@ -83,10 +98,26 @@ class EventsViewModel : ScreenModel {
             filteredEvents = emptyList()
             hasMoreEvents = true
             
-            val eventsData = if (searchQuery.isBlank()) {
-                database.swiftdataQueries.fetchEvent(offset).executeAsList()
+            val eventsData = if (searchQuery.isBlank() && selectedDate == null) {
+                if (showLongEvents) {
+                    database.swiftdataQueries.filterEventsWithLongEvents("", offset).executeAsList()
+                } else {
+                    database.swiftdataQueries.filterEvents("", offset).executeAsList()
+                }
             } else {
-                database.swiftdataQueries.filterEvents(searchQuery, offset).executeAsList()
+                if (selectedDate != null) {
+                    database.swiftdataQueries.filterEventsByDate(
+                        searchQuery,
+                        selectedDate.toString(),
+                        offset
+                    ).executeAsList()
+                } else {
+                    if (showLongEvents) {
+                        database.swiftdataQueries.filterEventsWithLongEvents(searchQuery, offset).executeAsList()
+                    } else {
+                        database.swiftdataQueries.filterEvents(searchQuery, offset).executeAsList()
+                    }
+                }
             }
             
             if (eventsData.isNotEmpty()) {
@@ -101,6 +132,25 @@ class EventsViewModel : ScreenModel {
         }
     }
 
+    fun toggleLongEvents() {
+        showLongEvents = !showLongEvents
+        offset = 0
+        events = emptyList()
+        filteredEvents = emptyList()
+        hasMoreEvents = true
+        getEvents()
+    }
+
+    fun setSelectedDate(date: LocalDate?) {
+        selectedDate = date
+        offset = 0
+        events = emptyList()
+        filteredEvents = emptyList()
+        hasMoreEvents = true
+        getEvents()
+    }
+
+    // Only for testing
     private fun addTestEvents() {
         val testEvents = List(10) { index ->
             UpcomingEventData(
