@@ -29,7 +29,6 @@ import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.runBlocking
 import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.CGAPI.convertCookie
@@ -72,7 +71,7 @@ class WebviewScreen(val url : String, val text : String, val callback : ()->Unit
 
             val state = rememberWebViewState(url)
 
-            LaunchedEffect(state) {
+            LaunchedEffect(Unit) {
                 CGAPI.cookieHeader.forEach {
                     state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
                 }

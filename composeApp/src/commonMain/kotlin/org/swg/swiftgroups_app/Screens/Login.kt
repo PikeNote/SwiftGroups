@@ -20,7 +20,6 @@ import com.multiplatform.webview.web.WebViewState
 import io.ktor.util.date.GMTDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.CGAPI.convertCookie
@@ -39,7 +38,6 @@ object Login : Screen {
         screenModel = rememberScreenModel { LoginViewModel(navigator) }
 
         val state = rememberWebViewState("https://www.campusgroups.com/shibboleth/login?idp=cwru")
-
         Column(
             Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -47,6 +45,12 @@ object Login : Screen {
         ) {
             if(screenModel!!.requireLogin) {
                 WebView(state = state, modifier = Modifier.fillMaxSize())
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            CGAPI.cookieHeader.forEach {
+                state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
             }
         }
 

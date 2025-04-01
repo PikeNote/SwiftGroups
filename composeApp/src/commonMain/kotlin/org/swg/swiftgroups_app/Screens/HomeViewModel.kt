@@ -5,10 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
@@ -27,19 +26,14 @@ class HomeViewModel () : ScreenModel {
     fun fetchData() {
         screenModelScope.launch {
             delay(30)
-            launch (Dispatchers.IO) {
-                profileData = Home.profileDataItem.ifEmpty {
-                    CGAPI.grabProfileData()
-                }
-            }
+            profileData = Home.profileDataItem.ifEmpty { CGAPI.grabProfileData() }
+            yield()
+            val upcomingEventStaging: MutableList<Events> = mutableListOf()
+            val upcomingEventsData = CGAPI.grabMyEvents()
 
-
-            launch (Dispatchers.IO) {
-                val upcomingEventStaging: MutableList<Events> = mutableListOf()
-                val upcomingEventsData = CGAPI.grabMyEvents()
-
-                upcomingEventsData.list.forEach {
-                    upcomingEventStaging += Events(
+            upcomingEventsData.list.forEach {
+                upcomingEventStaging +=
+                    Events(
                         eventId = it.event_id.toLong(),
                         eventName = it.event_name,
                         start_time = it.event_start_utc,
@@ -54,41 +48,38 @@ class HomeViewModel () : ScreenModel {
                         eventCategory = "",
                         userCacheData = ""
                     )
-                }
-
-                upcomingEvents = upcomingEventStaging
             }
 
-            launch (Dispatchers.IO) {
-                try {
-                    val groupData = CGAPI.fetchMyGroups()
-                    if (groupData.isNotEmpty()) {
-                        val myGroups = groupData[1]
-                        val groupEvents: MutableList<Events> = mutableListOf()
-                        myGroups.groups.forEach {
-                            groupEvents += DBObject.db.swiftdataQueries.fetchEventClub(it.groupName)
+            upcomingEvents = upcomingEventStaging
+
+            yield()
+
+            try {
+                val groupData = CGAPI.fetchMyGroups()
+                if (groupData.isNotEmpty()) {
+                    val myGroups = groupData[1]
+                    val groupEvents: MutableList<Events> = mutableListOf()
+                    myGroups.groups.forEach {
+                        groupEvents +=
+                            DBObject.db.swiftdataQueries
+                                .fetchEventClub(it.groupName)
                                 .executeAsList()
-                        }
-                        upcomingGroupEvents = groupEvents
                     }
+                    upcomingGroupEvents = groupEvents
                 }
-                catch (e : Exception) {
-                    //
-                }
-
+            } catch (e: Exception) {
+                //
             }
+            yield()
 
             if (!CGAPI.databaseFetched) {
-                    launch (Dispatchers.IO) { try {
-                        CGAPI.fetchEventsData()
-                        CGAPI.fetchAllGroups()
-                    }
-                    catch (e: Exception) {
-                        //
-                    }}
+                try {
+                    CGAPI.fetchEventsData()
+                    CGAPI.fetchAllGroups()
+                } catch (e: Exception) {
+                    //
+                }
             }
-
         }
-
     }
 }

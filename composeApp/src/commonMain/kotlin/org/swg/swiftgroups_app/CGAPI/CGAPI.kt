@@ -7,7 +7,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.timeout
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.CacheControl
@@ -43,10 +42,6 @@ object CGAPI {
             publicStorage(KachetorStorage(10 * 1024 * 1024))
 
         }
-//        request { timeout {
-//            requestTimeoutMillis = 0
-//            socketTimeoutMillis = 0
-//        } }
     }
 
     var cookieHeader : List<io.ktor.http.Cookie> = emptyList()

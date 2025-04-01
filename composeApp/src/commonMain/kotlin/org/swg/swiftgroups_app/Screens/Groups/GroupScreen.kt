@@ -28,7 +28,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +57,7 @@ object GroupScreen : Screen {
     override fun Content() {
         val viewModel = rememberScreenModel { GroupScreenViewModel() }
         val naivgator = LocalNavigator.currentOrThrow
-        var searchText by remember { mutableStateOf("") }
+        var searchText by rememberSaveable { mutableStateOf("") }
 
         Column(
             modifier = Modifier

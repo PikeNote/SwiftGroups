@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -22,7 +21,6 @@ sqldelight {
 
 kotlin {
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
@@ -71,7 +69,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.qrose)
             implementation(libs.kachetor)
-            implementation(compose.material3)
+            implementation(libs.compose.material3)
         }
         appleMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -120,11 +118,8 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.material3.v120alpha05)
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.ui.graphics.android)
-    implementation(libs.androidx.ui.android)
     debugImplementation(compose.uiTooling)
 }
 

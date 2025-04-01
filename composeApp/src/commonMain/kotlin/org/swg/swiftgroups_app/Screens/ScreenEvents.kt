@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +25,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -50,111 +48,22 @@ import compose.icons.fontawesomeicons.solid.Search
 import compose.icons.fontawesomeicons.solid.Times
 import org.swg.swiftgroups_app.Components.Home.EventsCard
 import org.swg.swiftgroups_app.Fonts.AppFont
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.until
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.saveable.rememberSaveable
 import kotlinx.datetime.Instant
-import androidx.compose.material3.DatePickerDialog
+import org.swg.swiftgroups_app.Components.DatePickerModal
 
 private fun formatDate(date: LocalDate): String {
     return "${date.month.name.take(3)} ${date.dayOfMonth}, ${date.year}"
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DatePickerDialog(
-    onDismissRequest: () -> Unit,
-    onDateSelected: (LocalDate) -> Unit,
-    onClearDate: () -> Unit,
-    selectedDate: LocalDate? = null
-) {
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDate?.let {
-            val now = Clock.System.now()
-            val todayStart = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
-            val daysDiff = todayStart.until(selectedDate, DateTimeUnit.DAY)
-            val startOfToday = now.toEpochMilliseconds() / (24 * 60 * 60 * 1000L) * (24 * 60 * 60 * 1000L)
-            startOfToday + (daysDiff - 1) * 24 * 60 * 60 * 1000L
-        }
-    )
-
-    DatePickerDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    datePickerState.selectedDateMillis?.let {
-                        val instant = Instant.fromEpochMilliseconds(it + 24 * 60 * 60 * 1000L)
-                        val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-                        onDateSelected(localDateTime.date)
-                    }
-                    onDismissRequest()
-                }
-            ) {
-                Text(
-                    "OK",
-                    color = Color(0xFF1A73E8),
-                    style = AppFont.InterTypography.button
-                )
-            }
-        },
-        dismissButton = {
-            Row {
-                TextButton(
-                    onClick = {
-                        datePickerState.selectedDateMillis = null
-                        onClearDate()
-                        onDismissRequest()
-                    }
-                ) {
-                    Text(
-                        "Clear",
-                        color = Color(0xFF1A73E8),
-                        style = AppFont.InterTypography.button
-                    )
-                }
-                TextButton(onClick = onDismissRequest) {
-                    Text(
-                        "Cancel",
-                        color = Color(0xFF1A73E8),
-                        style = AppFont.InterTypography.button
-                    )
-                }
-            }
-        },
-        colors = DatePickerDefaults.colors(
-            containerColor = Color.White
-        )
-    ) {
-        DatePicker(
-            state = datePickerState,
-            showModeToggle = false,
-            colors = DatePickerDefaults.colors(
-                containerColor = Color.White,
-                selectedDayContainerColor = Color(0xFF1A73E8),
-                todayDateBorderColor = Color(0xFF1A73E8),
-                todayContentColor = Color(0xFF1A73E8),
-                selectedDayContentColor = Color.White,
-                currentYearContentColor = Color(0xFF1A73E8),
-                selectedYearContainerColor = Color(0xFF1A73E8).copy(alpha = 0.12f),
-                weekdayContentColor = Color(0xFF666666)
-            )
-        )
-    }
 }
 
 object ScreenEvents : Screen {
     @Composable
     override fun Content() {
         val viewModel: EventsViewModel = rememberScreenModel { EventsViewModel() }
-        var searchText by remember { mutableStateOf("") }
+        var searchText by rememberSaveable { mutableStateOf("") }
         var showDatePicker by remember { mutableStateOf(false) }
 
         Column(
@@ -278,14 +187,15 @@ object ScreenEvents : Screen {
                 ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(viewModel.filteredEvents) { eventData ->
+                items(viewModel.events.filter {
+                    longDate(it.start_time, it.end_time) || viewModel.showLongEvents
+                }) { eventData ->
                     EventsCard(
                         eventData,
                         cardWidth = 500.dp,
                         horizontalPadding = 16.dp
                     ).Content()
                 }
-
                 // Loading indicator
                 if (viewModel.isLoading) {
                     item {
@@ -313,16 +223,20 @@ object ScreenEvents : Screen {
 
         // Date Picker Dialog
         if (showDatePicker) {
-            DatePickerDialog(
-                onDismissRequest = { showDatePicker = false },
+            DatePickerModal(
+                onDismiss = { showDatePicker = false },
                 onDateSelected = { date ->
-                    viewModel.setSelectedDate(date)
+                    viewModel.setSelectedDateCal(date)
                 },
                 onClearDate = {
-                    viewModel.setSelectedDate(null)
-                },
-                selectedDate = viewModel.selectedDate
+                    viewModel.setSelectedDateCal(null)
+                }
             )
         }
+    }
+
+    fun longDate(start_time : String, end_time : String) : Boolean {
+        return Instant.parse(start_time).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear ==
+                Instant.parse(end_time).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear
     }
 }
