@@ -30,6 +30,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.Divider
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +66,7 @@ import compose.icons.fontawesomeicons.regular.Eye
 import compose.icons.fontawesomeicons.regular.ShareSquare
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.Components.Event.QRCode
 import org.swg.swiftgroups_app.Components.Home.Button.HorizontalLogoButton
@@ -72,6 +74,7 @@ import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.MapPin
 import org.swg.swiftgroups_app.Icons.PencilSquare
+import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.Groups.GroupPage
 import org.swg.swiftgroups_app.Screens.Webview.WebviewScreen
 import org.swg.swiftgroups_app.ShareManager.shareLink
@@ -83,6 +86,11 @@ class SingleEventScreen(eventID : Int) : Screen {
     @Composable
     @Preview
     override fun Content() {
+        val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
+        LaunchedEffect(Unit) {
+            bottomTabVisibilityManager.setBottomBarVisibility(false)
+        }
+
         val navigator = LocalNavigator.currentOrThrow
         val eventAPI = singleEventViewModel.eventSpecificAPI.value
 
@@ -128,7 +136,8 @@ class SingleEventScreen(eventID : Int) : Screen {
                     .background(Brush.verticalGradient(colorStops = AppTheme.eventPageImage))
             ) {
                 TextButton(
-                    onClick = {navigator.pop()},
+                    onClick = {bottomTabVisibilityManager.setBottomBarVisibility(true)
+                        navigator.pop()},
                     colors = ButtonDefaults.buttonColors(
                         contentColor = Color.Black,
                         backgroundColor = Color.Transparent

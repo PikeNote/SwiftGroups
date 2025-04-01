@@ -1,7 +1,9 @@
 package org.swg.swiftgroups_app.Screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -10,10 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,7 +33,11 @@ import org.swg.swiftgroups_app.Components.Home.ProfileBar
 import org.swg.swiftgroups_app.Fonts.AppFont
 import androidx.compose.ui.text.font.FontWeight
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.Icons.QrCodeScan
+import org.swg.swiftgroups_app.Screens.Home.QRScreen
 
 object ScreenHome : Screen {
 
@@ -36,7 +45,7 @@ object ScreenHome : Screen {
     override fun Content() {
         val viewModel: HomeViewModel = rememberScreenModel { HomeViewModel() }
         val refetchProfile by  CGAPI.refetchProfile
-
+        val navigator = LocalNavigator.currentOrThrow
         if(refetchProfile) {
             CGAPI.refetchProfile.value = false
             viewModel.fetchData()
@@ -48,8 +57,15 @@ object ScreenHome : Screen {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("SwiftGroups", style=AppFont.InterTypography.h2, fontWeight = FontWeight.Black)
-
+            Box(modifier = Modifier.fillMaxWidth().padding(horizontal=10.dp)) {
+                Text("SwiftGroups", style=AppFont.InterTypography.h2, fontWeight = FontWeight.Black, modifier = Modifier.align(
+                    Alignment.Center))
+                Icon(QrCodeScan, "Personal QR Code", modifier = Modifier.clickable {
+                    if(viewModel.profileData.isNotEmpty()) {
+                        navigator.push(QRScreen(viewModel.profileData[0].uid))
+                    }
+                }.align(Alignment.CenterEnd).size(30.dp))
+            }
             Spacer(Modifier.height(10.dp))
 
             viewModel.profileData.forEach { data ->

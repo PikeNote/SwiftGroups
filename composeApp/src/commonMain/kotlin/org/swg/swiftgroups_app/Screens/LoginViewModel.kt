@@ -24,8 +24,8 @@ class LoginViewModel (navigator : Navigator?) : ScreenModel {
                 runBlocking {
                     val loggedIn = CGAPI.checkLoggedIn()
                     if (loggedIn.isNotEmpty()) {
-                        Home.profileDataItem = loggedIn
-                        navigator?.replace(Home)
+                        TabNavigation.profileDataItem = loggedIn
+                        navigator?.replace(TabNavigation)
                     } else {
                         requireLogin = true
                     }

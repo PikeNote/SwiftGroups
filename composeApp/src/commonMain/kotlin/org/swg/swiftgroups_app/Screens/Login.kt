@@ -62,7 +62,7 @@ object Login : Screen {
                     delay(300)
                     storeCookies(state, navigator)
                     if(DBObject.db.swiftdataQueries.eventsEmpty().executeAsOne()) {
-                        navigator.replace(Home)
+                        navigator.replace(TabNavigation)
                     } else {
                         navigator.replace(DatabaseLoading)
                     }
@@ -95,6 +95,6 @@ object Login : Screen {
 
         CGAPI.cookieHeader = ktorCookies
         screenModel?.secureVault?.set("cg_cookie", cookieData)
-        navigator.replace(Home)
+        navigator.replace(TabNavigation)
     }
 }

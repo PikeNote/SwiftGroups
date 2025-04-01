@@ -26,7 +26,7 @@ class HomeViewModel () : ScreenModel {
     fun fetchData() {
         screenModelScope.launch {
             delay(30)
-            profileData = Home.profileDataItem.ifEmpty { CGAPI.grabProfileData() }
+            profileData = TabNavigation.profileDataItem.ifEmpty { CGAPI.grabProfileData() }
             yield()
             val upcomingEventStaging: MutableList<Events> = mutableListOf()
             val upcomingEventsData = CGAPI.grabMyEvents()

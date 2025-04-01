@@ -11,12 +11,20 @@ import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import okio.FileSystem
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 import org.swg.swiftgroups_app.Fonts.AppFont
+import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.Login
 
 @Composable
 @Preview
 fun App() {
+    startKoin {
+        modules(
+            module { single<BottomTabVisibilityManager> { BottomTabVisibilityManager() } }
+        )
+    }
 
     setSingletonImageLoaderFactory { context ->
         ImageLoader.Builder(context)
@@ -35,12 +43,16 @@ fun App() {
             .build()
     }
 
+
     val typography = AppFont.InterTypography
+
 
     MaterialTheme(
         typography = typography,
         colors = AppTheme.theme
-    ) {Navigator(Login, onBackPressed = null)
+    ) {
+
+        Navigator(Login, onBackPressed = null)
     }
 
 

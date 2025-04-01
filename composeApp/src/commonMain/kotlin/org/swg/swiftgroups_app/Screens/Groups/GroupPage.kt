@@ -3,7 +3,6 @@ package org.swg.swiftgroups_app.Screens.Groups
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +29,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +46,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Regular
 import compose.icons.fontawesomeicons.regular.Calendar
 import compose.icons.fontawesomeicons.regular.Clipboard
+import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Components.GroupPage.IconText
 import org.swg.swiftgroups_app.Components.Home.Button.HorizontalLogoButton
 import org.swg.swiftgroups_app.Components.Home.EventHome
@@ -53,12 +54,18 @@ import org.swg.swiftgroups_app.Components.SpinningBar
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.Person
+import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.Webview.WebviewScreen
 
 class GroupPage (private val groupID : String) : Screen {
 
     @Composable
     override fun Content() {
+        val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
+        LaunchedEffect(Unit) {
+            bottomTabVisibilityManager.setBottomBarVisibility(false)
+        }
+
         val viewmodel = rememberScreenModel { GroupPageViewModel(groupID) }
         val navigator =  LocalNavigator.currentOrThrow
         val group = viewmodel.group.value
@@ -86,7 +93,9 @@ class GroupPage (private val groupID : String) : Screen {
 
 
                 TextButton(
-                    onClick = {navigator.pop()},
+                    onClick = {
+                        bottomTabVisibilityManager.setBottomBarVisibility(true)
+                        navigator.pop()},
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Color.Transparent
                     ),

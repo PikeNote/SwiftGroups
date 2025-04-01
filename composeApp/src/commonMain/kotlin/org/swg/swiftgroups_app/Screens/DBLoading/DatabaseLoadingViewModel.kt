@@ -9,7 +9,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
-import org.swg.swiftgroups_app.Screens.Home
+import org.swg.swiftgroups_app.Screens.TabNavigation
 
 class DatabaseLoadingViewModel(val navigator : Navigator) : ScreenModel {
     val logs = mutableStateListOf<String>()
@@ -29,7 +29,7 @@ class DatabaseLoadingViewModel(val navigator : Navigator) : ScreenModel {
             )
             if(!failed) {
                 CGAPI.databaseFetched = true
-                navigator.replace(Home)
+                navigator.replace(TabNavigation)
             } else {
                 showButton = true
             }
