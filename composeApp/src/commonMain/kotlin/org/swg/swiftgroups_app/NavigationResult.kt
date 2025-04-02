@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package org.swg.swiftgroups_app
 
 private val screenResults = hashMapOf<String, Any?>()

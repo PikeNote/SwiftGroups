@@ -1,5 +1,6 @@
 package org.swg.swiftgroups_app.Screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,13 +32,15 @@ import cafe.adriel.voyager.core.screen.Screen
 import org.swg.swiftgroups_app.Components.Home.EventHome
 import org.swg.swiftgroups_app.Components.Home.ProfileBar
 import org.swg.swiftgroups_app.Fonts.AppFont
-import androidx.compose.ui.text.font.FontWeight
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import org.jetbrains.compose.resources.painterResource
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.Icons.QrCodeScan
 import org.swg.swiftgroups_app.Screens.Home.QRScreen
+import swiftgroups.composeapp.generated.resources.Res
+import swiftgroups.composeapp.generated.resources.swiftgroups_title
 
 object ScreenHome : Screen {
 
@@ -58,8 +61,11 @@ object ScreenHome : Screen {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal=10.dp)) {
-                Text("SwiftGroups", style=AppFont.InterTypography.h2, fontWeight = FontWeight.Black, modifier = Modifier.align(
-                    Alignment.Center))
+                Image(
+                    painter = painterResource(Res.drawable.swiftgroups_title),
+                    contentDescription = "SwiftGroups Logo",
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
                 Icon(QrCodeScan, "Personal QR Code", modifier = Modifier.clickable {
                     if(viewModel.userQrCode != null) {
                         navigator.push(QRScreen(viewModel.userQrCode!!.qrcodeNumber))

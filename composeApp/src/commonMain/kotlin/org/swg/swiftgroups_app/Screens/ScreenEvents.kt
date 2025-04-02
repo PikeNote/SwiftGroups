@@ -1,6 +1,7 @@
 package org.swg.swiftgroups_app.Screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
@@ -53,7 +53,10 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.painterResource
 import org.swg.swiftgroups_app.Components.DatePickerModal
+import swiftgroups.composeapp.generated.resources.Res
+import swiftgroups.composeapp.generated.resources.swiftgroups_title
 
 private fun formatDate(date: LocalDate): String {
     return "${date.month.name.take(3)} ${date.dayOfMonth}, ${date.year}"
@@ -73,13 +76,11 @@ object ScreenEvents : Screen {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                "SwiftGroups",
-                style = AppFont.InterTypography.h2,
-                fontWeight = FontWeight.Black,
-                modifier = Modifier.padding(bottom = 16.dp)
+            Image(
+                painter = painterResource(Res.drawable.swiftgroups_title),
+                contentDescription = "SwiftGroups Logo",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-
             // Search Bar
             TextField(
                 value = searchText,

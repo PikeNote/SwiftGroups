@@ -1,5 +1,6 @@
 package org.swg.swiftgroups_app.Screens.Groups
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,7 +38,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -49,7 +49,10 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Search
 import compose.icons.fontawesomeicons.solid.Times
+import org.jetbrains.compose.resources.painterResource
 import org.swg.swiftgroups_app.Fonts.AppFont
+import swiftgroups.composeapp.generated.resources.Res
+import swiftgroups.composeapp.generated.resources.swiftgroups_title
 
 object GroupScreen : Screen {
 
@@ -66,13 +69,11 @@ object GroupScreen : Screen {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                "SwiftGroups",
-                style = AppFont.InterTypography.h2,
-                fontWeight = FontWeight.Black,
-                modifier = Modifier.padding(bottom = 16.dp)
+            Image(
+                painter = painterResource(Res.drawable.swiftgroups_title),
+                contentDescription = "SwiftGroups Logo",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-
             TextField(
                 value = searchText,
                 textStyle = AppFont.InterTypography.h4,
