@@ -18,7 +18,7 @@ object DateTimeFormat {
 
     val home_event_time_format = LocalDateTime.Format {
         amPmHour(Padding.NONE)
-        char(' ')
+        char(':')
         minute(Padding.ZERO)
         char(' ')
         amPmMarker(am = "AM", pm = "PM")
