@@ -38,8 +38,11 @@ import compose.icons.fontawesomeicons.solid.PencilAlt
 import compose.icons.fontawesomeicons.solid.Qrcode
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
+import kotlinx.datetime.minus
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.Components.Home.Button.VerticalLogoButton
 import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat.home_event_date_format
@@ -53,12 +56,27 @@ class EventHome(
     private val eventData: Events,
     private val cardWidth: Dp = 270.dp,
     private val horizontalPadding: Dp = 0.dp,
-    private val enableButton: Boolean = false
+    private val enableButton: Boolean = false,
+    private val isUTC: Boolean = false
 ) {
 
     private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-    private val eventStartTime = Instant.parse(eventData.start_time).toLocalDateTime(TimeZone.UTC)
-    private val eventEndTime = Instant.parse(eventData.end_time).toLocalDateTime(TimeZone.UTC)
+    private val eventStartTime : LocalDateTime
+    private val eventEndTime : LocalDateTime
+
+    init {
+        val eventStart = Instant.parse(eventData.start_time)
+        val eventEnd = Instant.parse(eventData.end_time)
+        if (isUTC) {
+            eventStartTime = eventStart.toLocalDateTime(TimeZone.currentSystemDefault())
+            eventEndTime = eventEnd.toLocalDateTime(TimeZone.currentSystemDefault())
+
+        } else {
+            eventStartTime = eventStart.toLocalDateTime(TimeZone.UTC)
+            eventEndTime = eventEnd.toLocalDateTime(TimeZone.UTC)
+        }
+    }
+
 
     @Composable
     fun Content() {

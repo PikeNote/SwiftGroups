@@ -102,7 +102,7 @@ object ScreenHome : Screen {
                 ) {
                     viewModel.upcomingEvents.forEach { data ->
                         item {
-                            EventHome(data, enableButton = true).Content()
+                            EventHome(data, enableButton = true, isUTC = true).Content()
                         }
                     }
                 }
@@ -132,7 +132,7 @@ object ScreenHome : Screen {
 
                     viewModel.upcomingGroupEvents.forEach { data ->
                         item {
-                            EventHome(data, enableButton = true).Content()
+                            EventHome(data, enableButton = true, isUTC = false).Content()
                         }
                     }
 
