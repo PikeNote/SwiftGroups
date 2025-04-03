@@ -48,9 +48,9 @@ class EventsCard(
     private val cardWidth: Dp = 270.dp,
     private val horizontalPadding: Dp = 0.dp
 ) {
-    private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-    private val eventStartTime = Instant.parse(eventDat.start_time).toLocalDateTime(TimeZone.currentSystemDefault())
-    private val eventEndTime = Instant.parse(eventDat.end_time).toLocalDateTime(TimeZone.currentSystemDefault())
+    private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+    private val eventStartTime = Instant.parse(eventDat.start_time).toLocalDateTime(TimeZone.UTC)
+    private val eventEndTime = Instant.parse(eventDat.end_time).toLocalDateTime(TimeZone.UTC)
 
     @Composable
     fun Content() {

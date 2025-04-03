@@ -56,9 +56,9 @@ class EventHome(
     private val enableButton: Boolean = false
 ) {
 
-    private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-    private val eventStartTime = Instant.parse(eventData.start_time).toLocalDateTime(TimeZone.currentSystemDefault())
-    private val eventEndTime = Instant.parse(eventData.end_time).toLocalDateTime(TimeZone.currentSystemDefault())
+    private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+    private val eventStartTime = Instant.parse(eventData.start_time).toLocalDateTime(TimeZone.UTC)
+    private val eventEndTime = Instant.parse(eventData.end_time).toLocalDateTime(TimeZone.UTC)
 
     @Composable
     fun Content() {
