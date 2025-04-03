@@ -23,7 +23,7 @@ object AppTheme {
 
     val profileColorStops = arrayOf(
         0f to Color(0xFF446BA0),
-        0.71f to Color(0xFF71AEFF)
+        0.71f to Color(0xFFCCCCCC)
     )
 
     val eventPageImage = arrayOf(
