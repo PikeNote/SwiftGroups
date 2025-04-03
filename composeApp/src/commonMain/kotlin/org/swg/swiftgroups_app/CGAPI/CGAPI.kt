@@ -14,6 +14,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroups
 import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
@@ -26,6 +28,7 @@ import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
+import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
 
 object CGAPI {
     var databaseFetched = false
@@ -79,17 +82,17 @@ object CGAPI {
         }
 
         if (response.status.value in 200..299) {
-            val upcomingEventData: List<ProfileDataItem> = response.body()
-
-            return upcomingEventData
+            val profileData: List<ProfileDataItem> = response.body()
+            DBObject.db.swiftdataQueries.insertModifications("profileData",Json.encodeToString(profileData))
+            return profileData
         } else {
             return emptyList()
         }
 
     }
 
-    suspend fun checkLoggedIn() : List<ProfileDataItem> {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_profile") {
+    suspend fun checkLoggedIn() : Boolean {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_auto_login.aspx") {
             // {"logout":true}
             method = HttpMethod.Get
             headers {
@@ -102,16 +105,9 @@ object CGAPI {
         if (response.status.value in 200..299) {
             val loggedIn : String = response.body()
 
-            if(loggedIn.contains("logout")) {
-                return emptyList()
-            }
-
-
-            val profileData : List<ProfileDataItem> = response.body()
-
-            return profileData
+            return !loggedIn.contains("logout")
         } else {
-            return emptyList()
+            return false
         }
     }
 
@@ -176,6 +172,7 @@ object CGAPI {
         if (response.status.value in 200..299) {
             println("Group fetched successfully!")
             val groupList : List<ProfileGroupItem> = response.body()
+            DBObject.db.swiftdataQueries.insertModifications("homeMyGroups",Json.encodeToString(groupList))
             return groupList
         } else {
             return emptyList()
@@ -315,5 +312,11 @@ object CGAPI {
             domain = ktorCookie.domain,
             path = ktorCookie.path,
         )
+    }
+
+    fun checkDBExpiry(dbTimeString : String, expiryMin : Int = 60) : Boolean {
+        val changedAt = Instant.parse(dbTimeString, DateTimeFormat.db_currentTimestamp)
+        val now = Clock.System.now()
+        return (now-changedAt).inWholeMinutes <= expiryMin
     }
 }

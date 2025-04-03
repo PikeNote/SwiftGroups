@@ -56,6 +56,7 @@ class DatabaseLoadingViewModel(val navigator : Navigator) : ScreenModel {
             logs += "No clubs found in database! Fetching clubs now..."
             try {
                 CGAPI.fetchAllGroups()
+                CGAPI.fetchAllPersonalGroups()
                 logs += "Clubs fetched!"
             } catch (_: Throwable) {
                 failed = true

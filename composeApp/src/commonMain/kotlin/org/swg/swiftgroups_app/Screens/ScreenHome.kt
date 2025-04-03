@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ object ScreenHome : Screen {
     override fun Content() {
         val viewModel: HomeViewModel = rememberScreenModel { HomeViewModel() }
         val refetchProfile by  CGAPI.refetchProfile
+        val profileData by viewModel.profileData.collectAsState()
         val navigator = LocalNavigator.currentOrThrow
         if(refetchProfile) {
             CGAPI.refetchProfile.value = false
@@ -74,7 +76,7 @@ object ScreenHome : Screen {
             }
             Spacer(Modifier.height(10.dp))
 
-            viewModel.profileData.forEach { data ->
+            profileData.forEach { data ->
                 ProfileBar(data).Content()
             }
 

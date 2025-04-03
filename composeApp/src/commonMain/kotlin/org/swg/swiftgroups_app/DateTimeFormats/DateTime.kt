@@ -1,6 +1,7 @@
 package org.swg.swiftgroups_app.DateTimeFormats
 
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
@@ -21,5 +22,20 @@ object DateTimeFormat {
         minute(Padding.ZERO)
         char(' ')
         amPmMarker(am = "AM", pm = "PM")
+    }
+
+    val db_currentTimestamp = DateTimeComponents.Format {
+        //YYYY-MM-DD HH:MM:SS
+        year()
+        char('-')
+        monthNumber(padding = Padding.ZERO)
+        char('-')
+        dayOfMonth(padding = Padding.ZERO)
+        char(' ')
+        hour(padding = Padding.ZERO)
+        char(':')
+        minute(padding = Padding.ZERO)
+        char(':')
+        second(padding = Padding.ZERO)
     }
 }

@@ -8,9 +8,15 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.CGAPI.Groups.HomeGroup.ProfileGroupItem
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
@@ -23,14 +29,32 @@ class HomeViewModel () : ScreenModel {
     }
 
     var upcomingEvents by mutableStateOf(emptyList<Events>())
-    var profileData by mutableStateOf(emptyList<ProfileDataItem>())
+
+    private val _profileData = MutableStateFlow(emptyList<ProfileDataItem>())
+    val profileData: StateFlow<List<ProfileDataItem>> = _profileData.asStateFlow()
+
     var upcomingGroupEvents by mutableStateOf(emptyList<Events>())
     var userQrCode : UserProfileQRCode? by mutableStateOf(null)
 
     fun fetchData() {
         screenModelScope.launch(Dispatchers.IO) {
             delay(30)
-            profileData = TabNavigation.profileDataItem.ifEmpty { CGAPI.grabProfileData() }
+            val profileCache = DBObject.db.swiftdataQueries.fetchModifications("profileData").executeAsOneOrNull()
+            _profileData.update {
+                if (profileCache == null) {
+                    CGAPI.grabProfileData()
+                } else {
+                    // If the data was fetched more than 60 minutes ago, don't fetch it again
+                    if (CGAPI.checkDBExpiry(profileCache.changed_at) && profileCache.value_ != "[]") {
+                        println("Defaulting to cached profile")
+                        Json.decodeFromString(profileCache.value_)
+
+                    } else {
+                        CGAPI.grabProfileData()
+                    }
+                }
+            }
+
             yield()
             val upcomingEventStaging: MutableList<Events> = mutableListOf()
             val upcomingEventsData = CGAPI.grabMyEvents()
@@ -62,8 +86,20 @@ class HomeViewModel () : ScreenModel {
 
             yield()
 
+
             try {
-                val groupData = CGAPI.fetchMyGroups()
+                val myGroupCache = DBObject.db.swiftdataQueries.fetchModifications("homeMyGroups").executeAsOneOrNull()
+                val groupData : List<ProfileGroupItem> = if(myGroupCache == null) {
+                    CGAPI.fetchMyGroups()
+                } else {
+                    if(CGAPI.checkDBExpiry(myGroupCache.changed_at)) {
+                        println("Defaulting to cached my groups")
+                        Json.decodeFromString(myGroupCache.value_)
+                    } else {
+                        CGAPI.fetchMyGroups()
+                    }
+                }
+
                 if (groupData.isNotEmpty()) {
                     val myGroups = groupData[1]
                     val groupEvents: MutableList<Events> = mutableListOf()
@@ -83,12 +119,28 @@ class HomeViewModel () : ScreenModel {
 
             if (!CGAPI.databaseFetched) {
                 try {
-                    CGAPI.fetchEventsData()
+                    val eventsCache = DBObject.db.swiftdataQueries.fetchModifications("events").executeAsOneOrNull()
+                    val groupsCache = DBObject.db.swiftdataQueries.fetchModifications("clubs").executeAsOneOrNull()
+
+                    if(eventsCache != null) {
+                        if(!CGAPI.checkDBExpiry(eventsCache.changed_at)) {
+                            CGAPI.fetchEventsData()
+                        } else {
+                            println("Defaulting to cached events")
+                        }
+                    }
                     yield()
-                    CGAPI.fetchAllPersonalGroups()
-                    yield()
-                    CGAPI.fetchAllGroups()
-                    yield()
+
+                    if(groupsCache != null) {
+                        if(!CGAPI.checkDBExpiry(groupsCache.changed_at)) {
+                            CGAPI.fetchAllPersonalGroups()
+                            yield()
+                            CGAPI.fetchAllGroups()
+                            yield()
+                        } else {
+                            println("Defaulting to cached groups")
+                        }
+                    }
                 } catch (e: Exception) {
                     //
                 }

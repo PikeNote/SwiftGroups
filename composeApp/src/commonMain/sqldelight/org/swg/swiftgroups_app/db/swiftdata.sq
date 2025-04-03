@@ -29,6 +29,39 @@ CREATE TABLE IF NOT EXISTS clubs (
         clubCacheData TEXT NOT NULL DEFAULT ''
 );
 
+CREATE TABLE IF NOT EXISTS modifications (
+    modifiedItem TEXT NOT NULL PRIMARY KEY ON CONFLICT REPLACE,
+    value TEXT NOT NULL,
+    changed_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TRIGGER IF NOT EXISTS events_onupdate AFTER UPDATE ON events
+BEGIN
+    INSERT INTO modifications (modifiedItem, value) VALUES ('events','UPDATE');
+END;
+
+CREATE TRIGGER IF NOT EXISTS events_oninsert AFTER INSERT ON events
+BEGIN
+    INSERT INTO modifications (modifiedItem, value) VALUES ('events','UPDATE');
+END;
+
+CREATE TRIGGER IF NOT EXISTS clubs_onupdate AFTER UPDATE ON clubs
+BEGIN
+    INSERT INTO modifications (modifiedItem, value) VALUES ('clubs','UPDATE');
+END;
+
+CREATE TRIGGER IF NOT EXISTS clubs_oninsert AFTER INSERT ON clubs
+BEGIN
+    INSERT INTO modifications (modifiedItem, value) VALUES ('clubs','UPDATE');
+END;
+
+
+fetchModifications:
+SELECT * FROM modifications WHERE modifiedItem = ?;
+
+insertModifications:
+INSERT OR REPLACE INTO modifications (modifiedItem, value) VALUES (?, ?);
+
 insertEvent {
   UPDATE events
   SET start_time = :start_time,

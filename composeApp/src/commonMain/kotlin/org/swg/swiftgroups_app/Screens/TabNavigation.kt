@@ -21,7 +21,6 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.multiplatform.webview.cookie.Cookie
 import org.koin.compose.koinInject
-import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.Fonts.AppFont.InterFontFamily
 import org.swg.swiftgroups_app.Tabs.TabEvents
 import org.swg.swiftgroups_app.Tabs.TabFeed
@@ -32,8 +31,6 @@ import org.swg.swiftgroups_app.Tabs.TabWithNavigator
 import org.swg.swiftgroups_app.getScreenResult
 
 object TabNavigation : Screen {
-
-    var profileDataItem : List<ProfileDataItem> = emptyList()
     private var cookies : List<Cookie>? = null
 
     @Composable
@@ -41,7 +38,7 @@ object TabNavigation : Screen {
 
 
         val bottomBarVisibilityManager: BottomTabVisibilityManager = koinInject()
-        var isBottomBarVisible = remember { mutableStateOf(true) }
+        val isBottomBarVisible = remember { mutableStateOf(true) }
 
         bottomBarVisibilityManager.observeBottomBarVisibility { isVisible ->
             isBottomBarVisible.value = isVisible

@@ -23,8 +23,7 @@ class LoginViewModel (navigator : Navigator?) : ScreenModel {
                 CGAPI.cookieHeader = Json.decodeFromString(storedCookie)
                 runBlocking {
                     val loggedIn = CGAPI.checkLoggedIn()
-                    if (loggedIn.isNotEmpty()) {
-                        TabNavigation.profileDataItem = loggedIn
+                    if (loggedIn) {
                         navigator?.replace(TabNavigation)
                     } else {
                         requireLogin = true
