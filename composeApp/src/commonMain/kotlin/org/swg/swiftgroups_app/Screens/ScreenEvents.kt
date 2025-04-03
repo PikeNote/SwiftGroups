@@ -120,7 +120,9 @@ object ScreenEvents : Screen {
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color(0xFFF5F5F5),
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
+                    textColor = Color.Black,
+                    cursorColor = Color.Black
                 ),
                 singleLine = true
             )

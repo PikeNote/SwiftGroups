@@ -111,7 +111,9 @@ object GroupScreen : Screen {
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color(0xFFF5F5F5),
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
+                    textColor = Color.Black,
+                    cursorColor = Color.Black
                 ),
                 singleLine = true
             )
@@ -123,7 +125,10 @@ object GroupScreen : Screen {
                     item {
                         Box(
                             modifier = Modifier.fillMaxWidth().height(92.dp).padding(horizontal = 8.dp)
-                                .shadow(2.dp, shape = RoundedCornerShape(20.dp))
+                                .shadow(
+                                    elevation = 2.dp,
+                                    shape = RoundedCornerShape(20.dp),
+                                )
                                 .padding(2.dp)
                                 .clickable {
                                     naivgator.push(GroupPage(groupID = it.clubID))
