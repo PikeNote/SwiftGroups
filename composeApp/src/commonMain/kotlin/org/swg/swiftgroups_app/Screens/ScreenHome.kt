@@ -64,7 +64,7 @@ object ScreenHome : Screen {
                 Image(
                     painter = painterResource(Res.drawable.swiftgroups_title),
                     contentDescription = "SwiftGroups Logo",
-                    modifier = Modifier.align(Alignment.CenterStart)
+                    modifier = Modifier.align(Alignment.Center)
                 )
                 Icon(QrCodeScan, "Personal QR Code", modifier = Modifier.clickable {
                     if(viewModel.userQrCode != null) {
