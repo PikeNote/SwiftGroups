@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
@@ -26,7 +28,7 @@ class HomeViewModel () : ScreenModel {
     var userQrCode : UserProfileQRCode? by mutableStateOf(null)
 
     fun fetchData() {
-        screenModelScope.launch {
+        screenModelScope.launch(Dispatchers.IO) {
             delay(30)
             profileData = TabNavigation.profileDataItem.ifEmpty { CGAPI.grabProfileData() }
             yield()
@@ -71,6 +73,7 @@ class HomeViewModel () : ScreenModel {
                                 .fetchEventClub(it.groupName)
                                 .executeAsList()
                     }
+
                     upcomingGroupEvents = groupEvents
                 }
             } catch (e: Exception) {
@@ -81,7 +84,11 @@ class HomeViewModel () : ScreenModel {
             if (!CGAPI.databaseFetched) {
                 try {
                     CGAPI.fetchEventsData()
+                    yield()
+                    CGAPI.fetchAllPersonalGroups()
+                    yield()
                     CGAPI.fetchAllGroups()
+                    yield()
                 } catch (e: Exception) {
                     //
                 }
