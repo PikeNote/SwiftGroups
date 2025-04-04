@@ -74,6 +74,7 @@ kotlin {
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+            implementation(libs.compose.shadow)
         }
         appleMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -124,7 +125,7 @@ android {
 dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.ui.graphics.android)
-    implementation("org.jetbrains.compose.material3:material3:1.8.0-beta01")
+    implementation(libs.compose.material3)
     debugImplementation(compose.uiTooling)
 }
 

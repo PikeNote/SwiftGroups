@@ -13,6 +13,7 @@ import coil3.request.crossfade
 import okio.FileSystem
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import org.koin.mp.KoinPlatform.stopKoin
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.Login
@@ -20,6 +21,7 @@ import org.swg.swiftgroups_app.Screens.Login
 @Composable
 @Preview
 fun App() {
+    stopKoin()
     startKoin {
         modules(
             module { single<BottomTabVisibilityManager> { BottomTabVisibilityManager() } }
@@ -57,5 +59,3 @@ fun App() {
 
 
 }
-
-

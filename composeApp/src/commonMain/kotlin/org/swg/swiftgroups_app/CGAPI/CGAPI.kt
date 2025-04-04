@@ -21,6 +21,10 @@ import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroups
 import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
 import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
+import org.swg.swiftgroups_app.CGAPI.Feed.Button
+import org.swg.swiftgroups_app.CGAPI.Feed.Feed
+import org.swg.swiftgroups_app.CGAPI.Feed.FeedFilterItem
+import org.swg.swiftgroups_app.CGAPI.Feed.FeedPostsItem
 import org.swg.swiftgroups_app.CGAPI.Groups.Group
 import org.swg.swiftgroups_app.CGAPI.Groups.GroupList
 import org.swg.swiftgroups_app.CGAPI.Groups.HomeGroup.ProfileGroupItem
@@ -33,6 +37,9 @@ import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
 object CGAPI {
     var databaseFetched = false
     var refetchProfile = mutableStateOf(false)
+    val json =  Json {
+        ignoreUnknownKeys = true
+    }
     val client = HttpClient() {
         install(ContentNegotiation) {
             json(contentType = ContentType.Any, json = Json {
@@ -170,7 +177,7 @@ object CGAPI {
         }
 
         if (response.status.value in 200..299) {
-            println("Group fetched successfully!")
+            println("My groups fetched successfully!")
             val groupList : List<ProfileGroupItem> = response.body()
             DBObject.db.swiftdataQueries.insertModifications("homeMyGroups",Json.encodeToString(groupList))
             return groupList
@@ -189,7 +196,7 @@ object CGAPI {
         }
 
         if (response.status.value in 200..299) {
-            println("Group fetched successfully!")
+            println("Profile QR code fetched successfully!")
             val profileQR : UserProfileQRCode = response.body()
             return profileQR
         } else {
@@ -215,6 +222,54 @@ object CGAPI {
             return null
         }
     }
+
+    suspend fun fetchFeed(offset : Int, feedID : String = "0") : List<Feed> {
+        var feedType = "topic"
+        if(feedID == "0") {
+            feedType = ""
+        }
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_home?feed_type=${feedType}&feed_type_id=${feedID}&v=2&limit=15&range=${offset}") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            println("Feed fetched successfully!")
+            val feedList : List<FeedPostsItem> = response.body()
+            return if(feedList.isNotEmpty()) {
+                feedList.first().feeds
+            } else {
+                emptyList()
+            }
+        }
+        return emptyList()
+    }
+
+    suspend fun fetchFilter() : List<Button> {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_feed_top") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            println("Filter fetched successfully!")
+            val filterList : List<FeedFilterItem> = response.body()
+            if(filterList.isNotEmpty()) {
+                DBObject.db.swiftdataQueries.insertModifications("filterButtons",Json.encodeToString(filterList.first().buttons))
+                return filterList.first().buttons
+            } else {
+                return emptyList()
+            }
+        }
+        return emptyList()
+    }
+
 
     suspend fun fetchAllGroups() {
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?limit=1000") {

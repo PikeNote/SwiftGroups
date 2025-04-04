@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
-import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.CGAPI.CGAPI.json
 import org.swg.swiftgroups_app.CGAPI.Groups.HomeGroup.ProfileGroupItem
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
@@ -47,7 +47,7 @@ class HomeViewModel () : ScreenModel {
                     // If the data was fetched more than 60 minutes ago, don't fetch it again
                     if (CGAPI.checkDBExpiry(profileCache.changed_at) && profileCache.value_ != "[]") {
                         println("Defaulting to cached profile")
-                        Json.decodeFromString(profileCache.value_)
+                        json.decodeFromString(profileCache.value_)
 
                     } else {
                         CGAPI.grabProfileData()
@@ -94,7 +94,7 @@ class HomeViewModel () : ScreenModel {
                 } else {
                     if(CGAPI.checkDBExpiry(myGroupCache.changed_at)) {
                         println("Defaulting to cached my groups")
-                        Json.decodeFromString(myGroupCache.value_)
+                        json.decodeFromString(myGroupCache.value_)
                     } else {
                         CGAPI.fetchMyGroups()
                     }

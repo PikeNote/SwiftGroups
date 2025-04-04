@@ -8,6 +8,7 @@ androidx-lifecycle = "2.8.4"
 coilCompose = "3.1.0"
 coilNetworkKtor3 = "3.1.0"
 compose-multiplatform = "1.7.0"
+composeShadow = "2.0.3"
 composeWebviewMultiplatform = "1.9.40"
 kachetor = "1.1.0"
 kotlin = "2.1.20-RC2"
@@ -28,6 +29,7 @@ compose-material3 = { module = "org.jetbrains.compose.material3:material3", vers
 androidx-security-crypto-ktx = { module = "androidx.security:security-crypto-ktx", version.ref = "securityCryptoKtx" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilNetworkKtor3" }
+compose-shadow = { module = "com.adamglin:compose-shadow", version.ref = "composeShadow" }
 compose-webview-multiplatform = { module = "io.github.kevinnzou:compose-webview-multiplatform", version.ref = "composeWebviewMultiplatform" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }

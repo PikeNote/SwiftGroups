@@ -8,14 +8,14 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Newspaper
-import org.swg.swiftgroups_app.Screens.ScreenEvents
+import org.swg.swiftgroups_app.Screens.FeedScreen
 
 object TabFeed : TabWithNavigator {
     override var nav: Navigator? = null
 
     @Composable
     override fun Content() {
-        Navigator(screen = ScreenEvents) { navigator ->
+        Navigator(screen = FeedScreen) { navigator ->
             SlideTransition(navigator = navigator)
             nav = navigator
         }

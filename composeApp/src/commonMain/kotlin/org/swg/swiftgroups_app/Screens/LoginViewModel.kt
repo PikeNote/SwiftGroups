@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.CGAPI.CGAPI.json
 import org.swg.swiftgroups_app.SecureStorage.SecureStorage
 
 class LoginViewModel (navigator : Navigator?) : ScreenModel {
@@ -20,7 +20,7 @@ class LoginViewModel (navigator : Navigator?) : ScreenModel {
         try {
             val storedCookie = secureVault.getString("cg_cookie", null)
             if (!storedCookie.isNullOrEmpty()) {
-                CGAPI.cookieHeader = Json.decodeFromString(storedCookie)
+                CGAPI.cookieHeader = json.decodeFromString(storedCookie)
                 runBlocking {
                     val loggedIn = CGAPI.checkLoggedIn()
                     if (loggedIn) {
