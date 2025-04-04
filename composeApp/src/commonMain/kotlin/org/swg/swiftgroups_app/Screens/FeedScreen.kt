@@ -90,7 +90,7 @@ object FeedScreen : Screen {
                         }
                     }, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         AsyncImage(model = "https://community.case.edu${item.icon_url}",item.name, modifier = Modifier.size(25.dp), contentScale = ContentScale.Crop)
-                        Text(item.name, style = AppFont.InterTypography.body1, maxLines=1, overflow = TextOverflow.Ellipsis)
+                        Text(item.name, style = AppFont.InterTypography.body1, maxLines=1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = 3.dp))
                     }
 
                 }

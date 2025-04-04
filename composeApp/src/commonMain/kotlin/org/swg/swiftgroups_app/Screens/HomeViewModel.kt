@@ -147,7 +147,12 @@ class HomeViewModel () : ScreenModel {
                             } else {
                                 println("Defaulting to cached groups")
                             }
-                        }
+                        } else {
+							CGAPI.fetchAllPersonalGroups()
+							yield()
+							CGAPI.fetchAllGroups()
+							yield()
+						}
                     } catch (_: Exception) {
                         CGAPI.fetchAllPersonalGroups()
                         yield()
@@ -155,7 +160,7 @@ class HomeViewModel () : ScreenModel {
                         yield()
                     }
                 } catch (e: Exception) {
-                    //
+                    println(e.toString())
                 }
             }
         }

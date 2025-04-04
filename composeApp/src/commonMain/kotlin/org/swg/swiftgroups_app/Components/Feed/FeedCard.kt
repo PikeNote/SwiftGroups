@@ -88,7 +88,7 @@ class FeedCard(val feed: Feed) : Screen{
                             AsyncImage(
                                 model = "https://community.case.edu${feed.photos[page].photo_url}",
                                 contentDescription = null,
-                                contentScale = ContentScale.Crop,
+                                contentScale = ContentScale.Fit,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(240.dp)
