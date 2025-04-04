@@ -92,12 +92,14 @@ class HomeViewModel () : ScreenModel {
                 val groupData : List<ProfileGroupItem> = if(myGroupCache == null) {
                     CGAPI.fetchMyGroups()
                 } else {
-                    if(CGAPI.checkDBExpiry(myGroupCache.changed_at)) {
-                        println("Defaulting to cached my groups")
-                        json.decodeFromString(myGroupCache.value_)
-                    } else {
-                        CGAPI.fetchMyGroups()
-                    }
+                    try {
+                        if (CGAPI.checkDBExpiry(myGroupCache.changed_at)) {
+                            println("Defaulting to cached my groups")
+                            json.decodeFromString(myGroupCache.value_)
+                        } else {
+                            CGAPI.fetchMyGroups()
+                        }
+                    } catch (_:Exception) {CGAPI.fetchMyGroups()}
                 }
 
                 if (groupData.isNotEmpty()) {
@@ -122,24 +124,35 @@ class HomeViewModel () : ScreenModel {
                     val eventsCache = DBObject.db.swiftdataQueries.fetchModifications("events").executeAsOneOrNull()
                     val groupsCache = DBObject.db.swiftdataQueries.fetchModifications("clubs").executeAsOneOrNull()
 
-                    if(eventsCache != null) {
-                        if(!CGAPI.checkDBExpiry(eventsCache.changed_at)) {
-                            CGAPI.fetchEventsData()
-                        } else {
-                            println("Defaulting to cached events")
+                    try {
+                        if(eventsCache != null) {
+                            if(!CGAPI.checkDBExpiry(eventsCache.changed_at)) {
+                                CGAPI.fetchEventsData()
+                            } else {
+                                println("Defaulting to cached events")
+                            }
                         }
+                    } catch (_:Exception) {
+                        CGAPI.fetchEventsData()
                     }
                     yield()
 
-                    if(groupsCache != null) {
-                        if(!CGAPI.checkDBExpiry(groupsCache.changed_at)) {
-                            CGAPI.fetchAllPersonalGroups()
-                            yield()
-                            CGAPI.fetchAllGroups()
-                            yield()
-                        } else {
-                            println("Defaulting to cached groups")
+                    try {
+                        if (groupsCache != null) {
+                            if (!CGAPI.checkDBExpiry(groupsCache.changed_at)) {
+                                CGAPI.fetchAllPersonalGroups()
+                                yield()
+                                CGAPI.fetchAllGroups()
+                                yield()
+                            } else {
+                                println("Defaulting to cached groups")
+                            }
                         }
+                    } catch (_: Exception) {
+                        CGAPI.fetchAllPersonalGroups()
+                        yield()
+                        CGAPI.fetchAllGroups()
+                        yield()
                     }
                 } catch (e: Exception) {
                     //

@@ -19,10 +19,14 @@ class SingleEventViewModel (private val eventID : Int) : ScreenModel {
         try {
             val event = DBObject.db.swiftdataQueries.fetchSpecificEvent(eventID.toLong()).executeAsOneOrNull()
 
-            if (event != null) {
-                if(event.userCacheData.isNotEmpty()) {
-                    eventSpecificAPI.value = json.decodeFromString(event.userCacheData)
+            try {
+                if (event != null) {
+                    if (event.userCacheData.isNotEmpty()) {
+                        eventSpecificAPI.value = json.decodeFromString(event.userCacheData)
+                    }
+                    updateData()
                 }
+            } catch (_:Exception) {
                 updateData()
             }
         } catch (_: Exception) {
