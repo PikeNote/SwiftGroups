@@ -69,7 +69,7 @@ object DatabaseLoading : Screen {
                     viewModel.failed = false
                     viewModel.fetchAPIBatch()
                 }) {
-                    Text("Retry Request")
+                    Text("Retry Request", style = AppFont.InterTypography.h4)
                 }
             }
 
