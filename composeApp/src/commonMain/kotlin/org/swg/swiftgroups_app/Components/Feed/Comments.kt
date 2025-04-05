@@ -91,9 +91,10 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>) {
                     LazyColumn {
                         if(comments.isEmpty()) {
                             item {
-                                Spacer(modifier = Modifier.height(250.dp))
-                                Text("No comments!", style = AppFont.InterTypography.h3,
-                                modifier = Modifier.align(Alignment.CenterHorizontally))}
+                                Box (modifier = Modifier.fillMaxSize()){
+                                    Text("Hmm- no comments seem to be here...", style = AppFont.InterTypography.h5, color = Color.Gray, modifier = Modifier.align(Alignment.Center))
+                                }
+                            }
                         }
                         comments.forEach {
                             item {

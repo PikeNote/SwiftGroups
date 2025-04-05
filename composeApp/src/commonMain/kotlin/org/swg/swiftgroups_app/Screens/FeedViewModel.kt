@@ -25,16 +25,17 @@ class FeedViewModel : ScreenModel {
 
     val _selectedIndex = MutableStateFlow(0)
     val selectedIndex: StateFlow<Int> = _selectedIndex.asStateFlow()
+    
+    val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     var offset = 0
 
     var hasMorePosts by mutableStateOf(true)
-    var isLoading by mutableStateOf(false)
-
 
     init {
         screenModelScope.launch {
-            isLoading = true
+            _isLoading.update{ true }
             _feedList.update {
                 CGAPI.fetchFeed(0)
             }
@@ -61,7 +62,7 @@ class FeedViewModel : ScreenModel {
 
             offset += filterList.value.size
 
-            isLoading = false
+            _isLoading.update{ false }
         }
     }
 
@@ -71,7 +72,7 @@ class FeedViewModel : ScreenModel {
                 _feedList.update { mutableListOf() }
                 offset = 0
                 hasMorePosts = true
-                isLoading = true
+                _isLoading.update{ true }
             }
 
             val feedItems = CGAPI.fetchFeed(offset,
@@ -86,7 +87,7 @@ class FeedViewModel : ScreenModel {
                 it + feedItems
             }
 
-            isLoading = false
+            _isLoading.update{ false }
         }
     }
 }

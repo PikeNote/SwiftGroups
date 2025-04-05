@@ -146,9 +146,12 @@ class FeedCard(val feed: Feed) : Screen {
                     Row (modifier = Modifier.clickable{
                         CoroutineScope(Dispatchers.IO).launch{
                             CGAPI.likePost(feed.uid, liked.value == "false")
-                            liked.value = "true"
+                            if(liked.value == "false") {
+                                liked.value = "true"
+                            } else {
+                                liked.value = "false"
+                            }
                         }
-
                     }) {
                         Icon(FontAwesomeIcons.Solid.Heart, "", modifier = Modifier.size(20.dp), tint = if (liked.value == "true") Color.Red else Color.Gray)
                         Spacer(modifier = Modifier.width(4.dp))

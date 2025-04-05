@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,6 +54,7 @@ object FeedScreen : Screen {
         val feedList by viewModel.feedList.collectAsState()
         val buttonList by viewModel.filterList.collectAsState()
         val selectedIndex by viewModel.selectedIndex.collectAsState()
+        val isLoading by viewModel.isLoading.collectAsState()
 
         Column(
             modifier = Modifier
@@ -110,20 +110,17 @@ object FeedScreen : Screen {
                         Spacer(modifier = Modifier.height(150.dp))
                     }
 
-                    if (viewModel.isLoading) {
+                    if (isLoading) {
                         item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
+                            CircularProgressIndicator(
+                                color = Color(0xFF446BA0),
+                                backgroundColor = Color(0xFFCCCCCC),
+                                modifier = Modifier.height(100.dp).fillMaxWidth()
+                            )
                         }
                     }
 
-                    if (viewModel.hasMorePosts && !viewModel.isLoading) {
+                    if (viewModel.hasMorePosts && !isLoading) {
                         item {
                             LaunchedEffect(Unit) {
                                 viewModel.updateFeed()
