@@ -1,6 +1,9 @@
 package org.swg.swiftgroups_app.Components.Feed
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,9 +19,12 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,15 +37,28 @@ import coil3.compose.AsyncImage
 import com.adamglin.composeshadow.dropShadow
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Regular
+import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.regular.ChartBar
-import compose.icons.fontawesomeicons.regular.Heart
+import compose.icons.fontawesomeicons.solid.Heart
 import compose.icons.fontawesomeicons.regular.ShareSquare
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Feed.Feed
 import org.swg.swiftgroups_app.Fonts.AppFont
 
-class FeedCard(val feed: Feed) : Screen{
+
+class FeedCard(val feed: Feed) : Screen {
+
     @Composable
+    @Preview
     override fun Content() {
+        val showComments = remember{ mutableStateOf(false) }
+        val fadeOut = remember{ mutableStateOf(true) }
+        val liked = remember{ mutableStateOf(feed.liked) }
         Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
             Column (modifier = Modifier.dropShadow(
                 offsetY = 6.dp,
@@ -124,12 +143,20 @@ class FeedCard(val feed: Feed) : Screen{
                     horizontalArrangement = Arrangement.SpaceEvenly
 
                 ) {
-                    Row {
-                        Icon(FontAwesomeIcons.Regular.Heart, "", modifier = Modifier.size(20.dp))
+                    Row (modifier = Modifier.clickable{
+                        CoroutineScope(Dispatchers.IO).launch{
+                            CGAPI.likePost(feed.uid, liked.value == "false")
+                            liked.value = "true"
+                        }
+
+                    }) {
+                        Icon(FontAwesomeIcons.Solid.Heart, "", modifier = Modifier.size(20.dp), tint = if (liked.value == "true") Color.Red else Color.Gray)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Like")
                     }
-                    Row {
+                    Row (modifier=Modifier.clickable {
+                        showComments.value = true
+                    }){
                         Icon(FontAwesomeIcons.Regular.ChartBar, "", modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Comment")
@@ -183,6 +210,23 @@ class FeedCard(val feed: Feed) : Screen{
                     }
                 }
 
+            }
+
+        }
+
+        if(showComments.value) {
+            AnimatedVisibility(
+                visible = fadeOut.value,
+                exit = fadeOut()
+            ) {
+                commentModal(onDismissRequest = {fadeOut.value=false}, feed.comments)
+
+                DisposableEffect(Unit) {
+                    onDispose {
+                        showComments.value = false
+                        fadeOut.value = true
+                    }
+                }
             }
 
         }

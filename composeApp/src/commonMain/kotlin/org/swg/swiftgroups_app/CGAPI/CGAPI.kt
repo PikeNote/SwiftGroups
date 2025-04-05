@@ -309,6 +309,39 @@ object CGAPI {
         }
     }
 
+    suspend fun likeComment(commentID : String, like : Boolean) {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_comment_like?id=${commentID}&like=${if(like) 1 else 0}") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            println("Comment ${commentID} liked!")
+        } else {
+            println("Comment ${commentID} failed!")
+        }
+    }
+
+    suspend fun likePost(postID : String, like : Boolean) {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/update_likes?uid=${postID}&like=${if(like) 1 else 0}&type=feed&reaction=%F0%9F%91%8D") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            println("Comment ${postID} liked!")
+        } else {
+            println("Comment ${postID} failed!")
+        }
+    }
+
+
     suspend fun fetchAllPersonalGroups() {
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?view=my_groups") {
             method = HttpMethod.Get
