@@ -38,7 +38,6 @@ import com.adamglin.composeshadow.dropShadow
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Regular
 import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.regular.ChartBar
 import compose.icons.fontawesomeicons.solid.Heart
 import compose.icons.fontawesomeicons.regular.ShareSquare
 import kotlinx.coroutines.CoroutineScope
@@ -49,6 +48,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Feed.Feed
 import org.swg.swiftgroups_app.Fonts.AppFont
+import org.swg.swiftgroups_app.Icons.ChatBubble
 
 
 class FeedCard(val feed: Feed) : Screen {
@@ -157,7 +157,7 @@ class FeedCard(val feed: Feed) : Screen {
                     Row (modifier=Modifier.clickable {
                         showComments.value = true
                     }){
-                        Icon(FontAwesomeIcons.Regular.ChartBar, "", modifier = Modifier.size(20.dp))
+                        Icon(ChatBubble, "", modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Comment")
                     }
