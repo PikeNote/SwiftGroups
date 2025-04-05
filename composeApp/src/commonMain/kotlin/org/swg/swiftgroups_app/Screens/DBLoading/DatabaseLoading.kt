@@ -31,6 +31,9 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.Database
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.graphics.Color
 
 object DatabaseLoading : Screen {
 
@@ -64,20 +67,38 @@ object DatabaseLoading : Screen {
 
                 Spacer(modifier=Modifier.height(50.dp))
 
-                TextButton (onClick = {
-                    viewModel.showButton = false
-                    viewModel.failed = false
-                    viewModel.fetchAPIBatch()
-                }) {
-                    Text("Retry Request", style = AppFont.InterTypography.h4)
+                if (viewModel.showButton) {
+                    TextButton(
+                        onClick = {
+                            viewModel.showButton = false
+                            viewModel.failed = false
+                            viewModel.fetchAPIBatch()
+                        },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            "Retry Request", 
+                            style = AppFont.InterTypography.h4,
+                            color = Color.Black,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
                 }
             }
 
-            Column (modifier = Modifier.fillMaxWidth().height(200.dp).offset(y=600.dp).padding(horizontal = 10.dp)) {
-                Text("Fancy Logs", style = AppFont.InterTypography.h3)
-                viewModel.logs.forEach {
-                    Text(it, style = AppFont.InterTypography.body1)
-}
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .offset(y = 600.dp)
+                    .padding(horizontal = 10.dp)
+            ) {
+                item {
+                    Text("Fancy Logs", style = AppFont.InterTypography.h3)
+                }
+                items(viewModel.logs) { log ->
+                    Text(log, style = AppFont.InterTypography.body1)
+                }
             }
         }
 
