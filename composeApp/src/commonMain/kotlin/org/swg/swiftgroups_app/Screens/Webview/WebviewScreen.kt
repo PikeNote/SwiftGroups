@@ -59,12 +59,12 @@ class WebviewScreen(val url : String, val text : String, val callback : ()->Unit
                     ),
                     modifier = Modifier.align(Alignment.CenterStart),
                 ) {
-                    Icon(
-                        ArrowLeft, "Back Arrow",
-                        modifier = Modifier
-                            .size(30.dp),
-                        tint = Color.White
-                    )
+                        Icon(
+                            ArrowLeft, "Back Arrow",
+                            modifier = Modifier
+                                .size(30.dp),
+                            tint = Color.White
+                        )
                 }
                 Text(text, modifier = Modifier.align(Alignment.Center),style=AppFont.InterTypography.h3, color =Color.White)
             }

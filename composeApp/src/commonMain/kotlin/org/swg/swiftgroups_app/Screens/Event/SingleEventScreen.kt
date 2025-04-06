@@ -30,6 +30,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.Divider
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -87,11 +88,18 @@ class SingleEventScreen(eventID : Int) : Screen {
     @Preview
     override fun Content() {
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
+        val navigator = LocalNavigator.currentOrThrow
         LaunchedEffect(Unit) {
             bottomTabVisibilityManager.setBottomBarVisibility(false)
         }
 
-        val navigator = LocalNavigator.currentOrThrow
+        DisposableEffect(Unit) {
+            onDispose {
+                bottomTabVisibilityManager.setBottomBarVisibility(true)
+            }
+        }
+
+
         val eventAPI = singleEventViewModel.eventSpecificAPI.value
 
         val maxImageHeight = 210.dp

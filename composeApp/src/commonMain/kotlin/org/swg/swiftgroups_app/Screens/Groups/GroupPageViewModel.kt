@@ -19,9 +19,12 @@ class GroupPageViewModel(private val groupID : String) : ScreenModel
 
     init {
         val cacheString = fetchCache()
-        if(!cacheString.isNullOrEmpty()) {
-            group = json.decodeFromString(cacheString)
-        }
+        try {
+            if(!cacheString.isNullOrEmpty()) {
+                group = json.decodeFromString(cacheString)
+            }
+        } catch (_: Exception){}
+
         screenModelScope.launch {
             updateData()
         }
@@ -37,8 +40,11 @@ class GroupPageViewModel(private val groupID : String) : ScreenModel
 
 
             // Update cache
-            val jsonData = Json.encodeToString(group.value)
-            DBObject.db.swiftdataQueries.updateClubCache(jsonData, groupID)
+            val groupCacheData : Group? = group.value
+            if(groupCacheData != null) {
+                val jsonData = Json.encodeToString(Group.serializer(),groupCacheData)
+                DBObject.db.swiftdataQueries.updateClubCache(jsonData, groupID)
+            }
         }
     }
 

@@ -33,6 +33,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.adamglin.composeshadow.dropShadow
 import compose.icons.FontAwesomeIcons
@@ -49,6 +51,7 @@ import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Feed.Feed
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ChatBubble
+import org.swg.swiftgroups_app.Screens.ImageScreen.ImageScreen
 
 
 class FeedCard(val feed: Feed) : Screen {
@@ -59,6 +62,7 @@ class FeedCard(val feed: Feed) : Screen {
         val showComments = remember{ mutableStateOf(false) }
         val fadeOut = remember{ mutableStateOf(true) }
         val liked = remember{ mutableStateOf(feed.liked) }
+        val navigator = LocalNavigator.currentOrThrow
         Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
             Column (modifier = Modifier.dropShadow(
                 offsetY = 6.dp,
@@ -111,6 +115,9 @@ class FeedCard(val feed: Feed) : Screen {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(240.dp)
+                                    .clickable {
+                                        navigator.push(ImageScreen(feed.photos.map {it.photo_url}))
+                                    }
                             )
                         }
                         if(feed.photos.size > 1) {

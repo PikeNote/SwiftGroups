@@ -14,11 +14,13 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -28,6 +30,7 @@ import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 
 class QRScreen (val qrString : String) : Screen {
+    @OptIn(InternalVoyagerApi::class)
     @Composable
     override fun Content() {
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
@@ -35,6 +38,14 @@ class QRScreen (val qrString : String) : Screen {
             bottomTabVisibilityManager.setBottomBarVisibility(false)
         }
         val navigator = LocalNavigator.currentOrThrow
+
+        DisposableEffect(Unit) {
+            onDispose {
+                bottomTabVisibilityManager.setBottomBarVisibility(true)
+            }
+        }
+
+
         Box (modifier = Modifier.fillMaxSize().padding(10.dp)) {
             TextButton(
                 onClick = {

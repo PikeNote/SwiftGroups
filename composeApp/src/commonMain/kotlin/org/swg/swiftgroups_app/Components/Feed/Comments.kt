@@ -22,12 +22,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.IconButton
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,9 +52,12 @@ import kotlinx.coroutines.launch
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Feed.Comment
 import org.swg.swiftgroups_app.Fonts.AppFont
+import org.swg.swiftgroups_app.Icons.Send
 
 @Composable
 fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>) {
+
+    var commentText by rememberSaveable { mutableStateOf("") }
 
     val visible = remember { mutableStateOf(false) }
 
@@ -79,57 +88,93 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>) {
                     animationSpec = tween(durationMillis = 500)
                 )
             ) {
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth().height(500.dp)
+                    Box(modifier = Modifier
+                        .fillMaxWidth().height(560.dp)
                         .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                        .background(Color.White)
-                ) {
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    LazyColumn {
-                        if(comments.isEmpty()) {
-                            item {
-                                Box (modifier = Modifier.fillMaxSize()){
-                                    Text("Hmm- no comments seem to be here...", style = AppFont.InterTypography.h5, color = Color.Gray, modifier = Modifier.align(Alignment.Center))
-                                }
-                            }
-                        }
-                        comments.forEach {
-                            item {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-                                    horizontalArrangement = Arrangement.SpaceAround
-                                ) {
-                                    AsyncImage(
-                                        model = "https://community.case.edu${it.writerPhotoUrl}", "", modifier = Modifier.size(50.dp).clip(CircleShape)
-                                    )
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                    Column(
-                                        modifier = Modifier.weight(8f),
-                                        verticalArrangement = Arrangement.Center
-                                    ) {
-                                        Text("${it.writerFirstName} ${it.writerLastName} • ${it.writeWhen}", style = AppFont.InterTypography.h5)
-                                        Text(it.content)
+                        .background(Color.White)) {
+                        LazyColumn(modifier = Modifier.align(Alignment.TopCenter).offset(y = 10.dp).height(490.dp).fillMaxWidth()) {
+                            if(comments.isEmpty()) {
+                                item {
+                                    Box (modifier = Modifier.fillMaxSize()){
+                                        Text("Hmm- no comments seem to be here...", style = AppFont.InterTypography.h5, color = Color.Gray, modifier = Modifier.align(Alignment.Center))
                                     }
-                                    Icon(
-                                        FontAwesomeIcons.Solid.Heart,
-                                        "",
-                                        modifier = Modifier.size(25.dp).weight(1.8f)
-                                            .offset(y = 10.dp).clickable {
-                                                CoroutineScope(Dispatchers.IO).launch{
-                                                    CGAPI.likeComment(it.commentId, it.iLiked == 0)
-                                                }
-                                         },tint = if (it.iLiked == 0) Color.Gray else Color.Red
-                                    )
                                 }
                             }
+                            comments.forEach {
+                                item {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                                        horizontalArrangement = Arrangement.SpaceAround
+                                    ) {
+                                        AsyncImage(
+                                            model = "https://community.case.edu${it.writerPhotoUrl}", "", modifier = Modifier.size(50.dp).clip(CircleShape)
+                                        )
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Column(
+                                            modifier = Modifier.weight(1f),
+                                            verticalArrangement = Arrangement.Center
+                                        ) {
+                                            Text("${it.writerFirstName} ${it.writerLastName} • ${it.writeWhen}", style = AppFont.InterTypography.h5)
+                                            Text(it.content)
+                                        }
+                                        Icon(
+                                            FontAwesomeIcons.Solid.Heart,
+                                            "",
+                                            modifier = Modifier.size(25.dp)
+                                                .offset(y = 10.dp).clickable {
+                                                    CoroutineScope(Dispatchers.IO).launch{
+                                                        CGAPI.likeComment(it.commentId, it.iLiked == 0)
+                                                    }
+                                                },tint = if (it.iLiked == 0) Color.Gray else Color.Red
+                                        )
+                                    }
+                                }
+                            }
+
                         }
+
+                        TextField(
+                            value = commentText,
+                            textStyle = AppFont.InterTypography.body1,
+                            onValueChange = {
+                                commentText = it
+                            },
+                            modifier = Modifier
+                                .height(50.dp)
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .align(Alignment.BottomCenter),
+                            placeholder = {
+                                androidx.compose.material.Text(
+                                    "Enter a comment...",
+                                    style = AppFont.InterTypography.body1
+                                )
+                            },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = {
+                                        commentText = ""
+                                    }
+                                ) {
+                                    androidx.compose.material.Icon(
+                                        Send,
+                                        contentDescription = "Send Comment",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            },
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = Color(0xFFF5F5F5),
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                textColor = Color.Black,
+                                cursorColor = Color.Black
+                            ),
+                            singleLine = true
+                        )
 
                     }
-
-                }
             }
         }
 

@@ -3,6 +3,7 @@ package org.swg.swiftgroups_app.Screens.Groups
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,11 +39,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import com.adamglin.composeshadow.dropShadow
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Regular
 import compose.icons.fontawesomeicons.regular.Calendar
@@ -55,10 +59,12 @@ import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.Person
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
+import org.swg.swiftgroups_app.Screens.ImageScreen.ImageScreen
 import org.swg.swiftgroups_app.Screens.Webview.WebviewScreen
 
 class GroupPage (private val groupID : String) : Screen {
 
+    @OptIn(InternalVoyagerApi::class)
     @Composable
     override fun Content() {
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
@@ -70,27 +76,46 @@ class GroupPage (private val groupID : String) : Screen {
         val navigator =  LocalNavigator.currentOrThrow
         val group = viewmodel.group.value
 
+        DisposableEffect(Unit) {
+            onDispose {
+                bottomTabVisibilityManager.setBottomBarVisibility(true)
+            }
+        }
+
+
         Column (
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
             Box (modifier = Modifier.height(250.dp)) {
-                AsyncImage(model=group?.group_logo_url?.let{"https://community.case.edu$it"} ?: "https://placehold.co/200x200?text=-",
-                    "", modifier = Modifier.fillMaxWidth().height(200.dp), contentScale = ContentScale.Crop)
+
+                AsyncImage(model=group?.group_cover_url?.let{"https://community.case.edu$it"} ?: "https://placehold.co/200x200?text=-",
+                    "Group Cover Image", modifier = Modifier.fillMaxWidth().height(200.dp)
+                        .dropShadow(
+                            shape = RoundedCornerShape(0.dp),
+                            offsetY = 4.dp
+                        ).clickable {
+                            if(group!= null) {
+                                navigator.push(ImageScreen(listOf(group.group_cover_url)))
+                            }
+                        }, contentScale = ContentScale.Crop)
+
 
                 if(group != null) {
-                    AsyncImage(model="https://community.case.edu${group.group_cover_url}",
-                        "", modifier = Modifier
+                    AsyncImage(model="https://community.case.edu${group.group_logo_url}",
+                        "Group Logo Image", modifier = Modifier
                             .size(100.dp)
                             .border(border = BorderStroke(2.dp, Color.Black), shape = CircleShape)
                             .clip(CircleShape)
                             .align(Alignment.BottomCenter)
+                            .dropShadow(
+                                shape = CircleShape,
+                                offsetY = 4.dp
+                            )
 
                         , contentScale = ContentScale.Crop)
                 } else {
                     SpinningBar(height = 100.dp, Modifier.align(Alignment.BottomCenter))
                 }
-
-
 
                 TextButton(
                     onClick = {
