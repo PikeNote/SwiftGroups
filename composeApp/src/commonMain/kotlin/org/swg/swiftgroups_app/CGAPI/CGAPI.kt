@@ -22,6 +22,7 @@ import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
 import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
 import org.swg.swiftgroups_app.CGAPI.Feed.Button
+import org.swg.swiftgroups_app.CGAPI.Feed.Comment
 import org.swg.swiftgroups_app.CGAPI.Feed.Feed
 import org.swg.swiftgroups_app.CGAPI.Feed.FeedFilterItem
 import org.swg.swiftgroups_app.CGAPI.Feed.FeedPostsItem
@@ -306,6 +307,43 @@ object CGAPI {
                     println("Groups added/updated to DB!")
                 }
             }
+        }
+    }
+
+    suspend fun postComment(postID : String, text : String) : Boolean {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_comment_post?to_uid=${postID}&comment=${text}&type=feed") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            println("Comment posted!")
+            return true
+        } else {
+            println("Comment failed!")
+            return false
+        }
+    }
+
+    suspend fun getFeedComments(postUID : String) : List<Comment> {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_comments?uid=${postUID}") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            val commentList : List<Comment> = response.body()
+            println("Comment posted!")
+            return commentList
+        } else {
+            println("Comment failed!")
+            return emptyList()
         }
     }
 

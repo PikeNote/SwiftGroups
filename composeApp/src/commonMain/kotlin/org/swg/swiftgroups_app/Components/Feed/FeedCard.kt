@@ -229,7 +229,7 @@ class FeedCard(val feed: Feed) : Screen {
                 visible = fadeOut.value,
                 exit = fadeOut()
             ) {
-                commentModal(onDismissRequest = {fadeOut.value=false}, feed.comments)
+                commentModal(onDismissRequest = {fadeOut.value=false}, feed.comments, feed.uid)
 
                 DisposableEffect(Unit) {
                     onDispose {

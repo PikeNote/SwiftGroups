@@ -26,6 +26,9 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,72 +52,95 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Feed.Comment
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.Send
 
 @Composable
-fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>) {
+fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUID : String) {
 
     var commentText by rememberSaveable { mutableStateOf("") }
-
+    var commentList by remember { mutableStateOf(comments) }
     val visible = remember { mutableStateOf(false) }
+    var enabled by remember { mutableStateOf(true) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         visible.value = true
     }
-
-    Dialog(onDismissRequest = { visible.value = false },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+    Scaffold (
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
     ) {
 
-        Box(
-            modifier = Modifier.fillMaxSize()
-                .clickable(remember { MutableInteractionSource() }, indication = null) {
-                    visible.value = false
-                    onDismissRequest()
-                },
-            contentAlignment = Alignment.BottomCenter
+        Dialog(onDismissRequest = { visible.value = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
         ) {
-            AnimatedVisibility(
-                visible = visible.value,
-                enter = slideInVertically(
-                    initialOffsetY = { fullHeight -> fullHeight }, // start off-screen
-                    animationSpec = tween(durationMillis = 500)
-                ),
-                exit = slideOutVertically(
-                    targetOffsetY = { fullHeight -> fullHeight },
-                    animationSpec = tween(durationMillis = 500)
-                )
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .clickable(remember { MutableInteractionSource() }, indication = null) {
+                        visible.value = false
+                        onDismissRequest()
+                    },
+                contentAlignment = Alignment.BottomCenter
             ) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth().height(560.dp)
-                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                        .background(Color.White)) {
-                        LazyColumn(modifier = Modifier.align(Alignment.TopCenter).offset(y = 10.dp).height(490.dp).fillMaxWidth()) {
-                            if(comments.isEmpty()) {
+                AnimatedVisibility(
+                    visible = visible.value,
+                    enter = slideInVertically(
+                        initialOffsetY = { fullHeight -> fullHeight }, // start off-screen
+                        animationSpec = tween(durationMillis = 500)
+                    ),
+                    exit = slideOutVertically(
+                        targetOffsetY = { fullHeight -> fullHeight },
+                        animationSpec = tween(durationMillis = 500)
+                    )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth().height(560.dp)
+                            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                            .background(Color.White)
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.align(Alignment.TopCenter).offset(y = 10.dp)
+                                .height(490.dp).fillMaxWidth()
+                        ) {
+                            if (commentList.isEmpty()) {
                                 item {
-                                    Box (modifier = Modifier.fillMaxSize()){
-                                        Text("Hmm- no comments seem to be here...", style = AppFont.InterTypography.h5, color = Color.Gray, modifier = Modifier.align(Alignment.Center))
+                                    Box(modifier = Modifier.fillMaxSize()) {
+                                        Text(
+                                            "Hmm- no comments seem to be here...",
+                                            style = AppFont.InterTypography.h5,
+                                            color = Color.Gray,
+                                            modifier = Modifier.align(Alignment.Center)
+                                        )
                                     }
                                 }
                             }
-                            comments.forEach {
+                            commentList.forEach {
                                 item {
                                     Row(
                                         modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
                                         horizontalArrangement = Arrangement.SpaceAround
                                     ) {
                                         AsyncImage(
-                                            model = "https://community.case.edu${it.writerPhotoUrl}", "", modifier = Modifier.size(50.dp).clip(CircleShape)
+                                            model = "https://community.case.edu${it.writerPhotoUrl}",
+                                            "",
+                                            modifier = Modifier.size(50.dp).clip(CircleShape)
                                         )
                                         Spacer(modifier = Modifier.width(10.dp))
                                         Column(
                                             modifier = Modifier.weight(1f),
                                             verticalArrangement = Arrangement.Center
                                         ) {
-                                            Text("${it.writerFirstName} ${it.writerLastName} • ${it.writeWhen}", style = AppFont.InterTypography.h5)
+                                            Text(
+                                                "${it.writerFirstName} ${it.writerLastName} • ${it.writeWhen}",
+                                                style = AppFont.InterTypography.h5
+                                            )
                                             Text(it.content)
                                         }
                                         Icon(
@@ -122,10 +148,10 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>) {
                                             "",
                                             modifier = Modifier.size(25.dp)
                                                 .offset(y = 10.dp).clickable {
-                                                    CoroutineScope(Dispatchers.IO).launch{
+                                                    CoroutineScope(Dispatchers.IO).launch {
                                                         CGAPI.likeComment(it.commentId, it.iLiked == 0)
                                                     }
-                                                },tint = if (it.iLiked == 0) Color.Gray else Color.Red
+                                                }, tint = if (it.iLiked == 0) Color.Gray else Color.Red
                                         )
                                     }
                                 }
@@ -151,11 +177,32 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>) {
                                     style = AppFont.InterTypography.body1
                                 )
                             },
+                            enabled = enabled,
                             trailingIcon = {
                                 IconButton(
                                     onClick = {
-                                        commentText = ""
-                                    }
+                                        enabled = false
+                                        if (commentText.isNotEmpty()) {
+                                            runBlocking {
+                                                val postComment = CGAPI.postComment(
+                                                    postID = postUID,
+                                                    text = commentText
+                                                )
+                                                if (postComment) {
+                                                    snackbarHostState.showSnackbar("Message sent!")
+                                                    commentList =
+                                                        CGAPI.getFeedComments(postUID = postUID)
+                                                } else {
+                                                    snackbarHostState.showSnackbar("Meassage failed to send...")
+                                                }
+                                                commentText = ""
+                                                enabled = true
+                                            }
+                                        }
+
+
+                                    },
+                                    enabled = enabled
                                 ) {
                                     androidx.compose.material.Icon(
                                         Send,
@@ -175,6 +222,7 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>) {
                         )
 
                     }
+                }
             }
         }
 
