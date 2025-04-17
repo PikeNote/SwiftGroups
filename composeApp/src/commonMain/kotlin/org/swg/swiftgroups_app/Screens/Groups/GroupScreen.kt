@@ -27,6 +27,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -50,7 +51,9 @@ import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Search
 import compose.icons.fontawesomeicons.solid.Times
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Fonts.AppFont
+import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import swiftgroups.composeapp.generated.resources.Res
 import swiftgroups.composeapp.generated.resources.swiftgroups_title
 
@@ -61,6 +64,11 @@ object GroupScreen : Screen {
         val viewModel = rememberScreenModel { GroupScreenViewModel() }
         val naivgator = LocalNavigator.currentOrThrow
         var searchText by rememberSaveable { mutableStateOf("") }
+
+        val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
+        LaunchedEffect(Unit) {
+            bottomTabVisibilityManager.setBottomBarVisibility(false)
+        }
 
         Column(
             modifier = Modifier
