@@ -40,6 +40,7 @@ import coil3.compose.AsyncImage
 import com.adamglin.composeshadow.innerShadow
 import kotlinx.coroutines.flow.update
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.Components.Feed.FeedCard
 import org.swg.swiftgroups_app.Components.SpinningBar
@@ -55,6 +56,12 @@ object FeedScreen : Screen {
         val buttonList by viewModel.filterList.collectAsState()
         val selectedIndex by viewModel.selectedIndex.collectAsState()
         val isLoading by viewModel.isLoading.collectAsState()
+
+        val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
+        LaunchedEffect(Unit) {
+            bottomTabVisibilityManager.setBottomBarVisibility(true)
+        }
+
 
         Column(
             modifier = Modifier

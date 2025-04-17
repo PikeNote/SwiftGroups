@@ -30,7 +30,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -64,22 +62,17 @@ import org.swg.swiftgroups_app.Screens.Webview.WebviewScreen
 
 class GroupPage (private val groupID : String) : Screen {
 
-    @OptIn(InternalVoyagerApi::class)
     @Composable
     override fun Content() {
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
-        LaunchedEffect(Unit) {
-            bottomTabVisibilityManager.setBottomBarVisibility(false)
-        }
+
 
         val viewmodel = rememberScreenModel { GroupPageViewModel(groupID) }
         val navigator =  LocalNavigator.currentOrThrow
         val group = viewmodel.group.value
 
-        DisposableEffect(Unit) {
-            onDispose {
-                bottomTabVisibilityManager.setBottomBarVisibility(true)
-            }
+        LaunchedEffect(Unit) {
+            bottomTabVisibilityManager.setBottomBarVisibility(false)
         }
 
 

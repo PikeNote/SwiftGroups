@@ -30,7 +30,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.Divider
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +54,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -77,36 +77,29 @@ import org.swg.swiftgroups_app.Icons.MapPin
 import org.swg.swiftgroups_app.Icons.PencilSquare
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.Groups.GroupPage
+import org.swg.swiftgroups_app.Screens.ImageScreen.ImageScreen
 import org.swg.swiftgroups_app.Screens.Webview.WebviewScreen
 import org.swg.swiftgroups_app.ShareManager.shareLink
 
-class SingleEventScreen(eventID : Int) : Screen {
-
-    private val singleEventViewModel = SingleEventViewModel(eventID)
+class SingleEventScreen(val eventID : Int) : Screen {
 
     @Composable
     @Preview
     override fun Content() {
+        val singleEventViewModel = rememberScreenModel { SingleEventViewModel(eventID) }
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
         val navigator = LocalNavigator.currentOrThrow
         LaunchedEffect(Unit) {
             bottomTabVisibilityManager.setBottomBarVisibility(false)
         }
 
-        DisposableEffect(Unit) {
-            onDispose {
-                bottomTabVisibilityManager.setBottomBarVisibility(true)
-            }
-        }
-
-
         val eventAPI = singleEventViewModel.eventSpecificAPI.value
 
         val maxImageHeight = 210.dp
         val currentImgSize : MutableState<Dp> = remember { mutableStateOf(maxImageHeight) }
-        val maxImageSizePx = with(LocalDensity.current) { 100.dp.toPx() }
 
         val scrollState = rememberScrollState()
+        val expansionThresholdPx = with(LocalDensity.current) { 30.dp.toPx() }
 
         val nestedScrollConnection = remember {
             object : NestedScrollConnection {
@@ -115,8 +108,9 @@ class SingleEventScreen(eventID : Int) : Screen {
                     source: NestedScrollSource
                 ): Offset {
                     val delta = available.y.dp
+                    val isNearTop = scrollState.value <= expansionThresholdPx
 
-                    if(delta > 0.dp && scrollState.value >=  maxImageSizePx) {
+                    if(delta > 0.dp && !isNearTop) {
                         return Offset.Zero
                     }
                     val newImageSize = currentImgSize.value + delta
@@ -144,7 +138,7 @@ class SingleEventScreen(eventID : Int) : Screen {
                     .background(Brush.verticalGradient(colorStops = AppTheme.eventPageImage))
             ) {
                 TextButton(
-                    onClick = {bottomTabVisibilityManager.setBottomBarVisibility(true)
+                    onClick = {
                         navigator.pop()},
                     colors = ButtonDefaults.buttonColors(
                         contentColor = Color.Black,
@@ -176,6 +170,9 @@ class SingleEventScreen(eventID : Int) : Screen {
                                 .graphicsLayer {
                                     this.alpha = imageAlpha
                                 }
+                                .clickable {
+                                    navigator.push(ImageScreen(listOf(eventAPI.photo_url)))
+                                }
                         )
                     } else {
                         Column (
@@ -202,17 +199,22 @@ class SingleEventScreen(eventID : Int) : Screen {
                             .graphicsLayer {
                                 this.alpha =
                                     maxOf(0f, (0.3f - imageAlpha) / 0.3f)// Apply the calculated alpha for the text
-                            }.padding(vertical = 10.dp).align(Alignment.Center)
+                            }.padding(vertical = 12.dp).align(Alignment.Center)
                     )
 
                 }
+            }
+
+            val minCollapsedOffset = 140.dp
+            val yOffsetPx = with(LocalDensity.current) {
+                kotlin.math.max(minCollapsedOffset.roundToPx(), ((currentImgSize.value + 100.dp).roundToPx()))
             }
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .offset {
-                        IntOffset(0, kotlin.math.max(118.5.dp.roundToPx(), ((currentImgSize.value + 90.dp).roundToPx())))
+                        IntOffset(0, yOffsetPx)
                     }
                     .verticalScroll(scrollState)
                     .padding(horizontal = 20.dp).fillMaxWidth(),

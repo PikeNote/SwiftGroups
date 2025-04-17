@@ -1,6 +1,7 @@
 package org.swg.swiftgroups_app.Screens
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -61,7 +62,8 @@ object TabNavigation : Screen {
 
                             }
                         }
-                    }
+                    },
+                    modifier = Modifier.navigationBarsPadding()
                 ) {
                     CurrentTab()
                 }

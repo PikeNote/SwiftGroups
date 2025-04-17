@@ -54,6 +54,7 @@ import kotlinx.datetime.toLocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Components.DatePickerModal
 import swiftgroups.composeapp.generated.resources.Res
 import swiftgroups.composeapp.generated.resources.swiftgroups_title
@@ -68,6 +69,14 @@ object ScreenEvents : Screen {
         val viewModel: EventsViewModel = rememberScreenModel { EventsViewModel() }
         var searchText by rememberSaveable { mutableStateOf("") }
         var showDatePicker by remember { mutableStateOf(false) }
+
+
+        val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
+        LaunchedEffect(Unit) {
+            bottomTabVisibilityManager.setBottomBarVisibility(true)
+        }
+
+
 
         Column(
             modifier = Modifier

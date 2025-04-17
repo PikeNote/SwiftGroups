@@ -20,7 +20,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +27,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -38,7 +36,6 @@ import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 
 class ImageScreen(private val linkList : List<String>) : Screen {
-    @OptIn(InternalVoyagerApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -46,13 +43,6 @@ class ImageScreen(private val linkList : List<String>) : Screen {
         LaunchedEffect(Unit) {
             bottomTabVisibilityManager.setBottomBarVisibility(false)
         }
-
-        DisposableEffect(Unit) {
-            onDispose {
-                bottomTabVisibilityManager.setBottomBarVisibility(true)
-            }
-        }
-
 
 
         Column (modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars).fillMaxSize()) {

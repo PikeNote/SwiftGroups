@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,6 +38,7 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.Icons.QrCodeScan
 import org.swg.swiftgroups_app.Screens.Home.QRScreen
@@ -55,6 +57,12 @@ object ScreenHome : Screen {
             CGAPI.refetchProfile.value = false
             viewModel.fetchData()
         }
+
+        val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
+        LaunchedEffect(Unit) {
+            bottomTabVisibilityManager.setBottomBarVisibility(true)
+        }
+
         Column (
             modifier = Modifier
                 .fillMaxSize()
