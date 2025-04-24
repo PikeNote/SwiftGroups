@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,9 +27,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,16 +63,11 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUI
     var commentList by remember { mutableStateOf(comments) }
     val visible = remember { mutableStateOf(false) }
     var enabled by remember { mutableStateOf(true) }
-    val snackbarHostState = remember { SnackbarHostState() }
+    //val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         visible.value = true
     }
-    Scaffold (
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-    ) {
 
         Dialog(onDismissRequest = { visible.value = false },
             properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -189,11 +182,11 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUI
                                                     text = commentText
                                                 )
                                                 if (postComment) {
-                                                    snackbarHostState.showSnackbar("Message sent!")
+                                                    //snackbarHostState.showSnackbar("Message sent!")
                                                     commentList =
                                                         CGAPI.getFeedComments(postUID = postUID)
                                                 } else {
-                                                    snackbarHostState.showSnackbar("Meassage failed to send...")
+                                                    //snackbarHostState.showSnackbar("Meassage failed to send...")
                                                 }
                                                 commentText = ""
                                                 enabled = true
@@ -226,6 +219,6 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUI
             }
         }
 
-    }
+
 
 }
