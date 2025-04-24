@@ -67,7 +67,7 @@ object GroupScreen : Screen {
 
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
         LaunchedEffect(Unit) {
-            bottomTabVisibilityManager.setBottomBarVisibility(false)
+            bottomTabVisibilityManager.setBottomBarVisibility(true)
         }
 
         Column(
