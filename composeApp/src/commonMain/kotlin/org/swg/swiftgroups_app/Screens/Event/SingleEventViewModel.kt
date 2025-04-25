@@ -38,7 +38,7 @@ class SingleEventViewModel (private val eventID : Int) : ScreenModel {
          screenModelScope.launch {
              val cgData = CGAPI.fetchEvent(eventID.toString())
 
-             if (eventSpecificAPI.value != cgData) {
+             if (eventSpecificAPI.value != cgData && cgData != null) {
                  eventSpecificAPI.value = cgData
                  DBObject.db.swiftdataQueries.updateCache(Json.encodeToString(cgData), eventID.toLong())
              }

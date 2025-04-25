@@ -152,18 +152,25 @@ object CGAPI {
 
 
     suspend fun fetchEvent(eventID : String) : EventSpecificAPI? {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_event_new?id=${eventID}") {
-            method = HttpMethod.Get
-            headers {
-                append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+        try {
+
+            val response: HttpResponse =
+                client.get("https://community.case.edu/mobile_ws/v18/mobile_event_new?id=${eventID}") {
+                    method = HttpMethod.Get
+                    headers {
+                        append(HttpHeaders.Host, "community.case.edu")
+                        append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+                    }
+                }
+
+            if (response.status.value in 200..299) {
+                val eventData: EventSpecificAPI = response.body()
+                return eventData
+            } else {
+                return null
             }
         }
-
-        if (response.status.value in 200..299) {
-            val eventData : EventSpecificAPI = response.body()
-            return eventData
-        } else {
+        catch (e : Exception) {
             return null
         }
     }
@@ -188,19 +195,24 @@ object CGAPI {
     }
 
     suspend fun fetchProfileQR() : UserProfileQRCode? {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_qrcode") {
-            method = HttpMethod.Get
-            headers {
-                append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+        try {
+            val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_qrcode") {
+                method = HttpMethod.Get
+                headers {
+                    append(HttpHeaders.Host, "community.case.edu")
+                    append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+                }
+            }
+
+            if (response.status.value in 200..299) {
+                println("Profile QR code fetched successfully!")
+                val profileQR : UserProfileQRCode = response.body()
+                return profileQR
+            } else {
+                return null
             }
         }
-
-        if (response.status.value in 200..299) {
-            println("Profile QR code fetched successfully!")
-            val profileQR : UserProfileQRCode = response.body()
-            return profileQR
-        } else {
+        catch (e : Exception) {
             return null
         }
     }

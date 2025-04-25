@@ -29,8 +29,10 @@ import platform.Foundation.create
 import platform.Foundation.dataUsingEncoding
 
 import platform.Security.SecItemAdd
+import platform.Security.SecItemUpdate
 import platform.Security.SecItemCopyMatching
 import platform.Security.SecItemDelete
+import platform.Security.errSecItemNotFound
 import platform.Security.kSecAttrAccessGroup
 import platform.Security.kSecAttrAccount
 import platform.Security.kSecAttrService
@@ -105,16 +107,30 @@ actual open class SecureStorageImpl(
         }
     }
 
-    @OptIn(BetaInteropApi::class)
     actual override fun set(key: String, stringValue: String): Boolean {
-        val valueNSData = NSString.create(string = stringValue).dataUsingEncoding(NSUTF8StringEncoding)
+        val valueNSData = NSString.create(string = stringValue)
+            .dataUsingEncoding(NSUTF8StringEncoding)
+            ?: throw Exception("Failed to encode value")
+
+        // build the common query (class, service, account)
         val query = baseQuery() ?: throw Exception("Failed to create query")
         CFDictionaryAddValue(query, kSecAttrAccount, CFBridgingRetain(key))
-        CFDictionaryAddValue(query, kSecValueData, CFBridgingRetain(valueNSData))
-        SecItemDelete(query) // Attempt to delete if it exists
-        return when (SecItemAdd(query, null) == noErr.toInt()) {
-            true -> true
-            false -> throw Exception("Duplicate item for key: $key")
+
+        // try to update existing item
+        val updateAttrs = CFDictionaryCreateMutable(
+            null, 1.convert(), null, null
+        ).apply {
+            CFDictionaryAddValue(this, kSecValueData, CFBridgingRetain(valueNSData))
+            CFAutorelease(this)
         }
+
+        val updateStatus = SecItemUpdate(query, updateAttrs)
+        if (updateStatus == errSecItemNotFound) {
+            // no existing item, fall back to add
+            CFDictionaryAddValue(query, kSecValueData, CFBridgingRetain(valueNSData))
+            val addStatus = SecItemAdd(query, null)
+            return addStatus == noErr.toInt()
+        }
+        return updateStatus == noErr.toInt()
     }
 }

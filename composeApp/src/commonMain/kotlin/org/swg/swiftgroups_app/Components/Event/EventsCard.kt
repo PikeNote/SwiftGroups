@@ -36,6 +36,7 @@ import compose.icons.fontawesomeicons.solid.LocationArrow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
 import org.swg.swiftgroups_app.Fonts.AppFont
@@ -49,6 +50,7 @@ class EventsCard(
     private val horizontalPadding: Dp = 0.dp
 ) {
     private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+    private val currentEDTTime = Clock.System.now().toLocalDateTime(TimeZone.of("America/New_York"))
     private val eventStartTime = Instant.parse(eventDat.start_time).toLocalDateTime(TimeZone.UTC)
     private val eventEndTime = Instant.parse(eventDat.end_time).toLocalDateTime(TimeZone.UTC)
 
@@ -70,7 +72,7 @@ class EventsCard(
                 .clip(shape = RoundedCornerShape(15.dp))
                 .background(Color(0xFFf2f1f1))
                 .then(
-                    if (currentTime in eventStartTime..eventEndTime) {
+                    if (currentEDTTime in eventStartTime..eventEndTime) {
                         Modifier.border(
                             width = 2.dp,
                             color = Color.Red,
@@ -111,7 +113,7 @@ class EventsCard(
                                 .height(130.dp)
                                 .fillMaxWidth()
                         )
-                        if (currentTime in eventStartTime..eventEndTime) {
+                        if (currentEDTTime in eventStartTime..eventEndTime) {
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
