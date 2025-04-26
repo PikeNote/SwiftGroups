@@ -61,6 +61,7 @@ class EventHome(
 ) {
 
     private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+    private val currentEDTTime = Clock.System.now().toLocalDateTime(TimeZone.of("America/New_York"))
     private val eventStartTime : LocalDateTime
     private val eventEndTime : LocalDateTime
 
@@ -112,7 +113,7 @@ class EventHome(
             ) {
                 Box(
                     modifier = Modifier.then(
-                        if (currentTime >= eventStartTime && currentTime <= eventEndTime) {
+                        if (currentEDTTime in eventStartTime..eventEndTime) {
                             Modifier.border(
                                 width = 2.dp,
                                 color = Color.Red,
@@ -141,7 +142,7 @@ class EventHome(
                                     .height(120.dp)
                                     .fillMaxWidth()
                             )
-                            if (currentTime >= eventStartTime && currentTime <= eventEndTime) {
+                            if (currentEDTTime in eventStartTime..eventEndTime) {
                                 Box(
                                     modifier = Modifier
                                         .align(Alignment.TopEnd)

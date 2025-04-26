@@ -139,3 +139,68 @@ SELECT EXISTS (SELECT 1 FROM events);
 
 clubsEmpty:
 SELECT EXISTS (SELECT 1 FROM clubs);
+
+fetchEventCategories:
+SELECT DISTINCT eventCategory FROM events ORDER BY eventCategory;
+
+filterEventsByCategories:
+SELECT * FROM events 
+WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') 
+AND (
+    lower(eventName) LIKE lower('%' || :searchQuery || '%')
+)
+AND eventCategory IN :categories
+ORDER BY start_time LIMIT ?, 50;
+
+filterEventsByDateAndCategories:
+SELECT * FROM events 
+WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') 
+AND (
+    lower(eventName) LIKE lower('%' || :searchQuery || '%')
+)
+AND date(start_time) = date(:selectedDate)
+AND eventCategory IN :categories
+ORDER BY start_time LIMIT ?, 50;
+
+fetchClubNames:
+SELECT DISTINCT clubName FROM events ORDER BY clubName;
+
+filterEventsByClubs:
+SELECT * FROM events 
+WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') 
+AND (
+    lower(eventName) LIKE lower('%' || :searchQuery || '%')
+)
+AND clubName IN :clubs
+ORDER BY start_time LIMIT ?, 50;
+
+filterEventsByDateAndClubs:
+SELECT * FROM events 
+WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') 
+AND (
+    lower(eventName) LIKE lower('%' || :searchQuery || '%')
+)
+AND date(start_time) = date(:selectedDate)
+AND clubName IN :clubs
+ORDER BY start_time LIMIT ?, 50;
+
+filterEventsByClubsAndCategories:
+SELECT * FROM events 
+WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') 
+AND (
+    lower(eventName) LIKE lower('%' || :searchQuery || '%')
+)
+AND clubName IN :clubs
+AND eventCategory IN :categories
+ORDER BY start_time LIMIT ?, 50;
+
+filterEventsByDateAndClubsAndCategories:
+SELECT * FROM events 
+WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc') 
+AND (
+    lower(eventName) LIKE lower('%' || :searchQuery || '%')
+)
+AND date(start_time) = date(:selectedDate)
+AND clubName IN :clubs
+AND eventCategory IN :categories
+ORDER BY start_time LIMIT ?, 50;

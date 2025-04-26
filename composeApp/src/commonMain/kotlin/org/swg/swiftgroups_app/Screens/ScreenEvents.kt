@@ -55,6 +55,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.swg.swiftgroups_app.Components.CategorySelectionModal
 import org.swg.swiftgroups_app.Components.DatePickerModal
 import swiftgroups.composeapp.generated.resources.Res
 import swiftgroups.composeapp.generated.resources.swiftgroups_title
@@ -69,14 +70,13 @@ object ScreenEvents : Screen {
         val viewModel: EventsViewModel = rememberScreenModel { EventsViewModel() }
         var searchText by rememberSaveable { mutableStateOf("") }
         var showDatePicker by remember { mutableStateOf(false) }
-
+        var showCategoryPicker by remember { mutableStateOf(false) }
+        var showClubPicker by remember { mutableStateOf(false) }
 
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
         LaunchedEffect(Unit) {
             bottomTabVisibilityManager.setBottomBarVisibility(true)
         }
-
-
 
         Column(
             modifier = Modifier
@@ -143,11 +143,13 @@ object ScreenEvents : Screen {
                     .padding(vertical = 12.dp, horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val filters = listOf("Hide Long Events", "Select Date")
+                val filters = listOf("Hide Long Events", "Select Date", "Select Category", "Select Club")
                 items(filters) { filter ->
                     val isSelected = when (filter) {
                         "Hide Long Events" -> !viewModel.showLongEvents
                         "Select Date" -> viewModel.selectedDate != null
+                        "Select Category" -> viewModel.selectedCategories.isNotEmpty()
+                        "Select Club" -> viewModel.selectedClubs.isNotEmpty()
                         else -> false
                     }
                     OutlinedButton(
@@ -155,6 +157,8 @@ object ScreenEvents : Screen {
                             when (filter) {
                                 "Hide Long Events" -> viewModel.toggleLongEvents()
                                 "Select Date" -> showDatePicker = true
+                                "Select Category" -> showCategoryPicker = true
+                                "Select Club" -> showClubPicker = true
                             }
                         },
                         modifier = Modifier
@@ -178,10 +182,11 @@ object ScreenEvents : Screen {
                             Spacer(modifier = Modifier.width(4.dp))
                         }
                         Text(
-                            if (filter == "Select Date" && viewModel.selectedDate != null) {
-                                formatDate(viewModel.selectedDate!!)
-                            } else {
-                                filter
+                            when (filter) {
+                                "Select Date" -> if (viewModel.selectedDate != null) formatDate(viewModel.selectedDate!!) else filter
+                                "Select Category" -> if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Categories" else filter
+                                "Select Club" -> if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Clubs" else filter
+                                else -> filter
                             },
                             style = AppFont.InterTypography.body2
                         )
@@ -242,6 +247,40 @@ object ScreenEvents : Screen {
                 },
                 onClearDate = {
                     viewModel.setSelectedDateCal(null)
+                }
+            )
+        }
+
+        // Category Selection Dialog
+        if (showCategoryPicker) {
+            CategorySelectionModal(
+                title = "Select Categories",
+                categories = viewModel.categories,
+                selectedCategories = viewModel.selectedCategories,
+                onDismiss = { showCategoryPicker = false },
+                onCategoriesSelected = { categories ->
+                    viewModel.updateSelectedCategories(categories)
+                },
+                onClearSelection = {
+                    viewModel.updateSelectedCategories(emptySet())
+                    showCategoryPicker = false
+                }
+            )
+        }
+
+        // Club Selection Dialog
+        if (showClubPicker) {
+            CategorySelectionModal(
+                title = "Select Clubs",
+                categories = viewModel.clubs,
+                selectedCategories = viewModel.selectedClubs,
+                onDismiss = { showClubPicker = false },
+                onCategoriesSelected = { clubs ->
+                    viewModel.updateSelectedClubs(clubs)
+                },
+                onClearSelection = {
+                    viewModel.updateSelectedClubs(emptySet())
+                    showClubPicker = false
                 }
             )
         }

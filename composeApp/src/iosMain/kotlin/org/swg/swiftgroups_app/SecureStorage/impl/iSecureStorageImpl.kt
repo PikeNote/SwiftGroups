@@ -107,6 +107,7 @@ actual open class SecureStorageImpl(
         }
     }
 
+    @OptIn(BetaInteropApi::class)
     actual override fun set(key: String, stringValue: String): Boolean {
         val valueNSData = NSString.create(string = stringValue)
             .dataUsingEncoding(NSUTF8StringEncoding)
