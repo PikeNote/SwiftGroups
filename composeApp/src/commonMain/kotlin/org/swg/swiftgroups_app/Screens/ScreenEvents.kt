@@ -2,10 +2,12 @@ package org.swg.swiftgroups_app.Screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -45,6 +48,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Calendar
 import compose.icons.fontawesomeicons.solid.Search
+import compose.icons.fontawesomeicons.solid.Sync
 import compose.icons.fontawesomeicons.solid.Times
 import org.swg.swiftgroups_app.Components.Home.EventsCard
 import org.swg.swiftgroups_app.Fonts.AppFont
@@ -52,6 +56,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import androidx.compose.runtime.saveable.rememberSaveable
+import compose.icons.fontawesomeicons.solid.Undo
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -59,6 +64,7 @@ import org.swg.swiftgroups_app.Components.CategorySelectionModal
 import org.swg.swiftgroups_app.Components.DatePickerModal
 import swiftgroups.composeapp.generated.resources.Res
 import swiftgroups.composeapp.generated.resources.swiftgroups_title
+import compose.icons.fontawesomeicons.solid.ChevronRight
 
 private fun formatDate(date: LocalDate): String {
     return "${date.month.name.take(3)} ${date.dayOfMonth}, ${date.year}"
@@ -85,11 +91,29 @@ object ScreenEvents : Screen {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(Res.drawable.swiftgroups_title),
-                contentDescription = "SwiftGroups Logo",
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
+            Box(modifier = Modifier.fillMaxWidth().padding(horizontal=10.dp)) {
+                Image(
+                    painter = painterResource(Res.drawable.swiftgroups_title),
+                    contentDescription = "SwiftGroups Logo",
+                    modifier = Modifier.align(Alignment.Center)
+                )
+                IconButton(
+                    onClick = {
+                        viewModel.setSelectedDateCal(null)
+                        viewModel.updateSelectedCategories(emptySet())
+                        viewModel.updateSelectedClubs(emptySet())
+                        viewModel.filterEvents("")
+                    },
+                    modifier = Modifier.align(Alignment.CenterEnd).size(30.dp)
+                ) {
+                    Icon(
+                        FontAwesomeIcons.Solid.Undo,
+                        contentDescription = "Reset Filters",
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            }
+            Spacer(Modifier.height(10.dp))
             // Search Bar
             TextField(
                 value = searchText,
@@ -137,61 +161,80 @@ object ScreenEvents : Screen {
             )
 
             // Filter Buttons
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp, horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                val filters = listOf("Hide Long Events", "Select Date", "Select Category", "Select Club")
-                items(filters) { filter ->
-                    val isSelected = when (filter) {
-                        "Hide Long Events" -> !viewModel.showLongEvents
-                        "Select Date" -> viewModel.selectedDate != null
-                        "Select Category" -> viewModel.selectedCategories.isNotEmpty()
-                        "Select Club" -> viewModel.selectedClubs.isNotEmpty()
-                        else -> false
-                    }
-                    OutlinedButton(
-                        onClick = {
-                            when (filter) {
-                                "Hide Long Events" -> viewModel.toggleLongEvents()
-                                "Select Date" -> showDatePicker = true
-                                "Select Category" -> showCategoryPicker = true
-                                "Select Club" -> showClubPicker = true
-                            }
-                        },
-                        modifier = Modifier
-                            .height(36.dp),
-                        shape = RoundedCornerShape(4.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = if (isSelected) Color(0xFFEEEEEE) else Color.Transparent,
-                            contentColor = if (isSelected) Color.Black else Color(0xFF666666)
-                        ),
-                        border = BorderStroke(
-                            width = 1.dp,
-                            color = if (isSelected) Color.Black else Color(0xFFCCCCCC)
-                        )
-                    ) {
-                        if (filter == "Select Date") {
-                            Icon(
-                                FontAwesomeIcons.Solid.Calendar,
-                                contentDescription = "Calendar",
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
+            Box(modifier = Modifier.fillMaxWidth()) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp, horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val filters = listOf("Hide Long Events", "Select Date", "Select Category", "Select Club")
+                    items(filters) { filter ->
+                        val isSelected = when (filter) {
+                            "Hide Long Events" -> !viewModel.showLongEvents
+                            "Select Date" -> viewModel.selectedDate != null
+                            "Select Category" -> viewModel.selectedCategories.isNotEmpty()
+                            "Select Club" -> viewModel.selectedClubs.isNotEmpty()
+                            else -> false
                         }
-                        Text(
-                            when (filter) {
-                                "Select Date" -> if (viewModel.selectedDate != null) formatDate(viewModel.selectedDate!!) else filter
-                                "Select Category" -> if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Categories" else filter
-                                "Select Club" -> if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Clubs" else filter
-                                else -> filter
+                        OutlinedButton(
+                            onClick = {
+                                when (filter) {
+                                    "Hide Long Events" -> viewModel.toggleLongEvents()
+                                    "Select Date" -> showDatePicker = true
+                                    "Select Category" -> showCategoryPicker = true
+                                    "Select Club" -> showClubPicker = true
+                                }
                             },
-                            style = AppFont.InterTypography.body2
-                        )
+                            modifier = Modifier
+                                .height(36.dp),
+                            shape = RoundedCornerShape(4.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                backgroundColor = if (isSelected) Color(0xFFEEEEEE) else Color.Transparent,
+                                contentColor = if (isSelected) Color.Black else Color(0xFF666666)
+                            ),
+                            border = BorderStroke(
+                                width = 1.dp,
+                                color = if (isSelected) Color.Black else Color(0xFFCCCCCC)
+                            )
+                        ) {
+                            if (filter == "Select Date") {
+                                Icon(
+                                    FontAwesomeIcons.Solid.Calendar,
+                                    contentDescription = "Calendar",
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                            }
+                            Text(
+                                when (filter) {
+                                    "Select Date" -> if (viewModel.selectedDate != null) formatDate(viewModel.selectedDate!!) else filter
+                                    "Select Category" -> if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Categories" else filter
+                                    "Select Club" -> if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Clubs" else filter
+                                    else -> filter
+                                },
+                                style = AppFont.InterTypography.body2
+                            )
+                        }
                     }
                 }
+                // Chevron overlay at the end
+                Icon(
+                    FontAwesomeIcons.Solid.ChevronRight,
+                    contentDescription = "Scroll for more filters",
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 8.dp)
+                        .size(24.dp)
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(Color.Transparent, Color.White.copy(alpha = 0.8f)),
+                                startX = 0f,
+                                endX = 60f
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                )
             }
 
             // Events List

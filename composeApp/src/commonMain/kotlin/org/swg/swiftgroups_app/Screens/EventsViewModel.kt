@@ -87,11 +87,11 @@ class EventsViewModel : ScreenModel {
             }
             // Just Date
             selectedDate != null -> {
-                database.swiftdataQueries.filterEventsByDate(
-                    currentSearchQuery.trim(),
-                    selectedDate.toString(),
-                    offset
-                ).executeAsList()
+            database.swiftdataQueries.filterEventsByDate(
+                currentSearchQuery.trim(),
+                selectedDate.toString(),
+                offset
+            ).executeAsList()
             }
             // Just Categories
             selectedCategories.isNotEmpty() -> {
@@ -111,7 +111,7 @@ class EventsViewModel : ScreenModel {
             }
             // No filters
             else -> {
-                database.swiftdataQueries.filterEvents(currentSearchQuery.trim(), offset).executeAsList()
+            database.swiftdataQueries.filterEvents(currentSearchQuery.trim(), offset).executeAsList()
             }
         }
 
