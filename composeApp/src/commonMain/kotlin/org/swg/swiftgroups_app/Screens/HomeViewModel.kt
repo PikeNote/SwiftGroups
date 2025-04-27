@@ -7,6 +7,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +23,7 @@ import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 import org.swg.swiftgroupsapp.db.Events
 
-class HomeViewModel () : ScreenModel {
+class HomeViewModel : ScreenModel {
 
     init {
         fetchData()
@@ -39,28 +40,36 @@ class HomeViewModel () : ScreenModel {
     fun fetchData() {
         screenModelScope.launch(Dispatchers.IO) {
             delay(30)
-            val profileCache = DBObject.db.swiftdataQueries.fetchModifications("profileData").executeAsOneOrNull()
-            _profileData.update {
-                if (profileCache == null) {
-                    CGAPI.grabProfileData()
-                } else {
-                    // If the data was fetched more than 60 minutes ago, don't fetch it again
-                    if (CGAPI.checkDBExpiry(profileCache.changed_at) && profileCache.value_ != "[]") {
-                        println("Defaulting to cached profile")
-                        json.decodeFromString(profileCache.value_)
+            val profileCache = DBObject.db.swiftdataQueries
+                .fetchModifications("profileData")
+                .executeAsOneOrNull()
 
-                    } else {
-                        CGAPI.grabProfileData()
-                    }
+            val myGroupsCache = DBObject.db.swiftdataQueries
+                .fetchModifications("homeMyGroups")
+                .executeAsOneOrNull()
+
+            val eventsCache = DBObject.db.swiftdataQueries
+                .fetchModifications("events")
+                .executeAsOneOrNull()
+
+            val clubsCache = DBObject.db.swiftdataQueries
+                .fetchModifications("clubs")
+                .executeAsOneOrNull()
+
+            val profileDeferred = async {
+                // If the data was fetched more than 60 minutes ago, don't fetch it again
+                if (profileCache != null && CGAPI.checkDBExpiry(profileCache.changed_at) && profileCache.value_ != "[]") {
+                    println("Defaulting to cached profile")
+                    json.decodeFromString(profileCache.value_)
+
+                } else {
+                    CGAPI.grabProfileData()
                 }
+
             }
 
-            yield()
-            val upcomingEventStaging: MutableList<Events> = mutableListOf()
-            val upcomingEventsData = CGAPI.grabMyEvents()
-
-            upcomingEventsData.list.forEach {
-                upcomingEventStaging +=
+            val eventsDeferred = async {
+                CGAPI.grabMyEvents().list.map {
                     Events(
                         eventId = it.event_id.toLong(),
                         eventName = it.event_name,
@@ -77,92 +86,56 @@ class HomeViewModel () : ScreenModel {
                         eventTags = "",
                         userCacheData = ""
                     )
+                }
             }
 
-            upcomingEvents = upcomingEventStaging
-
-            yield()
-
-            userQrCode = CGAPI.fetchProfileQR()
-
-            yield()
-
-
-            try {
-                val myGroupCache = DBObject.db.swiftdataQueries.fetchModifications("homeMyGroups").executeAsOneOrNull()
-                val groupData : List<ProfileGroupItem> = if(myGroupCache == null) {
-                    CGAPI.fetchMyGroups()
+            val groupsDeferred = async {
+                val groupData = if (myGroupsCache != null && !CGAPI.checkDBExpiry(myGroupsCache.changed_at)
+                ) {
+                    println("Defaulting to cached my groups")
+                    json.decodeFromString<List<ProfileGroupItem>>(myGroupsCache.value_)
                 } else {
-                    try {
-                        if (CGAPI.checkDBExpiry(myGroupCache.changed_at)) {
-                            println("Defaulting to cached my groups")
-                            json.decodeFromString(myGroupCache.value_)
-                        } else {
-                            CGAPI.fetchMyGroups()
-                        }
-                    } catch (_:Exception) {CGAPI.fetchMyGroups()}
+                    runCatching { CGAPI.fetchMyGroups() }.getOrElse { emptyList() }
                 }
 
-                if (groupData.isNotEmpty()) {
-                    val myGroups = groupData[1]
-                    val groupEvents: MutableList<Events> = mutableListOf()
-                    myGroups.groups.forEach {
-                        groupEvents +=
-                            DBObject.db.swiftdataQueries
-                                .fetchEventClub(it.groupName)
-                                .executeAsList()
-                    }
-
-                    upcomingGroupEvents = groupEvents
-                }
-            } catch (e: Exception) {
-                //
+                groupData.getOrNull(1)
+                    ?.groups
+                    ?.flatMap { DBObject.db.swiftdataQueries.fetchEventClub(it.groupName).executeAsList() }
+                    .orEmpty()
             }
-            yield()
+
+
+            val qrDeferred = async {
+                CGAPI.fetchProfileQR()
+            }
+
+            _profileData.update { profileDeferred.await() }
+            upcomingEvents = eventsDeferred.await()
+            userQrCode = qrDeferred.await()
+            upcomingGroupEvents = groupsDeferred.await()
 
             if (!CGAPI.databaseFetched) {
-                try {
-                    val eventsCache = DBObject.db.swiftdataQueries.fetchModifications("events").executeAsOneOrNull()
-                    val groupsCache = DBObject.db.swiftdataQueries.fetchModifications("clubs").executeAsOneOrNull()
-
-                    try {
-                        if(eventsCache != null) {
-                            if(!CGAPI.checkDBExpiry(eventsCache.changed_at)) {
-                                CGAPI.fetchEventsData()
-                            } else {
-                                println("Defaulting to cached events")
-                            }
-                        }
-                    } catch (_:Exception) {
+                val fetchEventsDeferred = async {
+                    if (eventsCache != null && !CGAPI.checkDBExpiry(eventsCache.changed_at)) {
+                        println("Defaulting to cached events")
+                    } else {
                         CGAPI.fetchEventsData()
                     }
-                    yield()
+                }
 
-                    try {
-                        if (groupsCache != null) {
-                            if (!CGAPI.checkDBExpiry(groupsCache.changed_at)) {
-                                CGAPI.fetchAllPersonalGroups()
-                                yield()
-                                CGAPI.fetchAllGroups()
-                                yield()
-                            } else {
-                                println("Defaulting to cached groups")
-                            }
-                        } else {
-							CGAPI.fetchAllPersonalGroups()
-							yield()
-							CGAPI.fetchAllGroups()
-							yield()
-						}
-                    } catch (_: Exception) {
+                val fetchGroupsDeferred = async {
+                    if (clubsCache != null && !CGAPI.checkDBExpiry(clubsCache.changed_at)) {
+                        println("Defaulting to cached clubs")
+                    } else {
                         CGAPI.fetchAllPersonalGroups()
                         yield()
                         CGAPI.fetchAllGroups()
                         yield()
                     }
-                } catch (e: Exception) {
-                    println(e.toString())
                 }
+
+                fetchEventsDeferred.await()
+                fetchGroupsDeferred.await()
             }
         }
     }

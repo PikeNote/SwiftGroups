@@ -113,19 +113,24 @@ object FeedScreen : Screen {
                         }
                     }
 
-                    item {
-                        Spacer(modifier = Modifier.height(150.dp))
-                    }
-
-                    if (isLoading) {
+                    if (!isLoading) {
                         item {
-                            CircularProgressIndicator(
-                                color = Color(0xFF446BA0),
-                                backgroundColor = Color(0xFFCCCCCC),
-                                modifier = Modifier.height(100.dp).fillMaxWidth()
-                            )
+                            Spacer(modifier = Modifier.height(25.dp))
+                            Column (modifier = Modifier.fillMaxWidth().height(50.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                CircularProgressIndicator(
+                                    color = Color(0xFF446BA0),
+                                    backgroundColor = Color(0xFFCCCCCC),
+                                    modifier = Modifier.height(50.dp).width(50.dp)
+                                )
+                            }
                         }
                     }
+
+
+                    item {
+                        Spacer(modifier = Modifier.height(75.dp))
+                    }
+
 
                     if (viewModel.hasMorePosts && !isLoading) {
                         item {

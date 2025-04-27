@@ -45,7 +45,7 @@ object CGAPI {
         ignoreUnknownKeys = true
     }
     val secureVault = SecureStorage()
-    val client = HttpClient() {
+    val client = HttpClient {
         followRedirects = false
         install(ContentNegotiation) {
             json(contentType = ContentType.Any, json = Json {
