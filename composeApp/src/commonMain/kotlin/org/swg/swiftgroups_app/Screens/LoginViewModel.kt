@@ -7,24 +7,27 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.runBlocking
 import org.swg.swiftgroups_app.CGAPI.CGAPI
-import org.swg.swiftgroups_app.CGAPI.CGAPI.json
-import org.swg.swiftgroups_app.SecureStorage.SecureStorage
+import org.swg.swiftgroups_app.DatabaseDriver.DBObject
+import org.swg.swiftgroups_app.Screens.DBLoading.DatabaseLoading
 
 class LoginViewModel (navigator : Navigator?) : ScreenModel {
 
-    val secureVault = SecureStorage()
     var requireLogin by mutableStateOf(false)
     var navigator by mutableStateOf(false)
 
     init {
         try {
-            val storedCookie = secureVault.getString("cg_cookie", null)
-            if (!storedCookie.isNullOrEmpty()) {
-                CGAPI.cookieHeader = json.decodeFromString(storedCookie)
+            val authKey = CGAPI.secureVault.getString("authKey", null)
+            if (!authKey.isNullOrEmpty()) {
                 runBlocking {
-                    val loggedIn = CGAPI.checkLoggedIn()
-                    if (loggedIn) {
-                        navigator?.replace(TabNavigation)
+                    val auth = CGAPI.refreshToken(authKey)
+                    if (auth) {
+                        if(DBObject.db.swiftdataQueries.eventsEmpty().executeAsOne())  {
+                            navigator?.replace(TabNavigation)
+                        } else {
+                            navigator?.replace(DatabaseLoading)
+                        }
+
                     } else {
                         requireLogin = true
                     }
@@ -37,4 +40,6 @@ class LoginViewModel (navigator : Navigator?) : ScreenModel {
             requireLogin = true
         }
     }
+
+
 }

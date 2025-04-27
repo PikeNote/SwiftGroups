@@ -9,15 +9,17 @@ import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.parseServerSetCookieHeader
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroups
+import org.swg.swiftgroups_app.CGAPI.Auth.Auth
 import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
 import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
@@ -34,6 +36,7 @@ import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
+import org.swg.swiftgroups_app.SecureStorage.SecureStorage
 
 object CGAPI {
     var databaseFetched = false
@@ -41,7 +44,9 @@ object CGAPI {
     val json =  Json {
         ignoreUnknownKeys = true
     }
+    val secureVault = SecureStorage()
     val client = HttpClient() {
+        followRedirects = false
         install(ContentNegotiation) {
             json(contentType = ContentType.Any, json = Json {
                 prettyPrint = true
@@ -52,7 +57,6 @@ object CGAPI {
         }
         install(HttpCache) {
             publicStorage(KachetorStorage(10 * 1024 * 1024))
-
         }
     }
 
@@ -80,6 +84,42 @@ object CGAPI {
 
     }
 
+    suspend fun refreshToken(token : String) : Boolean {
+        println("Refreshing token... $token")
+        val response: HttpResponse = client.get("https://community.case.edu/student_login?api=1&app_device=android&mobile_token=${token}") {
+            method = HttpMethod.Get
+            headers {
+                append(HttpHeaders.Host, "community.case.edu")
+                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+            }
+        }
+
+        if (response.status.value in 200..299) {
+            println("Successful token request!")
+            val authResponse: Auth = response.body()
+            if(authResponse.success) {
+                val cookieSetHeaders : List<String> = response.headers.getAll(HttpHeaders.SetCookie).orEmpty()
+                val cookieList : List<io.ktor.http.Cookie> = cookieSetHeaders.map { parseServerSetCookieHeader(it) }
+                cookieHeader = mergeCookies(cookieHeader, cookieList)
+                secureVault.set("authKey", authResponse.mobile_token)
+                //secureVault.set("cg_cookie", generateCookieString((cookieHeader)))
+                // Prob don't need this .v.
+                return true
+            }
+        } else {
+            println("Token request failed! ${response.body<String>()}")
+            return false
+        }
+        return false
+    }
+
+    fun mergeCookies(existing: List<io.ktor.http.Cookie>, incoming: List<io.ktor.http.Cookie>): List<io.ktor.http.Cookie> {
+        val merged = (existing + incoming)
+            .groupBy { it.name }
+            .map { (_, cookies) -> cookies.last() } // Keep the latest by name
+        return merged
+    }
+
     suspend fun grabProfileData(): List<ProfileDataItem> {
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_profile") {
             method = HttpMethod.Get
@@ -99,23 +139,49 @@ object CGAPI {
 
     }
 
-    suspend fun checkLoggedIn() : Boolean {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_auto_login.aspx") {
-            // {"logout":true}
-            method = HttpMethod.Get
+    suspend fun fetchAppRedirect(
+        loginUrl: String,
+        cookieHeader: String,
+        hopsLeft: Int = 10
+    ): String? {
+        println("Fetching ---- ${loginUrl}")
+        if(loginUrl== "null") return null
+        if (hopsLeft <= 0) return null
+
+        val resp: HttpResponse = client.get(loginUrl) {
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
-                append(HttpHeaders.CacheControl, CacheControl.MaxAge(maxAgeSeconds = 3600).toString())
+                append(HttpHeaders.Referrer,        "https://www.campusgroups.com/")
+                append(HttpHeaders.Cookie,cookieHeader)
+                append(HttpHeaders.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
             }
         }
 
-        if (response.status.value in 200..299) {
-            val loggedIn : String = response.body()
+        println("Fetching App Redirect ${resp.status}")
+        println(resp.headers[HttpHeaders.Location])
+        resp.headers.entries().forEach { (name, values) ->
+            println("$name: ${values.joinToString("; ")}")
+        }
 
-            return !loggedIn.contains("logout")
+        return if (resp.status == HttpStatusCode.Found) {
+            val location = resp.headers[HttpHeaders.Location] ?: return null
+
+            // if this is the app‐scheme, we’re done
+            if (location.startsWith("cgapp://") || location.startsWith("novalsys-cwru://")) {
+                location
+            } else {
+                // otherwise resolve a relative redirect and recurse
+                val nextUrl = if (location.startsWith("http")) {
+                    location
+                } else {
+                    // assume same host
+                    "https://community.case.edu$location"
+                }
+                fetchAppRedirect(nextUrl, cookieHeader, hopsLeft - 1)
+            }
         } else {
-            return false
+            // not a redirect → no cgapp:// coming
+            null
         }
     }
 
@@ -140,7 +206,6 @@ object CGAPI {
                     end_time = it.endTime,
                     eventAttendees = it.attendeeCount.toLong(),
                     clubName = it.club?.clubName ?: "",
-                    clubURL = it.club?.clubUrl ?: ""
                     clubURL = it.club?.clubUrl ?: "",
                     eventTags = it.eventTags.joinToString()
                 )
