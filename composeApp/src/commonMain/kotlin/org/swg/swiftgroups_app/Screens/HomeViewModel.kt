@@ -74,6 +74,7 @@ class HomeViewModel () : ScreenModel {
                         eventPicture = "https://community.case.edu${it.photo_url}",
                         clubName = it.event_group,
                         eventCategory = "",
+                        eventTags = "",
                         userCacheData = ""
                     )
             }

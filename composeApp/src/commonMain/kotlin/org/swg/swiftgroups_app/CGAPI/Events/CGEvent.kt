@@ -14,26 +14,30 @@ data class CGEvent (
     var eventPicture : String = "",
     var club : Club? = null,
     var eventID: String = "",
-    var eventCategory: List<String> = ArrayList())
+    var eventCategory: List<String> = ArrayList(),
+    var eventTags : List<String> = ArrayList()
+)
+/*
 {
 
     fun selfValidate() : Boolean {
         if(startTime == "0" || endTime == "0") {
-            return false;
+            return false
         }
 
         if(eventName == "N/A") {
-            return false;
+            return false
         }
 
         if(eventUrl == "") {
-            return false;
+            return false
         }
 
         if(club == null || eventID == "") {
-            return false;
+            return false
         }
 
-        return true;
+        return true
     }
 }
+ */

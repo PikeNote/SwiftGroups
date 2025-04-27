@@ -24,9 +24,10 @@ import org.swg.swiftgroups_app.CGAPI.Events.Club
 object EventsAPI {
 
     // Crazy? I was crazy once. They locked me in a rubber room, a rubber room full of rats, and the rats made me go crazy :D
-    val regexMultiDate = Regex("[A-Za-z]+, ([A-Za-z]+) ([0-9]+), ([0-9]{4}) ([0-9]+):?([0-9]+)? ([A-Za-z]+)", RegexOption.MULTILINE)
+    private val regexMultiDate = Regex("[A-Za-z]+, ([A-Za-z]+) ([0-9]+), ([0-9]{4}) ([0-9]+):?([0-9]+)? ([A-Za-z]+)", RegexOption.MULTILINE)
     private val regexOneDate = Regex("[A-Za-z]+, ([A-Za-z]+) ([0-9]+), ([0-9]{4}) ([0-9]+):?([0-9]+)? ([A-Za-z]+) - ([0-9]+):?([0-9]+)? ([A-Za-z]+)", RegexOption.MULTILINE)
     private val htmlRegex = Regex("(<([^>]+)>)", RegexOption.IGNORE_CASE )
+    private val regexEventTag = Regex("<span[^>]*>\\s*<span[^>]*>(.*?)</span>\\s*")
 
     val dateTimeFormat = LocalDateTime.Format {
         monthName(MonthNames.ENGLISH_ABBREVIATED)
@@ -76,6 +77,7 @@ object EventsAPI {
                     if(it.p2 != "separator" && it.p4 != "") {
                         val fixedTime = htmlRegex.replace(it.p4, " ").replace("&ndash;", "-").replace("  ", " ")
                         val convertedTime : List<String> = timeConverter(fixedTime)
+                        val eventTags : List<String> = extractEventTags(it.p22)
 
                         eventItems.add(CGEvent(
                             eventName = it.p3,
@@ -88,7 +90,8 @@ object EventsAPI {
                             club = Club(clubName = it.p9, clubUrl = ""),
                             attendeeCount = it.p10,
                             startTime = convertedTime[0],
-                            endTime = convertedTime[1]
+                            endTime = convertedTime[1],
+                            eventTags = eventTags
                         ))
                     }
                 }
@@ -124,6 +127,17 @@ object EventsAPI {
             }
         }
         return emptyList()
+    }
+
+    private fun extractEventTags(tags : String) : List<String> {
+        val eventTagList = ArrayList<String>()
+        val eventTagMatches = regexEventTag.findAll(tags)
+        eventTagMatches.forEach {
+            if(it.groupValues.size > 1) {
+                eventTagList.add(it.groupValues[1])
+            }
+        }
+        return eventTagList
     }
 
 }

@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS events (
         eventPicture TEXT NOT NULL,
         clubURL TEXT NOT NULL,
         eventCategory TEXT NOT NULL,
+        eventTags TEXT NOT NULL,
         clubName TEXT NOT NULL,
         userCacheData TEXT NOT NULL DEFAULT '',
         FOREIGN KEY (clubName)
@@ -74,11 +75,12 @@ insertEvent {
       eventPicture = :eventPicture,
       clubName = :clubName,
       clubURL = :clubURL,
-      eventCategory = :eventCategory
+      eventCategory = :eventCategory,
+      eventTags = :eventTags
   WHERE eventId = :eventId;
 
-  INSERT OR IGNORE INTO events (eventId,start_time,end_time,eventName,eventDesc,eventAttendees,eventUrl,eventLocation, eventPicture,clubName,clubURL,eventCategory)
-  VALUES (:eventId,:start_time,:end_time,:eventName,:eventDesc,:eventAttendees,:eventUrl,:eventLocation, :eventPicture,:clubName,:clubURL,:eventCategory);
+  INSERT OR IGNORE INTO events (eventId,start_time,end_time,eventName,eventDesc,eventAttendees,eventUrl,eventLocation, eventPicture,clubName,clubURL,eventCategory, eventTags)
+  VALUES (:eventId,:start_time,:end_time,:eventName,:eventDesc,:eventAttendees,:eventUrl,:eventLocation, :eventPicture,:clubName,:clubURL,:eventCategory,:eventTags);
 }
 
 insertClub {

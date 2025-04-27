@@ -141,6 +141,8 @@ object CGAPI {
                     eventAttendees = it.attendeeCount.toLong(),
                     clubName = it.club?.clubName ?: "",
                     clubURL = it.club?.clubUrl ?: ""
+                    clubURL = it.club?.clubUrl ?: "",
+                    eventTags = it.eventTags.joinToString()
                 )
             }
             afterCommit {
