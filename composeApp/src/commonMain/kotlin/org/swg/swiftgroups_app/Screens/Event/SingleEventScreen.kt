@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -391,6 +392,35 @@ class SingleEventScreen(val eventID : Int) : Screen {
                     )
 
                     Text(eventAPI?.event_description ?:"")
+
+                    if (!eventAPI?.event_tags.isNullOrEmpty()) {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            "Tags",
+                            style = AppFont.InterTypography.h3,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(eventAPI?.event_tags ?: emptyList()) { tag ->
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(Color(0xFFEEEEEE))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        tag.name,
+                                        style = AppFont.InterTypography.body2,
+                                        color = Color(0xFF666666)
+                                    )
+                                }
+                            }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(230.dp))
                 }
