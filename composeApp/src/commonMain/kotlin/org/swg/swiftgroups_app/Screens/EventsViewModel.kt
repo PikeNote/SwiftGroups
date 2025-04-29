@@ -16,8 +16,10 @@ class EventsViewModel : ScreenModel {
     var selectedDate by mutableStateOf<LocalDate?>(null)
     var selectedCategories by mutableStateOf<Set<String>>(emptySet())
     var selectedClubs by mutableStateOf<Set<String>>(emptySet())
+    var selectedTags by mutableStateOf<Set<String>>(emptySet())
     var categories by mutableStateOf<List<String>>(emptyList())
     var clubs by mutableStateOf<List<String>>(emptyList())
+    var tags by mutableStateOf<List<String>>(emptyList())
 
     private var database = DBObject.db
     private var offset = 0L
@@ -28,6 +30,7 @@ class EventsViewModel : ScreenModel {
         getEvents()
         loadCategories()
         loadClubs()
+        loadTags()
     }
 
     private fun loadCategories() {
@@ -36,6 +39,13 @@ class EventsViewModel : ScreenModel {
 
     private fun loadClubs() {
         clubs = database.swiftdataQueries.fetchClubNames().executeAsList()
+    }
+
+    private fun loadTags() {
+        val rawTags = database.swiftdataQueries.fetchEventTags().executeAsList()
+        tags = rawTags.flatMap { tagString -> 
+            tagString.split(",").map { it.trim() }
+        }.distinct().sorted()
     }
 
     fun loadMoreEvents() {
@@ -48,6 +58,82 @@ class EventsViewModel : ScreenModel {
 
     private fun getEvents() {
         val eventsData = when {
+            // Date + Categories + Clubs + Tags
+            selectedDate != null && selectedCategories.isNotEmpty() && selectedClubs.isNotEmpty() && selectedTags.isNotEmpty() -> {
+                database.swiftdataQueries.filterEventsByDateAndTagsAndCategoriesAndClubs(
+                    currentSearchQuery.trim(),
+                    selectedDate.toString(),
+                    selectedTags.toList(),
+                    selectedCategories.toList(),
+                    selectedClubs.toList(),
+                    offset
+                ).executeAsList()
+            }
+            // Date + Categories + Tags
+            selectedDate != null && selectedCategories.isNotEmpty() && selectedTags.isNotEmpty() -> {
+                database.swiftdataQueries.filterEventsByDateAndTagsAndCategories(
+                    currentSearchQuery.trim(),
+                    selectedDate.toString(),
+                    selectedTags.toList(),
+                    selectedCategories.toList(),
+                    offset
+                ).executeAsList()
+            }
+            // Date + Clubs + Tags
+            selectedDate != null && selectedClubs.isNotEmpty() && selectedTags.isNotEmpty() -> {
+                database.swiftdataQueries.filterEventsByDateAndTagsAndClubs(
+                    currentSearchQuery.trim(),
+                    selectedDate.toString(),
+                    selectedTags.toList(),
+                    selectedClubs.toList(),
+                    offset
+                ).executeAsList()
+            }
+            // Categories + Clubs + Tags
+            selectedCategories.isNotEmpty() && selectedClubs.isNotEmpty() && selectedTags.isNotEmpty() -> {
+                database.swiftdataQueries.filterEventsByTagsAndCategoriesAndClubs(
+                    currentSearchQuery.trim(),
+                    selectedTags.toList(),
+                    selectedCategories.toList(),
+                    selectedClubs.toList(),
+                    offset
+                ).executeAsList()
+            }
+            // Date + Tags
+            selectedDate != null && selectedTags.isNotEmpty() -> {
+                database.swiftdataQueries.filterEventsByDateAndTags(
+                    currentSearchQuery.trim(),
+                    selectedDate.toString(),
+                    selectedTags.toList(),
+                    offset
+                ).executeAsList()
+            }
+            // Categories + Tags
+            selectedCategories.isNotEmpty() && selectedTags.isNotEmpty() -> {
+                database.swiftdataQueries.filterEventsByTagsAndCategories(
+                    currentSearchQuery.trim(),
+                    selectedTags.toList(),
+                    selectedCategories.toList(),
+                    offset
+                ).executeAsList()
+            }
+            // Clubs + Tags
+            selectedClubs.isNotEmpty() && selectedTags.isNotEmpty() -> {
+                database.swiftdataQueries.filterEventsByTagsAndClubs(
+                    currentSearchQuery.trim(),
+                    selectedTags.toList(),
+                    selectedClubs.toList(),
+                    offset
+                ).executeAsList()
+            }
+            // Just Tags
+            selectedTags.isNotEmpty() -> {
+                database.swiftdataQueries.filterEventsByTags(
+                    currentSearchQuery.trim(),
+                    selectedTags.toList(),
+                    offset
+                ).executeAsList()
+            }
             // Date + Categories + Clubs
             selectedDate != null && selectedCategories.isNotEmpty() && selectedClubs.isNotEmpty() -> {
                 database.swiftdataQueries.filterEventsByDateAndClubsAndCategories(
@@ -157,6 +243,12 @@ class EventsViewModel : ScreenModel {
 
     fun updateSelectedClubs(clubs: Set<String>) {
         selectedClubs = clubs
+        clearList()
+        getEvents()
+    }
+
+    fun updateSelectedTags(tags: Set<String>) {
+        selectedTags = tags
         clearList()
         getEvents()
     }

@@ -352,40 +352,46 @@ object CGAPI {
 
 
     suspend fun fetchAllGroups() {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?limit=1000") {
-            method = HttpMethod.Get
-            headers {
-                append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
-            }
-        }
-
-        if (response.status.value in 200..299) {
-            println("All Group fetched successfully!")
-            val groupList : AggregateGroups = response.body()
-
-            val swiftdataQueries = DBObject.db.swiftdataQueries
-
-            swiftdataQueries.transaction {
-
-
-                groupList.groups.list.forEach {
-                    val groupCategories : List<String> = (it.categories.map { it.name } + it.groupType)
-                    swiftdataQueries.insertClub(
-                        clubName = it.groupName,
-                        clubID = it.clubId,
-                        clubUrl = it.clubUrl,
-                        clubCategories = groupCategories.joinToString(","),
-                        clubBanner = it.coverURL,
-                        clubLogo = it.logoUrl,
-                        clubStatus = it.status,
-                        clubJoinURL = it.join_group_url
-                    )
+        try {
+            val response: HttpResponse =
+                client.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?limit=1000") {
+                    method = HttpMethod.Get
+                    headers {
+                        append(HttpHeaders.Host, "community.case.edu")
+                        append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+                    }
                 }
-                afterCommit {
-                    println("Groups added/updated to DB!")
+
+            if (response.status.value in 200..299) {
+                println("All Group fetched successfully!")
+                val groupList: AggregateGroups = response.body()
+
+                val swiftdataQueries = DBObject.db.swiftdataQueries
+
+                swiftdataQueries.transaction {
+
+
+                    groupList.groups.list.forEach {
+                        val groupCategories: List<String> =
+                            (it.categories.map { it.name } + it.groupType)
+                        swiftdataQueries.insertClub(
+                            clubName = it.groupName,
+                            clubID = it.clubId,
+                            clubUrl = it.clubUrl,
+                            clubCategories = groupCategories.joinToString(","),
+                            clubBanner = it.coverURL,
+                            clubLogo = it.logoUrl,
+                            clubStatus = it.status,
+                            clubJoinURL = it.join_group_url
+                        )
+                    }
+                    afterCommit {
+                        println("Groups added/updated to DB!")
+                    }
                 }
             }
+        } catch (e: Exception) {
+            //
         }
     }
 

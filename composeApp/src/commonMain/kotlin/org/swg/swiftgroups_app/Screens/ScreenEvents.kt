@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,11 +15,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
@@ -32,9 +32,11 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,24 +49,22 @@ import cafe.adriel.voyager.core.screen.Screen
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Calendar
+import compose.icons.fontawesomeicons.solid.ChevronRight
 import compose.icons.fontawesomeicons.solid.Search
-import compose.icons.fontawesomeicons.solid.Sync
 import compose.icons.fontawesomeicons.solid.Times
-import org.swg.swiftgroups_app.Components.Home.EventsCard
-import org.swg.swiftgroups_app.Fonts.AppFont
+import compose.icons.fontawesomeicons.solid.Undo
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import androidx.compose.runtime.saveable.rememberSaveable
-import compose.icons.fontawesomeicons.solid.Undo
-import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Components.CategorySelectionModal
 import org.swg.swiftgroups_app.Components.DatePickerModal
+import org.swg.swiftgroups_app.Components.Home.EventsCard
+import org.swg.swiftgroups_app.Fonts.AppFont
 import swiftgroups.composeapp.generated.resources.Res
 import swiftgroups.composeapp.generated.resources.swiftgroups_title
-import compose.icons.fontawesomeicons.solid.ChevronRight
 
 private fun formatDate(date: LocalDate): String {
     return "${date.month.name.take(3)} ${date.dayOfMonth}, ${date.year}"
@@ -78,6 +78,7 @@ object ScreenEvents : Screen {
         var showDatePicker by remember { mutableStateOf(false) }
         var showCategoryPicker by remember { mutableStateOf(false) }
         var showClubPicker by remember { mutableStateOf(false) }
+        var showTagPicker by remember { mutableStateOf(false) }
 
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
         LaunchedEffect(Unit) {
@@ -92,9 +93,9 @@ object ScreenEvents : Screen {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal=10.dp)) {
-                Image(
-                    painter = painterResource(Res.drawable.swiftgroups_title),
-                    contentDescription = "SwiftGroups Logo",
+            Image(
+                painter = painterResource(Res.drawable.swiftgroups_title),
+                contentDescription = "SwiftGroups Logo",
                     modifier = Modifier.align(Alignment.Center)
                 )
                 IconButton(
@@ -102,7 +103,9 @@ object ScreenEvents : Screen {
                         viewModel.setSelectedDateCal(null)
                         viewModel.updateSelectedCategories(emptySet())
                         viewModel.updateSelectedClubs(emptySet())
+                        viewModel.updateSelectedTags(emptySet())
                         viewModel.filterEvents("")
+                        searchText = ""
                     },
                     modifier = Modifier.align(Alignment.CenterEnd).size(30.dp)
                 ) {
@@ -113,7 +116,6 @@ object ScreenEvents : Screen {
                     )
                 }
             }
-            Spacer(Modifier.height(10.dp))
             // Search Bar
             TextField(
                 value = searchText,
@@ -162,79 +164,99 @@ object ScreenEvents : Screen {
 
             // Filter Buttons
             Box(modifier = Modifier.fillMaxWidth()) {
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp, horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    val filters = listOf("Hide Long Events", "Select Date", "Select Category", "Select Club")
-                    items(filters) { filter ->
-                        val isSelected = when (filter) {
-                            "Hide Long Events" -> !viewModel.showLongEvents
-                            "Select Date" -> viewModel.selectedDate != null
-                            "Select Category" -> viewModel.selectedCategories.isNotEmpty()
-                            "Select Club" -> viewModel.selectedClubs.isNotEmpty()
-                            else -> false
-                        }
-                        OutlinedButton(
-                            onClick = {
-                                when (filter) {
-                                    "Hide Long Events" -> viewModel.toggleLongEvents()
-                                    "Select Date" -> showDatePicker = true
-                                    "Select Category" -> showCategoryPicker = true
-                                    "Select Club" -> showClubPicker = true
-                                }
-                            },
-                            modifier = Modifier
-                                .height(36.dp),
-                            shape = RoundedCornerShape(4.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                backgroundColor = if (isSelected) Color(0xFFEEEEEE) else Color.Transparent,
-                                contentColor = if (isSelected) Color.Black else Color(0xFF666666)
-                            ),
-                            border = BorderStroke(
-                                width = 1.dp,
-                                color = if (isSelected) Color.Black else Color(0xFFCCCCCC)
-                            )
-                        ) {
-                            if (filter == "Select Date") {
-                                Icon(
-                                    FontAwesomeIcons.Solid.Calendar,
-                                    contentDescription = "Calendar",
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                            }
-                            Text(
-                                when (filter) {
-                                    "Select Date" -> if (viewModel.selectedDate != null) formatDate(viewModel.selectedDate!!) else filter
-                                    "Select Category" -> if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Categories" else filter
-                                    "Select Club" -> if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Clubs" else filter
-                                    else -> filter
-                                },
-                                style = AppFont.InterTypography.body2
-                            )
+                val listState = rememberLazyListState()
+                val isScrolledToEnd by remember {
+                    derivedStateOf {
+                        val layoutInfo = listState.layoutInfo
+                        val visibleItemsInfo = layoutInfo.visibleItemsInfo
+                        if (visibleItemsInfo.isEmpty()) {
+                            true
+                        } else {
+                            val lastVisibleItem = visibleItemsInfo.last()
+                            lastVisibleItem.index == layoutInfo.totalItemsCount - 1
                         }
                     }
                 }
-                // Chevron overlay at the end
-                Icon(
-                    FontAwesomeIcons.Solid.ChevronRight,
-                    contentDescription = "Scroll for more filters",
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 8.dp)
-                        .size(24.dp)
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(Color.Transparent, Color.White.copy(alpha = 0.8f)),
-                                startX = 0f,
-                                endX = 60f
-                            ),
-                            shape = RoundedCornerShape(12.dp)
+                
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    state = listState,
+            ) {
+                    val filters = listOf("Hide Long Events", "Select Date", "Select Categories", "Select Clubs", "Select Tags")
+                items(filters) { filter ->
+                    val isSelected = when (filter) {
+                        "Hide Long Events" -> !viewModel.showLongEvents
+                        "Select Date" -> viewModel.selectedDate != null
+                            "Select Categories" -> viewModel.selectedCategories.isNotEmpty()
+                            "Select Clubs" -> viewModel.selectedClubs.isNotEmpty()
+                            "Select Tags" -> viewModel.selectedTags.isNotEmpty()
+                        else -> false
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            when (filter) {
+                                "Hide Long Events" -> viewModel.toggleLongEvents()
+                                "Select Date" -> showDatePicker = true
+                                    "Select Categories" -> showCategoryPicker = true
+                                    "Select Clubs" -> showClubPicker = true
+                                    "Select Tags" -> showTagPicker = true
+                            }
+                        },
+                        modifier = Modifier
+                            .height(36.dp),
+                        shape = RoundedCornerShape(4.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            backgroundColor = if (isSelected) Color(0xFFEEEEEE) else Color.Transparent,
+                            contentColor = if (isSelected) Color.Black else Color(0xFF666666)
+                        ),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = if (isSelected) Color.Black else Color(0xFFCCCCCC)
                         )
-                )
+                    ) {
+                        if (filter == "Select Date") {
+                            Icon(
+                                FontAwesomeIcons.Solid.Calendar,
+                                contentDescription = "Calendar",
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
+                        Text(
+                                when (filter) {
+                                    "Select Date" -> if (viewModel.selectedDate != null) formatDate(viewModel.selectedDate!!) else filter
+                                    "Select Categories" -> if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Categories" else filter
+                                    "Select Clubs" -> if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Clubs" else filter
+                                    "Select Tags" -> if (viewModel.selectedTags.isNotEmpty()) "${viewModel.selectedTags.size} Tags" else filter
+                                    else -> filter
+                            },
+                            style = AppFont.InterTypography.body2
+                        )
+                    }
+                    }
+                }
+                // Only show chevron if not at the end
+                if (!isScrolledToEnd) {
+                    Icon(
+                        FontAwesomeIcons.Solid.ChevronRight,
+                        contentDescription = "Scroll for more filters",
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 8.dp)
+                            .size(24.dp)
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(Color.Transparent, Color.White.copy(alpha = 0.8f)),
+                                    startX = 0f,
+                                    endX = 60f
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                    )
+                }
             }
 
             // Events List
@@ -324,6 +346,23 @@ object ScreenEvents : Screen {
                 onClearSelection = {
                     viewModel.updateSelectedClubs(emptySet())
                     showClubPicker = false
+                }
+            )
+        }
+
+        // Tag Selection Dialog
+        if (showTagPicker) {
+            CategorySelectionModal(
+                title = "Select Tags",
+                categories = viewModel.tags,
+                selectedCategories = viewModel.selectedTags,
+                onDismiss = { showTagPicker = false },
+                onCategoriesSelected = { tags ->
+                    viewModel.updateSelectedTags(tags)
+                },
+                onClearSelection = {
+                    viewModel.updateSelectedTags(emptySet())
+                    showTagPicker = false
                 }
             )
         }
