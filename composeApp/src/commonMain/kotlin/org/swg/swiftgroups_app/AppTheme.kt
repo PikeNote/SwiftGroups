@@ -2,7 +2,6 @@ package org.swg.swiftgroups_app
 
 import androidx.compose.material.Colors
 import androidx.compose.ui.graphics.Color
-import org.swg.swiftgroups_app.Fonts.AppFont
 
 object AppTheme {
     val theme = Colors(
@@ -34,11 +33,10 @@ object AppTheme {
     )
 
 
-    val shadowBrush = listOf(
-        Color.Black.copy(alpha = 0.25f),  // Darker shadow at the base
-        Color.Black.copy(alpha = 0.15f),  // Soft transition
-        Color.Black.copy(alpha = 0.05f),  // Light fading effect
-        Color.Transparent                 // Full fade-out
+    val profilePageColorStop = arrayOf(
+        0.0f to Color(0xFFFFFDFD),
+        0.8077f to Color(0xFF697CB3),
     )
+
 
 }

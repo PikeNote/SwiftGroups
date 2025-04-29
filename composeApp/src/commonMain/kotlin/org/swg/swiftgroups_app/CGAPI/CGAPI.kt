@@ -120,7 +120,7 @@ object CGAPI {
         return merged
     }
 
-    suspend fun grabProfileData(): List<ProfileDataItem> {
+    suspend fun fetchMyProfileData(): List<ProfileDataItem> {
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_profile") {
             method = HttpMethod.Get
             headers {

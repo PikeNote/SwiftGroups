@@ -63,7 +63,7 @@ class HomeViewModel : ScreenModel {
                     json.decodeFromString(profileCache.value_)
 
                 } else {
-                    CGAPI.grabProfileData()
+                    CGAPI.fetchMyProfileData()
                 }
 
             }
