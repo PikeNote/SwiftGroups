@@ -44,10 +44,6 @@ class HomeViewModel : ScreenModel {
                 .fetchModifications("profileData")
                 .executeAsOneOrNull()
 
-            val myGroupsCache = DBObject.db.swiftdataQueries
-                .fetchModifications("homeMyGroups")
-                .executeAsOneOrNull()
-
             val eventsCache = DBObject.db.swiftdataQueries
                 .fetchModifications("events")
                 .executeAsOneOrNull()
@@ -58,7 +54,7 @@ class HomeViewModel : ScreenModel {
 
             val profileDeferred = async {
                 // If the data was fetched more than 60 minutes ago, don't fetch it again
-                if (profileCache != null && CGAPI.checkDBExpiry(profileCache.changed_at) && profileCache.value_ != "[]") {
+                if (profileCache != null && CGAPI.checkDBExpiry(profileCache.changed_at, 5) && profileCache.value_ != "[]") {
                     println("Defaulting to cached profile")
                     json.decodeFromString(profileCache.value_)
 
@@ -71,7 +67,7 @@ class HomeViewModel : ScreenModel {
             val eventsDeferred = async {
                 CGAPI.grabMyEvents().list.map {
                     Events(
-                        eventId = it.event_id.toLong(),
+                        eventId = it.event_id.toString(),
                         eventName = it.event_name,
                         start_time = it.event_start_utc,
                         end_time = it.event_end_utc,
@@ -90,18 +86,7 @@ class HomeViewModel : ScreenModel {
             }
 
             val groupsDeferred = async {
-                val groupData = if (myGroupsCache != null && !CGAPI.checkDBExpiry(myGroupsCache.changed_at)
-                ) {
-                    println("Defaulting to cached my groups")
-                    json.decodeFromString<List<ProfileGroupItem>>(myGroupsCache.value_)
-                } else {
-                    runCatching { CGAPI.fetchMyGroups() }.getOrElse { emptyList() }
-                }
-
-                groupData.getOrNull(1)
-                    ?.groups
-                    ?.flatMap { DBObject.db.swiftdataQueries.fetchEventClub(it.groupName).executeAsList() }
-                    .orEmpty()
+                loadMyGroupsEvents()
             }
 
 
@@ -120,6 +105,7 @@ class HomeViewModel : ScreenModel {
                         println("Defaulting to cached events")
                     } else {
                         CGAPI.fetchEventsData()
+                        loadMyGroupsEvents()
                     }
                 }
 
@@ -138,5 +124,24 @@ class HomeViewModel : ScreenModel {
                 fetchGroupsDeferred.await()
             }
         }
+    }
+
+    suspend fun loadMyGroupsEvents(
+    ): List<Events> {
+        val myGroupsCache = DBObject.db.swiftdataQueries
+            .fetchModifications("homeMyGroups")
+            .executeAsOneOrNull()
+
+        val groupData = if (myGroupsCache != null && !CGAPI.checkDBExpiry(myGroupsCache.changed_at)) {
+            println("Defaulting to cached my groups")
+            json.decodeFromString<List<ProfileGroupItem>>(myGroupsCache.value_)
+        } else {
+            runCatching { CGAPI.fetchMyGroups() }.getOrElse { emptyList() }
+        }
+
+        return groupData.getOrNull(1)
+            ?.groups
+            ?.flatMap { DBObject.db.swiftdataQueries.fetchEventClub(it.groupName).executeAsList() }
+            .orEmpty()
     }
 }

@@ -52,8 +52,7 @@ object EventsAPI {
         val timestamp = Clock.System.now()
         val tz = TimeZone.currentSystemDefault()
         val dateToday = timestamp.toLocalDateTime(tz).date
-
-        var url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter8=${dateToday.dayOfMonth} ${dateToday.format(monthShortFormat)} ${dateToday.year}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
+        var url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter8=${dateToday.dayOfMonth}%20${dateToday.format(monthShortFormat)}%20${dateToday.year}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
 
         if(grabEntire) {
             url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
@@ -78,7 +77,6 @@ object EventsAPI {
                         val fixedTime = htmlRegex.replace(it.p4, " ").replace("&ndash;", "-").replace("  ", " ")
                         val convertedTime : List<String> = timeConverter(fixedTime)
                         val eventTags : List<String> = extractEventTags(it.p22)
-
                         eventItems.add(CGEvent(
                             eventName = it.p3,
                             eventDesc = "",
@@ -100,10 +98,14 @@ object EventsAPI {
 
                 return eventItems
             } else {
+                println(url)
+                val bodyResponse : String = response.body()
+                println(bodyResponse)
+                println("Events fetching failed! ${response.status.value}")
                 return emptyList()
             }
         } catch (e: Exception) {
-            println("Error fetching events: ${e.message}")
+             println(e.message)
              return emptyList()
          }
     }

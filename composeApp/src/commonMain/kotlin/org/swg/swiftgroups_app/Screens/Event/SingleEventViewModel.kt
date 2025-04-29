@@ -17,7 +17,7 @@ class SingleEventViewModel (private val eventID : Int) : ScreenModel {
 
     init {
         try {
-            val event = DBObject.db.swiftdataQueries.fetchSpecificEvent(eventID.toLong()).executeAsOneOrNull()
+            val event = DBObject.db.swiftdataQueries.fetchSpecificEvent(eventID.toString()).executeAsOneOrNull()
 
             try {
                 if (event != null) {
@@ -40,7 +40,7 @@ class SingleEventViewModel (private val eventID : Int) : ScreenModel {
 
              if (eventSpecificAPI.value != cgData && cgData != null) {
                  eventSpecificAPI.value = cgData
-                 DBObject.db.swiftdataQueries.updateCache(Json.encodeToString(cgData), eventID.toLong())
+                 DBObject.db.swiftdataQueries.updateCache(Json.encodeToString(cgData), eventID.toString())
              }
          }
 

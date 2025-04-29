@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS events (
-        eventId INTEGER PRIMARY KEY,
+        eventId TEXT PRIMARY KEY,
         start_time TEXT NOT NULL,
         end_time TEXT NOT NULL,
         eventName TEXT NOT NULL,
