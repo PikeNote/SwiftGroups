@@ -206,9 +206,13 @@ class SingleEventScreen(val eventID : Int) : Screen {
                 }
             }
 
-            val minCollapsedOffset = 140.dp
+
             val yOffsetPx = with(LocalDensity.current) {
-                kotlin.math.max(minCollapsedOffset.roundToPx(), ((currentImgSize.value + 100.dp).roundToPx()))
+                val statusBarHeight = WindowInsets.statusBars.getTop(LocalDensity.current).toDp()
+                val minCollapsedOffset = 77.dp + statusBarHeight + AppFont.InterTypography.h3.fontSize.toDp()
+                kotlin.math.max(
+                    minCollapsedOffset.roundToPx(),
+                    ((currentImgSize.value + statusBarHeight + 62.dp).roundToPx()))
             }
 
             Column(
