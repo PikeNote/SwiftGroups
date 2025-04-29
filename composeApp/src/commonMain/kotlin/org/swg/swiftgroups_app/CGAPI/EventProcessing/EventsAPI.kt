@@ -59,7 +59,7 @@ object EventsAPI {
             url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
         }
         try {
-            val response: HttpResponse =  CGAPI.client.get(url) {
+            val response: HttpResponse =  CGAPI.backgroundClient.get(url) {
                 method = HttpMethod.Get
                 headers {
                     append(HttpHeaders.Host, "community.case.edu")

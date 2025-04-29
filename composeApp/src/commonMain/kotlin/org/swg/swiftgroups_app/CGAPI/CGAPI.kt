@@ -45,6 +45,22 @@ object CGAPI {
         ignoreUnknownKeys = true
     }
     val secureVault = SecureStorage()
+
+    val backgroundClient = HttpClient {
+        followRedirects = false
+        install(ContentNegotiation) {
+            json(contentType = ContentType.Any, json = Json {
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true
+                coerceInputValues = true
+            })
+        }
+        install(HttpCache) {
+            publicStorage(KachetorStorage(10 * 1024 * 1024))
+        }
+    }
+
     val client = HttpClient {
         followRedirects = false
         install(ContentNegotiation) {
@@ -63,7 +79,7 @@ object CGAPI {
     var cookieHeader : List<io.ktor.http.Cookie> = emptyList()
 
     suspend fun grabMyEvents(): UpcomingEvents {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_events_new?view=events_i_am_attending&limit=15&range=0") {
+        val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_events_new?view=events_i_am_attending&limit=15&range=0") {
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
@@ -113,7 +129,7 @@ object CGAPI {
         return false
     }
 
-    fun mergeCookies(existing: List<io.ktor.http.Cookie>, incoming: List<io.ktor.http.Cookie>): List<io.ktor.http.Cookie> {
+    private fun mergeCookies(existing: List<io.ktor.http.Cookie>, incoming: List<io.ktor.http.Cookie>): List<io.ktor.http.Cookie> {
         val merged = (existing + incoming)
             .groupBy { it.name }
             .map { (_, cookies) -> cookies.last() } // Keep the latest by name
@@ -121,7 +137,7 @@ object CGAPI {
     }
 
     suspend fun fetchMyProfileData(): List<ProfileDataItem> {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_profile") {
+        val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_profile") {
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
@@ -243,7 +259,7 @@ object CGAPI {
     }
 
     suspend fun fetchMyGroups() : List<ProfileGroupItem> {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v17/mobile_header_groups?search=&all=false") {
+        val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v17/mobile_header_groups?search=&all=false") {
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
@@ -263,7 +279,7 @@ object CGAPI {
 
     suspend fun fetchProfileQR() : UserProfileQRCode? {
         try {
-            val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_qrcode") {
+            val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_qrcode") {
                 method = HttpMethod.Get
                 headers {
                     append(HttpHeaders.Host, "community.case.edu")
@@ -354,7 +370,7 @@ object CGAPI {
     suspend fun fetchAllGroups() {
         try {
             val response: HttpResponse =
-                client.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?limit=1000") {
+                backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?limit=1000") {
                     method = HttpMethod.Get
                     headers {
                         append(HttpHeaders.Host, "community.case.edu")
@@ -466,7 +482,7 @@ object CGAPI {
 
 
     suspend fun fetchAllPersonalGroups() {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?view=my_groups") {
+        val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?view=my_groups") {
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
