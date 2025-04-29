@@ -26,15 +26,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.Divider
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +50,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -90,6 +93,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
         val singleEventViewModel = rememberScreenModel { SingleEventViewModel(eventID) }
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
         val navigator = LocalNavigator.currentOrThrow
+
         LaunchedEffect(Unit) {
             bottomTabVisibilityManager.setBottomBarVisibility(false)
         }
@@ -101,6 +105,8 @@ class SingleEventScreen(val eventID : Int) : Screen {
 
         val scrollState = rememberScrollState()
         val expansionThresholdPx = with(LocalDensity.current) { 30.dp.toPx() }
+
+        var columnSize by remember { mutableStateOf(0) }
 
         val nestedScrollConnection = remember {
             object : NestedScrollConnection {
@@ -154,7 +160,11 @@ class SingleEventScreen(val eventID : Int) : Screen {
                     )
                 }
 
-                Box (modifier = Modifier.padding(horizontal = 10.dp)) {
+
+
+                Box (modifier = Modifier.padding(horizontal = 10.dp).onSizeChanged { size ->
+                    columnSize = size.height
+                }) {
                     Spacer(modifier = Modifier.height(currentImgSize.value + 20.dp))
                     if(eventAPI != null) {
                         AsyncImage(
@@ -200,19 +210,16 @@ class SingleEventScreen(val eventID : Int) : Screen {
                             .graphicsLayer {
                                 this.alpha =
                                     maxOf(0f, (0.3f - imageAlpha) / 0.3f)// Apply the calculated alpha for the text
-                            }.padding(vertical = 12.dp).align(Alignment.Center)
+                            }.padding(vertical = 12.dp).align(Alignment.Center),
                     )
 
                 }
             }
-
-
             val yOffsetPx = with(LocalDensity.current) {
                 val statusBarHeight = WindowInsets.statusBars.getTop(LocalDensity.current).toDp()
-                val minCollapsedOffset = 77.dp + statusBarHeight + AppFont.InterTypography.h3.fontSize.toDp()
                 kotlin.math.max(
-                    minCollapsedOffset.roundToPx(),
-                    ((currentImgSize.value + statusBarHeight + 62.dp).roundToPx()))
+                    (statusBarHeight + 48.dp).roundToPx() + columnSize,
+                    (statusBarHeight + 42.dp).roundToPx() + columnSize)
             }
 
             Column(
