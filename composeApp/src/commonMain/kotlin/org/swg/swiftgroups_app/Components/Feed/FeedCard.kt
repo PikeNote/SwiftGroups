@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +47,6 @@ import compose.icons.fontawesomeicons.Regular
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Heart
 import compose.icons.fontawesomeicons.regular.ShareSquare
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
@@ -66,8 +66,10 @@ class FeedCard(val feed: Feed) : Screen {
     override fun Content() {
         val showComments = remember{ mutableStateOf(false) }
         val fadeOut = remember{ mutableStateOf(true) }
-        val liked = remember{ mutableStateOf(feed.liked) }
+        val liked = remember{ mutableStateOf(feed.liked == "true") }
         val navigator = LocalNavigator.currentOrThrow
+        val scope = rememberCoroutineScope()
+
         Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
             Column (modifier = Modifier.dropShadow(
                 offsetY = 6.dp,
@@ -111,7 +113,7 @@ class FeedCard(val feed: Feed) : Screen {
                     modifier = Modifier.padding(horizontal = 5.dp)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                if(feed.photos != null) {
+                if(!feed.photos.isNullOrEmpty()) {
                     Box {
                         val pagerState = rememberPagerState(pageCount = {
                             feed.photos.size
@@ -164,16 +166,12 @@ class FeedCard(val feed: Feed) : Screen {
 
                 ) {
                     Row (modifier = Modifier.clickable{
-                        CoroutineScope(Dispatchers.IO).launch{
-                            CGAPI.likePost(feed.uid, liked.value == "false")
-                            if(liked.value == "false") {
-                                liked.value = "true"
-                            } else {
-                                liked.value = "false"
-                            }
+                        scope.launch(Dispatchers.IO) {
+                            CGAPI.likePost(feed.uid, !liked.value)
+                            liked.value = !liked.value
                         }
                     }) {
-                        Icon(FontAwesomeIcons.Solid.Heart, "", modifier = Modifier.size(20.dp), tint = if (liked.value == "true") Color.Red else Color.Gray)
+                        Icon(FontAwesomeIcons.Solid.Heart, "", modifier = Modifier.size(20.dp), tint = if (liked.value) Color.Red else Color.Gray)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Like")
                     }
@@ -195,8 +193,8 @@ class FeedCard(val feed: Feed) : Screen {
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(6.dp).background(Color(0xFFE0E0E3)))
-            if (feed.comments.isNotEmpty()) {
+            Box (modifier = Modifier.height(6.dp).background(Color(0xFFE0E0E3)))
+            feed.comments.firstOrNull()?.let { comment ->
                 Column(
                     modifier = Modifier.defaultMinSize(minHeight = 50.dp)
                         .fillMaxWidth()
@@ -210,7 +208,7 @@ class FeedCard(val feed: Feed) : Screen {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         AsyncImage(
-                            model = "https://community.case.edu${feed.comments[0].writerPhotoUrl}",
+                            model = "https://community.case.edu${comment.writerPhotoUrl}",
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -225,10 +223,10 @@ class FeedCard(val feed: Feed) : Screen {
                             )
                         ) {
                             Text(
-                                "${feed.comments[0].writerFirstName} ${feed.comments[0].writerLastName} • ${feed.comments[0].writeWhen}",
+                                "${comment.writerFirstName} ${comment.writerLastName} • ${comment.writeWhen}",
                                 style = AppFont.InterTypography.h5
                             )
-                            Text(feed.comments[0].content)
+                            Text(comment.content)
                         }
                     }
                 }
