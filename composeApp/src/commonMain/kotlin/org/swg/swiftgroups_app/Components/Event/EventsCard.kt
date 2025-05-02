@@ -17,12 +17,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -51,11 +53,17 @@ class EventsCard(
     private val currentEDTTime = Clock.System.now().toLocalDateTime(TimeZone.of("America/New_York"))
     private val eventStartTime = Instant.parse(eventDat.start_time).toLocalDateTime(TimeZone.UTC)
     private val eventEndTime = Instant.parse(eventDat.end_time).toLocalDateTime(TimeZone.UTC)
+    private val locationHTMLRegex = Regex("^([^<]+).*?href=[\"'](?:\\\\&quot;)?(https://[^\"'>\\\\]+)")
+    private var onlineEventMeeting = false
+    private var meetingLink = ""
 
     @Composable
     fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-
+        val processedLocation = remember(eventDat.eventLocation) {
+            processLocation(eventDat.eventLocation)
+        }
+        val uriHandler = LocalUriHandler.current
         Row(
             modifier = Modifier
                 .width(cardWidth)
@@ -180,7 +188,13 @@ class EventsCard(
                         Row(
                             modifier = Modifier
                                 .padding(vertical = 2.dp)
-                                .clickable { openMapLocationQuery(eventDat.eventLocation) },
+                                .clickable {
+                                    if(!onlineEventMeeting) {
+                                        openMapLocationQuery(eventDat.eventLocation)
+                                    } else {
+                                        uriHandler.openUri(meetingLink)
+                                    }
+                                },
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
@@ -189,7 +203,7 @@ class EventsCard(
                                 modifier = Modifier.size(10.dp)
                             )
                             Text(
-                                eventDat.eventLocation,
+                                processedLocation,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 color = Color.Blue,
@@ -200,5 +214,19 @@ class EventsCard(
                 }
             }
         }
+    }
+
+    private fun processLocation(location : String) : String {
+        val regexMatches = locationHTMLRegex.findAll(location)
+
+        if(regexMatches.any()) {
+            val firstMatch = regexMatches.first()
+            if(firstMatch.groupValues.size >= 3) {
+                meetingLink = firstMatch.groupValues[2]
+                onlineEventMeeting = true
+                return "${firstMatch.groupValues[1]} (Link)"
+            }
+        }
+        return location
     }
 }
