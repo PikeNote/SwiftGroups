@@ -75,6 +75,7 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.compose.shadow)
+            implementation(libs.autolinktext)
         }
         appleMain.dependencies {
             implementation(libs.ktor.client.darwin)

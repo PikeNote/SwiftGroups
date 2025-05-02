@@ -31,6 +31,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -52,6 +56,7 @@ import org.swg.swiftgroups_app.CGAPI.Feed.Feed
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ChatBubble
 import org.swg.swiftgroups_app.Screens.ImageScreen.ImageScreen
+import sh.calvin.autolinktext.rememberAutoLinkText
 
 
 class FeedCard(val feed: Feed) : Screen {
@@ -94,7 +99,15 @@ class FeedCard(val feed: Feed) : Screen {
                 Spacer(modifier = Modifier.height(5.dp))
 
                 Text(
-                    feed.content,
+                    AnnotatedString.rememberAutoLinkText(
+                        feed.content,
+                        defaultLinkStyles = TextLinkStyles(
+                            SpanStyle(
+                                color = Color(0xFF456CA0),
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    ),
                     modifier = Modifier.padding(horizontal = 5.dp)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
