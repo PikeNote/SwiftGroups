@@ -291,30 +291,24 @@ class SingleEventScreen(val eventID : Int) : Screen {
                             logo = FontAwesomeIcons.Regular.ShareSquare,
                             textStyle = AppFont.InterTypography.h5,
                             backgroundColor = Color(0xFFD9D9D9),
-                            textColor = Color.Black
+                            textColor = Color.Black,
+                            width = if(eventAPI.register_url=="") 340.dp else 170.dp
                         )
 
-                        Spacer(modifier = Modifier.width(20.dp))
+                        if(eventAPI.register_url.isNotEmpty()) {
+                            Spacer(modifier = Modifier.width(20.dp))
 
-                        if(eventAPI.registered  == 0) {
                             HorizontalLogoButton(
-                                text = "Registration",
+                                text = if (eventAPI.registered == 0) "Registration" else "Edit",
                                 onClick = {
+                                    val title = if (eventAPI.registered == 0) "Registration" else "Edit Registration"
+                                    val matchUrl = if (eventAPI.registered == 0)
+                                        "https://community.case.edu/confirmation?type=rsvp&" else "/rsvp_boot?id="
+
                                     navigator.push(WebviewScreen(eventAPI.register_url,
-                                        "Registration",
+                                        title,
                                         { singleEventViewModel.updateData() },
-                                        "https://community.case.edu/confirmation?type=rsvp&"))
-                                },
-                                size = 20.dp,
-                                logo = PencilSquare,
-                                textStyle = AppFont.InterTypography.h5
-                            )
-                        } else {
-                            HorizontalLogoButton(
-                                text = "Edit",
-                                onClick = {
-                                    navigator.push(WebviewScreen(eventAPI.register_url, "Edit Registration", { singleEventViewModel.updateData() },
-                                        "/rsvp_boot?id=" ))
+                                        matchUrl))
                                 },
                                 size = 20.dp,
                                 logo = PencilSquare,
