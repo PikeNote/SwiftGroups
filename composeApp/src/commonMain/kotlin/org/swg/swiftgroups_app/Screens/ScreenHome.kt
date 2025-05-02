@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -108,10 +109,8 @@ object ScreenHome : Screen {
                     horizontalArrangement = Arrangement.spacedBy(15.dp),
                     userScrollEnabled = true
                 ) {
-                    viewModel.upcomingEvents.forEach { data ->
-                        item {
-                            EventHome(data, enableButton = true, isUTC = true).Content()
-                        }
+                    items(viewModel.upcomingEvents, key = {it.eventId}) {
+                        EventHome(it, enableButton = false, isUTC = true).Content()
                     }
                 }
             }
@@ -138,12 +137,9 @@ object ScreenHome : Screen {
                     userScrollEnabled = true
                 ) {
 
-                    viewModel.upcomingGroupEvents.forEach { data ->
-                        item {
-                            EventHome(data, enableButton = true, isUTC = false).Content()
-                        }
+                    items (viewModel.upcomingGroupEvents, key = {it.eventId}) {
+                        EventHome(it, enableButton = false, isUTC = false).Content()
                     }
-
                 }
             }
         }

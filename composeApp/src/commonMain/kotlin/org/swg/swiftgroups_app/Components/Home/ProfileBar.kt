@@ -27,6 +27,9 @@ import coil3.compose.AsyncImage
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.User
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.Components.Home.Button.VerticalLogoButton
@@ -39,6 +42,9 @@ class ProfileBar ( private val profileData : ProfileDataItem ) {
     fun Content() {
 
         val navigator = LocalNavigator.currentOrThrow
+
+        val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
 
         Row (
             modifier = Modifier
@@ -64,9 +70,15 @@ class ProfileBar ( private val profileData : ProfileDataItem ) {
 
             )
 
+            val greetingText = when (currentTime.hour) {
+                in 5..11 -> "morning"
+                in 12..18 -> "afternoon"
+                else -> "evening"
+            }
+
             Spacer(Modifier.weight(1f))
             Column {
-                Text("Good evening, ", style = AppFont.InterTypography.h3, fontWeight = FontWeight.Medium)
+                Text("Good ${greetingText}, ", style = AppFont.InterTypography.h3, fontWeight = FontWeight.Medium)
                 Text("${profileData.firstName}!", style = AppFont.InterTypography.h3)
             }
 
