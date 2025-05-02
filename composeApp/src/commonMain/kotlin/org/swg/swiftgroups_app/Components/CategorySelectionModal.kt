@@ -78,7 +78,7 @@ fun CategorySelectionModal(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                items(categories) { category ->
+                items(categories, key = {it}) { category ->
                     CategoryItem(
                         category = category,
                         isSelected = category in selectedCategories,

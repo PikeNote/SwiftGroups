@@ -1,32 +1,29 @@
 package org.swg.swiftgroups_app.Screens
 
-import androidx.compose.foundation.BorderStroke
+import EventFilterTemp
+import FilterButton
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -84,6 +81,31 @@ object ScreenEvents : Screen {
         LaunchedEffect(Unit) {
             bottomTabVisibilityManager.setBottomBarVisibility(true)
         }
+
+        val filters = remember { listOf(
+            EventFilterTemp("Hide Long Events", !viewModel.showLongEvents) { viewModel.toggleLongEvents() },
+            EventFilterTemp(
+                "Select Date",
+                viewModel.selectedDate != null,
+                viewModel.selectedDate?.let { formatDate(it) } ?: "Select Date",
+                FontAwesomeIcons.Solid.Calendar
+            ) { showDatePicker = true },
+            EventFilterTemp(
+                "Select Categories",
+                viewModel.selectedCategories.isNotEmpty(),
+                if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Categories" else "Select Categories"
+            ) { showCategoryPicker = true },
+            EventFilterTemp(
+                "Select Clubs",
+                viewModel.selectedClubs.isNotEmpty(),
+                if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Clubs" else "Select Clubs"
+            ) { showClubPicker = true },
+            EventFilterTemp(
+                "Select Tags",
+                viewModel.selectedTags.isNotEmpty(),
+                if (viewModel.selectedTags.isNotEmpty()) "${viewModel.selectedTags.size} Tags" else "Select Tags"
+            ) { showTagPicker = true },
+        ) }
 
         Column(
             modifier = Modifier
@@ -163,7 +185,7 @@ object ScreenEvents : Screen {
             )
 
             // Filter Buttons
-            Box(modifier = Modifier.fillMaxWidth()) {
+            Box(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
                 val listState = rememberLazyListState()
                 val isScrolledToEnd by remember {
                     derivedStateOf {
@@ -177,67 +199,24 @@ object ScreenEvents : Screen {
                         }
                     }
                 }
-                
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp, horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     state = listState,
-            ) {
-                    val filters = listOf("Hide Long Events", "Select Date", "Select Categories", "Select Clubs", "Select Tags")
-                items(filters) { filter ->
-                    val isSelected = when (filter) {
-                        "Hide Long Events" -> !viewModel.showLongEvents
-                        "Select Date" -> viewModel.selectedDate != null
-                            "Select Categories" -> viewModel.selectedCategories.isNotEmpty()
-                            "Select Clubs" -> viewModel.selectedClubs.isNotEmpty()
-                            "Select Tags" -> viewModel.selectedTags.isNotEmpty()
-                        else -> false
-                    }
-                    OutlinedButton(
-                        onClick = {
-                            when (filter) {
-                                "Hide Long Events" -> viewModel.toggleLongEvents()
-                                "Select Date" -> showDatePicker = true
-                                    "Select Categories" -> showCategoryPicker = true
-                                    "Select Clubs" -> showClubPicker = true
-                                    "Select Tags" -> showTagPicker = true
-                            }
-                        },
-                        modifier = Modifier
-                            .height(36.dp),
-                        shape = RoundedCornerShape(4.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = if (isSelected) Color(0xFFEEEEEE) else Color.Transparent,
-                            contentColor = if (isSelected) Color.Black else Color(0xFF666666)
-                        ),
-                        border = BorderStroke(
-                            width = 1.dp,
-                            color = if (isSelected) Color.Black else Color(0xFFCCCCCC)
-                        )
-                    ) {
-                        if (filter == "Select Date") {
-                            Icon(
-                                FontAwesomeIcons.Solid.Calendar,
-                                contentDescription = "Calendar",
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                        }
-                        Text(
-                                when (filter) {
-                                    "Select Date" -> if (viewModel.selectedDate != null) formatDate(viewModel.selectedDate!!) else filter
-                                    "Select Categories" -> if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Categories" else filter
-                                    "Select Clubs" -> if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Clubs" else filter
-                                    "Select Tags" -> if (viewModel.selectedTags.isNotEmpty()) "${viewModel.selectedTags.size} Tags" else filter
-                                    else -> filter
-                            },
-                            style = AppFont.InterTypography.body2
+                ) {
+                    items(filters, key = {it.label}) { filter ->
+                        FilterButton(
+                            label = filter.displayLabel,
+                            selected = filter.selected,
+                            onClick = filter.onClick,
+                            icon = filter.icon
                         )
                     }
-                    }
+
                 }
+
                 // Only show chevron if not at the end
                 if (!isScrolledToEnd) {
                     Icon(
@@ -249,13 +228,25 @@ object ScreenEvents : Screen {
                             .size(24.dp)
                             .background(
                                 brush = Brush.horizontalGradient(
-                                    colors = listOf(Color.Transparent, Color.White.copy(alpha = 0.8f)),
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color.White.copy(alpha = 0.8f)
+                                    ),
                                     startX = 0f,
                                     endX = 60f
                                 ),
                                 shape = RoundedCornerShape(12.dp)
                             )
                     )
+                }
+            }
+
+
+            val filteredEvents by remember(viewModel.events, viewModel.showLongEvents) {
+                derivedStateOf {
+                    viewModel.events.filter {
+                        longDate(it.start_time, it.end_time) || viewModel.showLongEvents
+                    }
                 }
             }
 
@@ -267,40 +258,39 @@ object ScreenEvents : Screen {
                     top = 8.dp,
                     bottom = 70.dp
                 ),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(viewModel.events.filter {
-                    longDate(it.start_time, it.end_time) || viewModel.showLongEvents
-                }) { eventData ->
-                    EventsCard(
-                        eventData,
-                        cardWidth = 500.dp,
-                        horizontalPadding = 16.dp
-                    ).Content()
-                }
-                // Loading indicator
-                if (viewModel.isLoading) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
+                verticalArrangement = Arrangement.spacedBy(8.dp))
+            {
+                items(filteredEvents, key = { it.eventId }) { eventData ->
+                        EventsCard(
+                            eventData,
+                            cardWidth = 500.dp,
+                            horizontalPadding = 16.dp
+                        ).Content()
+                    }
+                    // Loading indicator
+                    if (viewModel.isLoading) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+
+                    // Load more when reaching the end
+                    if (viewModel.hasMoreEvents && !viewModel.isLoading) {
+                        item {
+                            LaunchedEffect(viewModel.events.size) {
+                                viewModel.loadMoreEvents()
+                            }
                         }
                     }
                 }
 
-                // Load more when reaching the end
-                if (viewModel.hasMoreEvents && !viewModel.isLoading) {
-                    item {
-                        LaunchedEffect(Unit) {
-                            viewModel.loadMoreEvents()
-                        }
-                    }
-                }
-            }
         }
 
         // Date Picker Dialog
@@ -368,8 +358,8 @@ object ScreenEvents : Screen {
         }
     }
 
-    fun longDate(start_time : String, end_time : String) : Boolean {
-        return Instant.parse(start_time).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear ==
-                Instant.parse(end_time).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear
+    private fun longDate(startTime : String, endTime : String) : Boolean {
+        return Instant.parse(startTime).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear ==
+                Instant.parse(endTime).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear
     }
 }

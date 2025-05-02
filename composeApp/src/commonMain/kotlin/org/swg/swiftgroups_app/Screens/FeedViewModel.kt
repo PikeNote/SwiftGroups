@@ -90,4 +90,9 @@ class FeedViewModel : ScreenModel {
             _isLoading.update{ false }
         }
     }
+
+    fun onFilterSelected(index: Int) {
+        _selectedIndex.value = index
+        updateFeed(wipe = true)
+    }
 }

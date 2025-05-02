@@ -416,7 +416,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            items(eventAPI?.event_tags ?: emptyList()) { tag ->
+                            items(eventAPI?.event_tags ?: emptyList(), key = {it.name}) { tag ->
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(4.dp))
