@@ -63,7 +63,7 @@ class EventsViewModel : ScreenModel {
                 database.swiftdataQueries.filterEventsByDateAndTagsAndCategoriesAndClubs(
                     currentSearchQuery.trim(),
                     selectedDate.toString(),
-                    selectedTags.toList(),
+                    selectedTags.joinToString(","),
                     selectedCategories.toList(),
                     selectedClubs.toList(),
                     offset
@@ -74,7 +74,7 @@ class EventsViewModel : ScreenModel {
                 database.swiftdataQueries.filterEventsByDateAndTagsAndCategories(
                     currentSearchQuery.trim(),
                     selectedDate.toString(),
-                    selectedTags.toList(),
+                    selectedTags.joinToString(","),
                     selectedCategories.toList(),
                     offset
                 ).executeAsList()
@@ -84,7 +84,7 @@ class EventsViewModel : ScreenModel {
                 database.swiftdataQueries.filterEventsByDateAndTagsAndClubs(
                     currentSearchQuery.trim(),
                     selectedDate.toString(),
-                    selectedTags.toList(),
+                    selectedTags.joinToString(","),
                     selectedClubs.toList(),
                     offset
                 ).executeAsList()
@@ -93,7 +93,7 @@ class EventsViewModel : ScreenModel {
             selectedCategories.isNotEmpty() && selectedClubs.isNotEmpty() && selectedTags.isNotEmpty() -> {
                 database.swiftdataQueries.filterEventsByTagsAndCategoriesAndClubs(
                     currentSearchQuery.trim(),
-                    selectedTags.toList(),
+                    selectedTags.joinToString(","),
                     selectedCategories.toList(),
                     selectedClubs.toList(),
                     offset
@@ -104,7 +104,7 @@ class EventsViewModel : ScreenModel {
                 database.swiftdataQueries.filterEventsByDateAndTags(
                     currentSearchQuery.trim(),
                     selectedDate.toString(),
-                    selectedTags.toList(),
+                    selectedTags.joinToString(","),
                     offset
                 ).executeAsList()
             }
@@ -112,7 +112,7 @@ class EventsViewModel : ScreenModel {
             selectedCategories.isNotEmpty() && selectedTags.isNotEmpty() -> {
                 database.swiftdataQueries.filterEventsByTagsAndCategories(
                     currentSearchQuery.trim(),
-                    selectedTags.toList(),
+                    selectedTags.joinToString(","),
                     selectedCategories.toList(),
                     offset
                 ).executeAsList()
@@ -121,7 +121,7 @@ class EventsViewModel : ScreenModel {
             selectedClubs.isNotEmpty() && selectedTags.isNotEmpty() -> {
                 database.swiftdataQueries.filterEventsByTagsAndClubs(
                     currentSearchQuery.trim(),
-                    selectedTags.toList(),
+                    selectedTags.joinToString(","),
                     selectedClubs.toList(),
                     offset
                 ).executeAsList()
@@ -130,7 +130,7 @@ class EventsViewModel : ScreenModel {
             selectedTags.isNotEmpty() -> {
                 database.swiftdataQueries.filterEventsByTags(
                     currentSearchQuery.trim(),
-                    selectedTags.toList(),
+                    selectedTags.joinToString(","),
                     offset
                 ).executeAsList()
             }

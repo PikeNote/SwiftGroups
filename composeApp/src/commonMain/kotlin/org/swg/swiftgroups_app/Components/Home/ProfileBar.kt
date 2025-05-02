@@ -65,7 +65,7 @@ class ProfileBar ( private val profileData : ProfileDataItem ) {
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(95.dp)
+                    .size(80.dp)
                     .clip(shape = CircleShape)
 
             )

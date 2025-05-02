@@ -36,7 +36,6 @@ import compose.icons.fontawesomeicons.solid.LocationArrow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
 import org.swg.swiftgroups_app.Fonts.AppFont
@@ -49,7 +48,6 @@ class EventsCard(
     private val cardWidth: Dp = 270.dp,
     private val horizontalPadding: Dp = 0.dp
 ) {
-    private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
     private val currentEDTTime = Clock.System.now().toLocalDateTime(TimeZone.of("America/New_York"))
     private val eventStartTime = Instant.parse(eventDat.start_time).toLocalDateTime(TimeZone.UTC)
     private val eventEndTime = Instant.parse(eventDat.end_time).toLocalDateTime(TimeZone.UTC)
@@ -82,6 +80,8 @@ class EventsCard(
                         Modifier
                     }
                 ).clickable {
+                    println("Event clicked: ${eventDat.eventName}")
+                    println("Event tags: ${eventDat.eventTags}")
                     navigator.push(SingleEventScreen(eventDat.eventId.toInt()))
                 },
             verticalAlignment = Alignment.CenterVertically,

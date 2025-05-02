@@ -216,7 +216,10 @@ WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc')
 AND (
     lower(eventName) LIKE lower('%' || :searchQuery || '%')
 )
-AND eventTags IN :tags
+AND (
+    :tags = '' OR
+    eventTags LIKE '%' || :tags || '%'
+)
 ORDER BY start_time LIMIT ?, 50;
 
 filterEventsByDateAndTags:
@@ -226,7 +229,10 @@ AND (
     lower(eventName) LIKE lower('%' || :searchQuery || '%')
 )
 AND date(start_time) = date(:selectedDate)
-AND eventTags IN :tags
+AND (
+    :tags = '' OR
+    eventTags LIKE '%' || :tags || '%'
+)
 ORDER BY start_time LIMIT ?, 50;
 
 filterEventsByTagsAndCategories:
@@ -235,7 +241,10 @@ WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc')
 AND (
     lower(eventName) LIKE lower('%' || :searchQuery || '%')
 )
-AND eventTags IN :tags
+AND (
+    :tags = '' OR
+    eventTags LIKE '%' || :tags || '%'
+)
 AND eventCategory IN :categories
 ORDER BY start_time LIMIT ?, 50;
 
@@ -245,7 +254,10 @@ WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc')
 AND (
     lower(eventName) LIKE lower('%' || :searchQuery || '%')
 )
-AND eventTags IN :tags
+AND (
+    :tags = '' OR
+    eventTags LIKE '%' || :tags || '%'
+)
 AND clubName IN :clubs
 ORDER BY start_time LIMIT ?, 50;
 
@@ -256,7 +268,10 @@ AND (
     lower(eventName) LIKE lower('%' || :searchQuery || '%')
 )
 AND date(start_time) = date(:selectedDate)
-AND eventTags IN :tags
+AND (
+    :tags = '' OR
+    eventTags LIKE '%' || :tags || '%'
+)
 AND eventCategory IN :categories
 ORDER BY start_time LIMIT ?, 50;
 
@@ -267,7 +282,10 @@ AND (
     lower(eventName) LIKE lower('%' || :searchQuery || '%')
 )
 AND date(start_time) = date(:selectedDate)
-AND eventTags IN :tags
+AND (
+    :tags = '' OR
+    eventTags LIKE '%' || :tags || '%'
+)
 AND clubName IN :clubs
 ORDER BY start_time LIMIT ?, 50;
 
@@ -278,7 +296,10 @@ AND (
     lower(eventName) LIKE lower('%' || :searchQuery || '%')
 )
 AND date(start_time) = date(:selectedDate)
-AND eventTags IN :tags
+AND (
+    :tags = '' OR
+    eventTags LIKE '%' || :tags || '%'
+)
 AND eventCategory IN :categories
 AND clubName IN :clubs
 ORDER BY start_time LIMIT ?, 50;
@@ -289,7 +310,10 @@ WHERE end_time > strftime('%Y-%m-%dT%H:%M:%S', 'now', 'utc')
 AND (
     lower(eventName) LIKE lower('%' || :searchQuery || '%')
 )
-AND eventTags IN :tags
+AND (
+    :tags = '' OR
+    eventTags LIKE '%' || :tags || '%'
+)
 AND eventCategory IN :categories
 AND clubName IN :clubs
 ORDER BY start_time LIMIT ?, 50;

@@ -42,6 +42,7 @@ fun CategorySelectionModal(
     val sheetState = rememberModalBottomSheetState()
 
     ModalBottomSheet(
+        containerColor = Color.White,
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         modifier = Modifier.fillMaxWidth()

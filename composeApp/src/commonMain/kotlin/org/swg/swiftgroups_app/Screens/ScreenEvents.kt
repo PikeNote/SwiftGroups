@@ -159,8 +159,8 @@ object ScreenEvents : Screen {
                 singleLine = true
             )
 
-            val filters = remember(viewModel.selectedDate, viewModel.selectedCategories, viewModel.selectedClubs.isNotEmpty(),
-                viewModel.selectedTags.isNotEmpty(), viewModel.showLongEvents) { listOf(
+            val filters = remember(viewModel.selectedDate, viewModel.selectedCategories, viewModel.selectedClubs,
+                viewModel.selectedTags, viewModel.showLongEvents) { listOf(
                 EventFilterTemp(
                     "Hide Long Events",
                     !viewModel.showLongEvents,
@@ -174,17 +174,17 @@ object ScreenEvents : Screen {
                 EventFilterTemp(
                     "Select Categories",
                     viewModel.selectedCategories.isNotEmpty(),
-                    if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Categories" else "Select Categories",
+                    if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Selected" else "Select Categories",
                     onClick = { showCategoryPicker = true }),
                 EventFilterTemp(
                     "Select Clubs",
                     viewModel.selectedClubs.isNotEmpty(),
-                    if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Clubs" else "Select Clubs",
+                    if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Selected" else "Select Clubs",
                     onClick =  { showClubPicker = true }),
                 EventFilterTemp(
                     "Select Tags",
                     viewModel.selectedTags.isNotEmpty(),
-                    if (viewModel.selectedTags.isNotEmpty()) "${viewModel.selectedTags.size} Tags" else "Select Tags",
+                    if (viewModel.selectedTags.isNotEmpty()) "${viewModel.selectedTags.size} Selected" else "Select Tags",
                     onClick =  { showTagPicker = true }),
             ) }
 
