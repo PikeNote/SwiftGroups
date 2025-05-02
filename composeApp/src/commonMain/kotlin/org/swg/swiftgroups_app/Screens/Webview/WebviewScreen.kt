@@ -19,6 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
@@ -37,9 +41,13 @@ import org.swg.swiftgroups_app.Icons.ArrowLeft
 
 class WebviewScreen(val url : String, val text : String, val callback : ()->Unit = {}, val urlMatch : String = "") : Screen {
 
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        var cookieSetAttempted by remember { mutableStateOf(false) }
+
+
 
         Column (
             verticalArrangement = Arrangement.SpaceEvenly,
@@ -69,26 +77,33 @@ class WebviewScreen(val url : String, val text : String, val callback : ()->Unit
                 Text(text, modifier = Modifier.align(Alignment.Center),style=AppFont.InterTypography.h3, color =Color.White)
             }
 
-            val state = rememberWebViewState(url)
-
-            LaunchedEffect(Unit) {
-                CGAPI.cookieHeader.forEach {
-                    state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
-                }
-            }
+            val state = rememberWebViewState(url, additionalHttpHeaders = mapOf("Cookie" to CGAPI.generateCookieString(CGAPI.cookieHeader)))
 
             WebView(state = state, modifier = Modifier.fillMaxWidth().weight(9f))
 
             LaunchedEffect(state) {
                 snapshotFlow { state.loadingState }
-                    .filter { it is LoadingState.Finished && state.lastLoadedUrl?.contains(urlMatch) == true }
+                    .filter { it is LoadingState.Finished }
 
                     .collect {
-                        callback()
-                        CGAPI.refetchProfile.value=true
-                        navigator.pop()
+                        if(urlMatch.isNotEmpty() && state.lastLoadedUrl?.contains(urlMatch) == true) {
+                            callback()
+                            CGAPI.refetchProfile.value=true
+                            navigator.pop()
+                        }
+
+                        if (!cookieSetAttempted) {
+                            cookieSetAttempted = true
+                            CGAPI.cookieHeader.forEach {
+                                state.cookieManager.setCookie(it.domain ?: "https://community.case.edu", cookie = convertCookie(it))
+                            }
+                        }
+
+
                     }
             }
+
+
         }
     }
 }
