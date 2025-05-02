@@ -82,31 +82,6 @@ object ScreenEvents : Screen {
             bottomTabVisibilityManager.setBottomBarVisibility(true)
         }
 
-        val filters = remember { listOf(
-            EventFilterTemp("Hide Long Events", !viewModel.showLongEvents) { viewModel.toggleLongEvents() },
-            EventFilterTemp(
-                "Select Date",
-                viewModel.selectedDate != null,
-                viewModel.selectedDate?.let { formatDate(it) } ?: "Select Date",
-                FontAwesomeIcons.Solid.Calendar
-            ) { showDatePicker = true },
-            EventFilterTemp(
-                "Select Categories",
-                viewModel.selectedCategories.isNotEmpty(),
-                if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Categories" else "Select Categories"
-            ) { showCategoryPicker = true },
-            EventFilterTemp(
-                "Select Clubs",
-                viewModel.selectedClubs.isNotEmpty(),
-                if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Clubs" else "Select Clubs"
-            ) { showClubPicker = true },
-            EventFilterTemp(
-                "Select Tags",
-                viewModel.selectedTags.isNotEmpty(),
-                if (viewModel.selectedTags.isNotEmpty()) "${viewModel.selectedTags.size} Tags" else "Select Tags"
-            ) { showTagPicker = true },
-        ) }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -183,6 +158,32 @@ object ScreenEvents : Screen {
                 ),
                 singleLine = true
             )
+
+            val filters = remember(viewModel.selectedDate, viewModel.selectedCategories, viewModel.selectedClubs.isNotEmpty(),
+                viewModel.selectedTags.isNotEmpty()) { listOf(
+                EventFilterTemp("Hide Long Events", !viewModel.showLongEvents) { viewModel.toggleLongEvents() },
+                EventFilterTemp(
+                    "Select Date",
+                    viewModel.selectedDate != null,
+                    viewModel.selectedDate?.let { formatDate(it) } ?: "Select Date",
+                    FontAwesomeIcons.Solid.Calendar
+                ) { showDatePicker = true },
+                EventFilterTemp(
+                    "Select Categories",
+                    viewModel.selectedCategories.isNotEmpty(),
+                    if (viewModel.selectedCategories.isNotEmpty()) "${viewModel.selectedCategories.size} Categories" else "Select Categories"
+                ) { showCategoryPicker = true },
+                EventFilterTemp(
+                    "Select Clubs",
+                    viewModel.selectedClubs.isNotEmpty(),
+                    if (viewModel.selectedClubs.isNotEmpty()) "${viewModel.selectedClubs.size} Clubs" else "Select Clubs"
+                ) { showClubPicker = true },
+                EventFilterTemp(
+                    "Select Tags",
+                    viewModel.selectedTags.isNotEmpty(),
+                    if (viewModel.selectedTags.isNotEmpty()) "${viewModel.selectedTags.size} Tags" else "Select Tags"
+                ) { showTagPicker = true },
+            ) }
 
             // Filter Buttons
             Box(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
