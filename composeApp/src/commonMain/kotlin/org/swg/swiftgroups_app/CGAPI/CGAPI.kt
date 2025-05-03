@@ -466,9 +466,11 @@ object CGAPI {
         }
 
         if (response.status.value in 200..299) {
-            println("Comment ${commentID} liked!")
+            println("Comment $commentID liked!")
+            return true
         } else {
-            println("Comment ${commentID} failed!")
+            println("Comment $commentID failed!")
+            return false
         }
     }
 

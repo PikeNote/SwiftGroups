@@ -10,7 +10,7 @@ data class Comment(
     val commentUid: String,
     val content: String,
     val feedUid: String?,
-    val iLiked: Int,
+    var iLiked: Int,
     val numberLikes: Int,
     val photoHeight: Int,
     val studentId: Int,

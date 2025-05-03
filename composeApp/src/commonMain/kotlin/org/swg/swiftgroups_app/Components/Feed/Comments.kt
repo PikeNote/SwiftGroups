@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -142,7 +141,12 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUI
                                             modifier = Modifier.size(25.dp)
                                                 .offset(y = 10.dp).clickable {
                                                     CoroutineScope(Dispatchers.IO).launch {
-                                                        CGAPI.likeComment(it.commentId, it.iLiked == 0)
+                                                        val likedSuccess = CGAPI.likeComment(it.commentId, it.iLiked == 0)
+                                                        if(likedSuccess) {
+                                                            it.iLiked = if (it.iLiked == 0) 1 else 0
+                                                            commentList =
+                                                                CGAPI.getFeedComments(postUID = postUID)
+                                                        }
                                                     }
                                                 }, tint = if (it.iLiked == 0) Color.Gray else Color.Red
                                         )
