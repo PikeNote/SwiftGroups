@@ -65,7 +65,7 @@ object CGAPI {
         }
     }
 
-    val client = HttpClient {
+    private val client = HttpClient {
         followRedirects = false
         install(ContentNegotiation) {
             json(contentType = ContentType.Any, json = Json {
@@ -164,7 +164,7 @@ object CGAPI {
         cookieHeader: String,
         hopsLeft: Int = 10
     ): String? {
-        println("Fetching ---- ${loginUrl}")
+        println("Fetching ---- $loginUrl")
         if(loginUrl== "null") return null
         if (hopsLeft <= 0) return null
 
@@ -390,18 +390,18 @@ object CGAPI {
                 swiftdataQueries.transaction {
 
 
-                    groupList.groups.list.forEach {
+                    groupList.groups.list.forEach { group ->
                         val groupCategories: List<String> =
-                            (it.categories.map { it.name } + it.groupType)
+                            (group.categories.map { it.name } + group.groupType)
                         swiftdataQueries.insertClub(
-                            clubName = it.groupName,
-                            clubID = it.clubId,
-                            clubUrl = it.clubUrl,
+                            clubName = group.groupName,
+                            clubID = group.clubId,
+                            clubUrl = group.clubUrl,
                             clubCategories = groupCategories.joinToString(","),
-                            clubBanner = it.coverURL,
-                            clubLogo = it.logoUrl,
-                            clubStatus = it.status,
-                            clubJoinURL = it.join_group_url
+                            clubBanner = group.coverURL,
+                            clubLogo = group.logoUrl,
+                            clubStatus = group.status,
+                            clubJoinURL = group.join_group_url
                         )
                     }
                     afterCommit {
@@ -415,7 +415,10 @@ object CGAPI {
     }
 
     suspend fun postComment(postID : String, text : String) : Boolean {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_comment_post?to_uid=${postID}&comment=${text}&type=feed") {
+        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_comment_post") {
+            parameter("to_uid", postID)
+            parameter("comment", text)
+            parameter("type", "feed")
             method = HttpMethod.Get
             headers {
                 append(HttpHeaders.Host, "community.case.edu")
@@ -428,6 +431,8 @@ object CGAPI {
             return true
         } else {
             println("Comment failed!")
+            val responseBody : String = response.body()
+            println(responseBody)
             return false
         }
     }
@@ -477,9 +482,9 @@ object CGAPI {
         }
 
         if (response.status.value in 200..299) {
-            println("Comment ${postID} liked!")
+            println("Comment $postID liked!")
         } else {
-            println("Comment ${postID} failed!")
+            println("Comment $postID failed!")
         }
     }
 
@@ -503,7 +508,7 @@ object CGAPI {
                 swiftdataQueries.transaction {
 
 
-                    groupList.groups.list.forEach {
+                    groupList.groups.list.forEach { it ->
                         val groupCategories : List<String> = (it.categories.map { it.name } + it.groupType)
                         swiftdataQueries.insertClub(
                             clubName = it.groupName,
