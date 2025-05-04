@@ -70,7 +70,7 @@ object FeedScreen : Screen {
                 LazyColumn(modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)) {
 
-                    items(feedList, key = {it.uid}) { feed ->
+                    items(feedList, key = {it.id}) { feed ->
                         FeedCard(feed).Content()
                     }
 
