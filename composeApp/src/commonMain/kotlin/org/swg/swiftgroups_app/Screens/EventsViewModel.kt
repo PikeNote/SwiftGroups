@@ -4,7 +4,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
+import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 import org.swg.swiftgroupsapp.db.Events
 
@@ -20,6 +27,9 @@ class EventsViewModel : ScreenModel {
     var categories by mutableStateOf<List<String>>(emptyList())
     var clubs by mutableStateOf<List<String>>(emptyList())
     var tags by mutableStateOf<List<String>>(emptyList())
+
+    val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private var database = DBObject.db
     private var offset = 0L
@@ -257,5 +267,13 @@ class EventsViewModel : ScreenModel {
         offset = 0
         events = emptyList()
         hasMoreEvents = true
+    }
+
+    fun getNewEvents() {
+        screenModelScope.launch {
+            CGAPI.fetchEventsData()
+            getEvents()
+            _isRefreshing.update { false }
+        }
     }
 }

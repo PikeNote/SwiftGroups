@@ -29,6 +29,9 @@ class FeedViewModel : ScreenModel {
     val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
     var offset = 0
 
     var hasMorePosts by mutableStateOf(true)
@@ -88,6 +91,10 @@ class FeedViewModel : ScreenModel {
             }
 
             _isLoading.update{ false }
+
+            if(_isRefreshing.value) {
+                _isRefreshing.update { false }
+            }
         }
     }
 

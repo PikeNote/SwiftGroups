@@ -138,6 +138,7 @@ class HomeViewModel : ScreenModel {
         } else {
             runCatching { CGAPI.fetchMyGroups() }.getOrElse { emptyList() }
         }
+        CGAPI._myGroupIDs.update { groupData.getOrNull(1)?.groups?.map{it.groupID.toString()} ?: emptyList() }
 
         return groupData.getOrNull(1)
             ?.groups

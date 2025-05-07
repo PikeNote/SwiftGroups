@@ -27,8 +27,13 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +55,7 @@ import compose.icons.fontawesomeicons.solid.ChevronRight
 import compose.icons.fontawesomeicons.solid.Search
 import compose.icons.fontawesomeicons.solid.Times
 import compose.icons.fontawesomeicons.solid.Undo
+import kotlinx.coroutines.flow.update
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -68,6 +74,7 @@ private fun formatDate(date: LocalDate): String {
 }
 
 object ScreenEvents : Screen {
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val viewModel: EventsViewModel = rememberScreenModel { EventsViewModel() }
@@ -76,6 +83,10 @@ object ScreenEvents : Screen {
         var showCategoryPicker by remember { mutableStateOf(false) }
         var showClubPicker by remember { mutableStateOf(false) }
         var showTagPicker by remember { mutableStateOf(false) }
+
+        val isRefreshing by viewModel.isRefreshing.collectAsState()
+
+        val state = rememberPullToRefreshState()
 
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
         LaunchedEffect(Unit) {
@@ -255,16 +266,34 @@ object ScreenEvents : Screen {
             }
 
             // Events List
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentPadding = PaddingValues(
-                    top = 8.dp,
-                    bottom = 70.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(8.dp))
-            {
-                items(filteredEvents, key = { it.eventId }) { eventData ->
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = {
+                    viewModel._isRefreshing.update { true }
+                    viewModel.getNewEvents()
+                },
+                state = state,
+                indicator = {
+                    PullToRefreshDefaults.Indicator(
+                        state = state,
+                        isRefreshing = isRefreshing,
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        containerColor = Color.White,
+                        color = Color(0xFF1A73E8)
+                    )
+                }
+            ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        top = 8.dp,
+                        bottom = 70.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                )
+                {
+                    items(filteredEvents, key = { it.eventId }) { eventData ->
                         EventsCard(
                             eventData,
                             cardWidth = 500.dp,
@@ -294,6 +323,7 @@ object ScreenEvents : Screen {
                         }
                     }
                 }
+            }
 
         }
 

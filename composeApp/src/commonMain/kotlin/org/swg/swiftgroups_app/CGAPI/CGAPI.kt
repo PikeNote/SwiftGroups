@@ -16,6 +16,10 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.parseServerSetCookieHeader
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
@@ -46,6 +50,9 @@ object CGAPI {
         ignoreUnknownKeys = true
     }
     val secureVault = SecureStorage()
+
+    val _myGroupIDs = MutableStateFlow(emptyList<String>())
+    val myGroupIDs: StateFlow<List<String>> = _myGroupIDs.asStateFlow()
 
     val backgroundClient = HttpClient {
         followRedirects = false
@@ -274,6 +281,7 @@ object CGAPI {
             println("My groups fetched successfully!")
             val groupList : List<ProfileGroupItem> = response.body()
             DBObject.db.swiftdataQueries.insertModifications("homeMyGroups",Json.encodeToString(groupList))
+            _myGroupIDs.update { groupList.getOrNull(1)?.groups?.map{it.groupID.toString()} ?: emptyList() }
             return groupList
         } else {
             return emptyList()
@@ -456,7 +464,7 @@ object CGAPI {
         }
     }
 
-    suspend fun likeComment(commentID : String, like : Boolean) {
+    suspend fun likeComment(commentID : String, like : Boolean) : Boolean {
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_comment_like?id=${commentID}&like=${if(like) 1 else 0}") {
             method = HttpMethod.Get
             headers {
