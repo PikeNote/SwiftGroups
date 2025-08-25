@@ -106,6 +106,7 @@ class HomeViewModel : ScreenModel {
                     } else {
                         CGAPI.fetchEventsData()
                         loadMyGroupsEvents()
+                        upcomingGroupEvents = groupsDeferred.await()
                     }
                 }
 
@@ -126,7 +127,7 @@ class HomeViewModel : ScreenModel {
         }
     }
 
-    suspend fun loadMyGroupsEvents(
+    private suspend fun loadMyGroupsEvents(
     ): List<Events> {
         val myGroupsCache = DBObject.db.swiftdataQueries
             .fetchModifications("homeMyGroups")
