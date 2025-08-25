@@ -567,6 +567,6 @@ object CGAPI {
     fun checkDBExpiry(dbTimeString : String, expiryMin : Int = 60) : Boolean {
         val changedAt = Instant.parse(dbTimeString, DateTimeFormat.db_currentTimestamp)
         val now = Clock.System.now()
-        return (now-changedAt).inWholeMinutes <= expiryMin
+        return (now-changedAt).inWholeMinutes >= expiryMin
     }
 }
