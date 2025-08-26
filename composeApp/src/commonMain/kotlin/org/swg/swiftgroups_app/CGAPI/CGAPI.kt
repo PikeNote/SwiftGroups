@@ -297,7 +297,7 @@ object CGAPI {
     }
 
     suspend fun fetchProfileQR() : UserProfileQRCode? {
-        return try {
+        return safeRequest(defaultValue = null, errorContextMessage = "Failed to fetch profile QR code") {
             val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_qrcode") {
                 method = HttpMethod.Get
                 headers {
@@ -313,18 +313,6 @@ object CGAPI {
             } else {
                 null
             }
-        } catch (e: HttpRequestTimeoutException) {
-            println("Error: Request timed out. ${e.message}")
-            null
-        } catch (e: SerializationException) {
-            println("Error: Failed to parse server response. ${e.message}")
-            null
-        } catch (e: IOException) {
-            println("Error: Network issue. Check connection. ${e.message}")
-            null
-        } catch (e: Exception) {
-            println("An unexpected error occurred: ${e.message}")
-            null
         }
     }
 
