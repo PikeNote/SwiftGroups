@@ -137,6 +137,7 @@ object GroupScreen : Screen {
                         IconButton(
                             onClick = {
                                 searchText = ""
+                                viewModel.fetchGroups(searchText)
                             }
                         ) {
                             Icon(

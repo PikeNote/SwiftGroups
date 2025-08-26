@@ -56,8 +56,10 @@ class GroupScreenViewModel : ScreenModel {
 
     fun fetchGroups(filter : String = "") {
         if(lastFilter != filter) {
+            lastFilter = filter
             _groupList.update { emptyList() }
             offset=0
+            hasMoreClubs = true
         }
         val clubList = DBObject.db.swiftdataQueries.fetchClubs(filter, offset).executeAsList()
         offset += clubList.size

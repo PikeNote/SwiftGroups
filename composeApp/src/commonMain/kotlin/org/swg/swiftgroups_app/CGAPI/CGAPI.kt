@@ -271,29 +271,16 @@ object CGAPI {
         }
     }
 
-    suspend fun fetchMyGroups() : List<ProfileGroupItem> {
-        return safeRequest(
-            defaultValue = emptyList(),
-            errorContextMessage = "Error fetching my groups"
-        ) {
-            val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v17/mobile_header_groups?search=&all=false") {
-                method = HttpMethod.Get
-                headers {
-                    append(HttpHeaders.Host, "community.case.edu")
-                    append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
-                }
-            }
-
-            if (response.status.value in 200..299) {
-                println("My groups fetched successfully!")
-                val groupList : List<ProfileGroupItem> = response.body()
-                DBObject.db.swiftdataQueries.insertModifications("homeMyGroups",Json.encodeToString(groupList))
-                _myGroupIDs.update { groupList.getOrNull(1)?.groups?.map{it.groupID.toString()} ?: emptyList() }
-                groupList
-            } else {
-                emptyList()
-            }
+    fun fetchMyGroups() : List<ProfileGroupItem> {
+        val groupList: List<ProfileGroupItem> = fetchMyGroups()
+        DBObject.db.swiftdataQueries.insertModifications(
+            "homeMyGroups",
+            Json.encodeToString(groupList)
+        )
+        _myGroupIDs.update {
+            groupList.getOrNull(1)?.groups?.map { it.groupID.toString() } ?: emptyList()
         }
+        return groupList
     }
 
     suspend fun fetchProfileQR() : UserProfileQRCode? {
@@ -390,8 +377,9 @@ object CGAPI {
                 } else {
                     emptyList()
                 }
+            } else {
+                emptyList()
             }
-            emptyList()
         }
     }
 

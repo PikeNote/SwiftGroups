@@ -65,5 +65,6 @@ fun FilterBar(
             }
 
         }
+        Spacer(modifier = Modifier.width(5.dp))
     }
 }
