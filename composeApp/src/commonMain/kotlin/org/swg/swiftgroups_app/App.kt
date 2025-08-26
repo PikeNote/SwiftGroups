@@ -34,6 +34,7 @@ fun App() {
             .memoryCache {
                 MemoryCache.Builder()
                     .maxSizePercent(context,0.25)
+                    .strongReferencesEnabled(true)
                     .build()
             }
             .diskCache {
@@ -44,7 +45,6 @@ fun App() {
             }
             .build()
     }
-
 
     val typography = AppFont.InterTypography
 

@@ -5,6 +5,7 @@ import com.multiplatform.webview.cookie.Cookie
 import com.vipulasri.kachetor.KachetorStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -22,6 +23,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.io.IOException
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroups
 import org.swg.swiftgroups_app.CGAPI.Auth.Auth
@@ -245,7 +248,10 @@ object CGAPI {
 
 
     suspend fun fetchEvent(eventID : String) : EventSpecificAPI? {
-        try {
+        return safeRequest(
+            defaultValue = null,
+            errorContextMessage = "Error fetching event ${eventID}"
+        ) {
 
             val response: HttpResponse =
                 client.get("https://community.case.edu/mobile_ws/v18/mobile_event_new?id=${eventID}") {
@@ -258,38 +264,40 @@ object CGAPI {
 
             if (response.status.value in 200..299) {
                 val eventData: EventSpecificAPI = response.body()
-                return eventData
+                eventData
             } else {
-                return null
+                null
             }
-        }
-        catch (e : Exception) {
-            return null
         }
     }
 
     suspend fun fetchMyGroups() : List<ProfileGroupItem> {
-        val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v17/mobile_header_groups?search=&all=false") {
-            method = HttpMethod.Get
-            headers {
-                append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+        return safeRequest(
+            defaultValue = emptyList(),
+            errorContextMessage = "Error fetching my groups"
+        ) {
+            val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v17/mobile_header_groups?search=&all=false") {
+                method = HttpMethod.Get
+                headers {
+                    append(HttpHeaders.Host, "community.case.edu")
+                    append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+                }
             }
-        }
 
-        if (response.status.value in 200..299) {
-            println("My groups fetched successfully!")
-            val groupList : List<ProfileGroupItem> = response.body()
-            DBObject.db.swiftdataQueries.insertModifications("homeMyGroups",Json.encodeToString(groupList))
-            _myGroupIDs.update { groupList.getOrNull(1)?.groups?.map{it.groupID.toString()} ?: emptyList() }
-            return groupList
-        } else {
-            return emptyList()
+            if (response.status.value in 200..299) {
+                println("My groups fetched successfully!")
+                val groupList : List<ProfileGroupItem> = response.body()
+                DBObject.db.swiftdataQueries.insertModifications("homeMyGroups",Json.encodeToString(groupList))
+                _myGroupIDs.update { groupList.getOrNull(1)?.groups?.map{it.groupID.toString()} ?: emptyList() }
+                groupList
+            } else {
+                emptyList()
+            }
         }
     }
 
     suspend fun fetchProfileQR() : UserProfileQRCode? {
-        try {
+        return try {
             val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_qrcode") {
                 method = HttpMethod.Get
                 headers {
@@ -301,85 +309,110 @@ object CGAPI {
             if (response.status.value in 200..299) {
                 println("Profile QR code fetched successfully!")
                 val profileQR : UserProfileQRCode = response.body()
-                return profileQR
+                profileQR
             } else {
-                return null
+                null
             }
-        }
-        catch (e : Exception) {
-            return null
+        } catch (e: HttpRequestTimeoutException) {
+            println("Error: Request timed out. ${e.message}")
+            null
+        } catch (e: SerializationException) {
+            println("Error: Failed to parse server response. ${e.message}")
+            null
+        } catch (e: IOException) {
+            println("Error: Network issue. Check connection. ${e.message}")
+            null
+        } catch (e: Exception) {
+            println("An unexpected error occurred: ${e.message}")
+            null
         }
     }
 
 
     suspend fun fetchGroup(groupID : String) : Group? {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_group_new?id=${groupID}") {
-            method = HttpMethod.Get
-            headers {
-                append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
-            }
-        }
+        return safeRequest(
+            defaultValue = null,
+            errorContextMessage = "Error fetching group $groupID"
+        ) {
+            val response: HttpResponse =
+                client.get("https://community.case.edu/mobile_ws/v18/mobile_group_new?id=${groupID}") {
+                    method = HttpMethod.Get
+                    headers {
+                        append(HttpHeaders.Host, "community.case.edu")
+                        append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+                    }
+                }
+            if (response.status.value in 200..299) {
+                println("Group fetched successfully!")
+                val groupList: GroupList = response.body()
 
-        if (response.status.value in 200..299) {
-            println("Group fetched successfully!")
-            val groupList : GroupList = response.body()
-            return groupList.group.first()
-        } else {
-            return null
+                groupList.group.firstOrNull()
+            } else {
+                println("Error fetching group $groupID: Received status ${response.status.value}")
+                null
+            }
         }
     }
 
     suspend fun fetchFeed(offset : Int, feedID : String = "0") : List<Feed> {
-        var feedType = "topic"
-        if(feedID == "0") {
-            feedType = ""
-        }
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_home?feed_type=${feedType}&feed_type_id=${feedID}&v=2&limit=15&range=${offset}") {
-            method = HttpMethod.Get
-            headers {
-                append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
-            }
-        }
+        return safeRequest(
+            defaultValue = emptyList(),
+            errorContextMessage = "Error fetching feed list"
+        ) {
+            val feedType = if (feedID == "0") "" else "topic"
+            val response: HttpResponse =
+                client.get("https://community.case.edu/mobile_ws/v18/mobile_home?feed_type=${feedType}&feed_type_id=${feedID}&v=2&limit=15&range=${offset}") {
+                    method = HttpMethod.Get
+                    headers {
+                        append(HttpHeaders.Host, "community.case.edu")
+                        append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+                    }
+                }
 
-        if (response.status.value in 200..299) {
-            println("Feed fetched successfully!")
-            val feedList : List<FeedPostsItem> = response.body()
-            return if(feedList.isNotEmpty()) {
-                feedList.first().feeds
+            if (response.status.value in 200..299) {
+                println("Feed fetched successfully!")
+                val feedList: List<FeedPostsItem> = response.body()
+                feedList.firstOrNull()?.feeds ?: emptyList()
             } else {
+                println("Error fetching feed: Received status ${response.status.value}")
                 emptyList()
             }
         }
-        return emptyList()
     }
 
     suspend fun fetchFilter() : List<Button> {
-        val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_feed_top") {
-            method = HttpMethod.Get
-            headers {
-                append(HttpHeaders.Host, "community.case.edu")
-                append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+        return safeRequest(
+            defaultValue = emptyList(),
+            errorContextMessage = "Error fetching feed filters"
+        ) {
+            val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_feed_top") {
+                method = HttpMethod.Get
+                headers {
+                    append(HttpHeaders.Host, "community.case.edu")
+                    append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+                }
             }
-        }
 
-        if (response.status.value in 200..299) {
-            println("Filter fetched successfully!")
-            val filterList : List<FeedFilterItem> = response.body()
-            if(filterList.isNotEmpty()) {
-                DBObject.db.swiftdataQueries.insertModifications("filterButtons",Json.encodeToString(filterList.first().buttons))
-                return filterList.first().buttons
-            } else {
-                return emptyList()
+            if (response.status.value in 200..299) {
+                println("Filter fetched successfully!")
+                val filterList : List<FeedFilterItem> = response.body()
+                if(filterList.isNotEmpty()) {
+                    DBObject.db.swiftdataQueries.insertModifications("filterButtons",Json.encodeToString(filterList.first().buttons))
+                    filterList.first().buttons
+                } else {
+                    emptyList()
+                }
             }
+            emptyList()
         }
-        return emptyList()
     }
 
 
     suspend fun fetchAllGroups() {
-        try {
+        safeRequest(
+            defaultValue = null,
+            errorContextMessage = "Error fetching all groups"
+        ) {
             val response: HttpResponse =
                 backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?limit=1000") {
                     method = HttpMethod.Get
@@ -417,8 +450,6 @@ object CGAPI {
                     }
                 }
             }
-        } catch (e: Exception) {
-            //
         }
     }
 
@@ -500,18 +531,19 @@ object CGAPI {
 
 
     suspend fun fetchAllPersonalGroups() {
-        try {
-            val response: HttpResponse = backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?view=my_groups") {
-                method = HttpMethod.Get
-                headers {
-                    append(HttpHeaders.Host, "community.case.edu")
-                    append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+        safeRequest(defaultValue = null, errorContextMessage = "Error fetching personal groups") {
+            val response: HttpResponse =
+                backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?view=my_groups") {
+                    method = HttpMethod.Get
+                    headers {
+                        append(HttpHeaders.Host, "community.case.edu")
+                        append(HttpHeaders.Cookie, generateCookieString(cookieHeader))
+                    }
                 }
-            }
 
             if (response.status.value in 200..299) {
                 println("Personal groups fetched successfully!")
-                val groupList : AggregateGroups = response.body()
+                val groupList: AggregateGroups = response.body()
 
                 val swiftdataQueries = DBObject.db.swiftdataQueries
 
@@ -519,7 +551,8 @@ object CGAPI {
 
 
                     groupList.groups.list.forEach { it ->
-                        val groupCategories : List<String> = (it.categories.map { it.name } + it.groupType)
+                        val groupCategories: List<String> =
+                            (it.categories.map { it.name } + it.groupType)
                         swiftdataQueries.insertClub(
                             clubName = it.groupName,
                             clubID = it.clubId,
@@ -536,10 +569,7 @@ object CGAPI {
                     }
                 }
             }
-        } catch (_: Exception) {
-
         }
-
     }
 
     fun generateCookieString(cookieList : List<io.ktor.http.Cookie>): String {
@@ -568,5 +598,27 @@ object CGAPI {
         val changedAt = Instant.parse(dbTimeString, DateTimeFormat.db_currentTimestamp)
         val now = Clock.System.now()
         return (now-changedAt).inWholeMinutes >= expiryMin
+    }
+
+    private suspend fun <T> safeRequest(
+        defaultValue: T,
+        errorContextMessage: String,
+        request: suspend () -> T
+    ): T {
+        return try {
+            request()
+        } catch (e: HttpRequestTimeoutException) {
+            println("$errorContextMessage: Request timed out. ${e.message}")
+            defaultValue
+        } catch (e: SerializationException) {
+            println("$errorContextMessage: Failed to parse server response. ${e.message}")
+            defaultValue
+        } catch (e: IOException) {
+            println("$errorContextMessage: Network issue. Check connection. ${e.message}")
+            defaultValue
+        } catch (e: Exception) {
+            println("$errorContextMessage: An unexpected error occurred. ${e.message}")
+            defaultValue
+        }
     }
 }

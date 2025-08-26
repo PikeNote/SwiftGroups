@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -38,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,7 +48,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -67,6 +68,18 @@ import swiftgroups.composeapp.generated.resources.Res
 import swiftgroups.composeapp.generated.resources.swiftgroups_title
 
 object GroupScreen : Screen {
+
+    private val categoryTagModifier = Modifier
+        .widthIn(min = 80.dp)
+        .clip(RoundedCornerShape(5.dp))
+        .background(Color(0xFFD9D9D9))
+        .padding(horizontal = 1.dp)
+
+    private val basicColor = Color(0xFF003B7F)
+
+    private val gradientBrush = listOf(basicColor, Color(0xAA6C65F0))
+
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -180,85 +193,73 @@ object GroupScreen : Screen {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(5.dp),
                     userScrollEnabled = true,
-                    state = listState
+                    state = listState,
+                    contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     items(displayList, key = { it.clubID }) {
+                        val categories = remember(it.clubCategories) {
+                            it.clubCategories.split(",").filter { cat -> cat.isNotBlank() }.take(3)
+                        }
                         Box(
-                            modifier = Modifier.fillMaxWidth().height(92.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(92.dp)
                                 .padding(horizontal = 8.dp)
-                                .shadow(
-                                    elevation = 2.dp,
-                                    shape = RoundedCornerShape(20.dp),
-                                )
-                                .padding(2.dp)
-                                .clickable {
-                                    naivgator.push(GroupPage(groupID = it.clubID))
-                                }
-
-
+                                .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(basicColor)
+                                .clickable { naivgator.push(GroupPage(groupID = it.clubID)) }
                         ) {
                             Box(
-                                modifier = Modifier.fillMaxWidth().height(90.dp)
-                                    .padding(horizontal = 2.dp)
-                                    .clip(
-                                        RoundedCornerShape(20.dp)
-                                    )
-                            ) {
-                                AsyncImage(
-                                    model = "https://community.case.edu${it.clubBanner}",
-                                    "",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(
-                                            Brush.horizontalGradient(
-                                                listOf(
-                                                    Color(0xFF003B7F),
-                                                    Color(0xAA6C65F0)
-                                                ) // Example with some transparency
-                                            )
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            gradientBrush
                                         )
+                                    )
+                            )
+
+                            AsyncImage(
+                                model = "https://community.case.edu${it.clubLogo}",
+                                contentDescription = "${it.clubName} Club Logo",
+                                modifier = Modifier
+                                    .padding(start = 12.dp)
+                                    .size(60.dp)
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .align(Alignment.CenterStart)
+                            )
+
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(start = 82.dp, end = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = it.clubName,
+                                    color = Color.White,
+                                    style = AppFont.InterTypography.h4,
+                                    maxLines = 2,
+                                    modifier = Modifier.weight(1f)
                                 )
 
-                                Row(
-                                    modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
+                                Spacer(Modifier.width(8.dp))
+
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterVertically),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    AsyncImage(
-                                        model = "https://community.case.edu${it.clubLogo}",
-                                        "",
-                                        modifier = Modifier.height(60.dp)
-                                            .clip(RoundedCornerShape(20.dp))
-                                    )
-
-
-                                    Text(
-                                        it.clubName,
-                                        color = Color.White,
-                                        style = AppFont.InterTypography.h4,
-                                        modifier = Modifier.padding(horizontal = 10.dp)
-                                            .width(190.dp)
-                                    )
-
-                                    Column(
-                                        verticalArrangement = Arrangement.spacedBy(3.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        it.clubCategories.split(",").filter { it != "" }.forEach {
-                                            Text(
-                                                it,
-                                                modifier = Modifier.widthIn(min = 80.dp).clip(
-                                                    RoundedCornerShape(5.dp)
-                                                ).background(Color(0xFFD9D9D9))
-                                                    .padding(horizontal = 1.dp),
-                                                style = AppFont.InterTypography.body1,
-                                                textAlign = TextAlign.Center, maxLines = 1
-                                            )
-                                        }
+                                    categories.forEach { cat ->
+                                        Text(
+                                            text = cat,
+                                            modifier = categoryTagModifier,
+                                            style = AppFont.InterTypography.body1,
+                                            textAlign = TextAlign.Center,
+                                            maxLines = 1
+                                        )
                                     }
                                 }
                             }
