@@ -113,6 +113,7 @@ object ScreenHome : Screen {
                         EventHome(it, enableButton = false, isUTC = true).Content()
                     }
                 }
+                Spacer(modifier = Modifier.height(10.dp))
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -141,6 +142,7 @@ object ScreenHome : Screen {
                         EventHome(it, enableButton = false, isUTC = false).Content()
                     }
                 }
+                Spacer(modifier = Modifier.height(10.dp))
             }
         }
 

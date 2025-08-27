@@ -26,6 +26,7 @@ import kotlinx.datetime.Instant
 import kotlinx.io.IOException
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroup
 import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroups
 import org.swg.swiftgroups_app.CGAPI.Auth.Auth
 import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
@@ -38,7 +39,6 @@ import org.swg.swiftgroups_app.CGAPI.Feed.FeedFilterItem
 import org.swg.swiftgroups_app.CGAPI.Feed.FeedPostsItem
 import org.swg.swiftgroups_app.CGAPI.Groups.Group
 import org.swg.swiftgroups_app.CGAPI.Groups.GroupList
-import org.swg.swiftgroups_app.CGAPI.Groups.HomeGroup.ProfileGroupItem
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
@@ -271,14 +271,14 @@ object CGAPI {
         }
     }
 
-    fun fetchMyGroups() : List<ProfileGroupItem> {
-        val groupList: List<ProfileGroupItem> = fetchMyGroups()
+    suspend fun fetchMyGroups() : List<AggregateGroup> {
+        val groupList: List<AggregateGroup> = fetchAllPersonalGroups()
         DBObject.db.swiftdataQueries.insertModifications(
             "homeMyGroups",
             Json.encodeToString(groupList)
         )
         _myGroupIDs.update {
-            groupList.getOrNull(1)?.groups?.map { it.groupID.toString() } ?: emptyList()
+            groupList.map { it.clubId }
         }
         return groupList
     }
@@ -506,8 +506,8 @@ object CGAPI {
     }
 
 
-    suspend fun fetchAllPersonalGroups() {
-        safeRequest(defaultValue = null, errorContextMessage = "Error fetching personal groups") {
+    suspend fun fetchAllPersonalGroups() : List<AggregateGroup> {
+        return safeRequest(defaultValue = emptyList(), errorContextMessage = "Error fetching personal groups") {
             val response: HttpResponse =
                 backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?view=my_groups") {
                     method = HttpMethod.Get
@@ -544,6 +544,9 @@ object CGAPI {
                         println("Personal groups added/updated to DB!")
                     }
                 }
+                groupList.groups.list
+            } else {
+                emptyList()
             }
         }
     }

@@ -15,9 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroup
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.CGAPI.json
-import org.swg.swiftgroups_app.CGAPI.Groups.HomeGroup.ProfileGroupItem
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
@@ -133,17 +133,13 @@ class HomeViewModel : ScreenModel {
             .fetchModifications("homeMyGroups")
             .executeAsOneOrNull()
 
-        val groupData = if (myGroupsCache != null && !CGAPI.checkDBExpiry(myGroupsCache.changed_at)) {
+        val groupData : List<AggregateGroup> = if (myGroupsCache != null && !CGAPI.checkDBExpiry(myGroupsCache.changed_at)) {
             println("Defaulting to cached my groups")
-            json.decodeFromString<List<ProfileGroupItem>>(myGroupsCache.value_)
+            json.decodeFromString<List<AggregateGroup>>(myGroupsCache.value_)
         } else {
             runCatching { CGAPI.fetchMyGroups() }.getOrElse { emptyList() }
         }
-        CGAPI._myGroupIDs.update { groupData.getOrNull(1)?.groups?.map{it.groupID.toString()} ?: emptyList() }
 
-        return groupData.getOrNull(1)
-            ?.groups
-            ?.flatMap { DBObject.db.swiftdataQueries.fetchEventClub(it.groupName).executeAsList() }
-            .orEmpty()
+        return groupData.flatMap { DBObject.db.swiftdataQueries.fetchEventClub(it.groupName).executeAsList() }
     }
 }
