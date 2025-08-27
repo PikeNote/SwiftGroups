@@ -52,9 +52,8 @@ object EventsAPI {
         val timestamp = Clock.System.now()
         val tz = TimeZone.currentSystemDefault()
         val dateToday = timestamp.toLocalDateTime(tz).date
-        // UNCOMMENT WHEN API IS FIXED ;w;
-        //var url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter8=${dateToday.dayOfMonth}%20${dateToday.format(monthShortFormat)}%20${dateToday.year}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
-        var url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
+
+        var url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter8=${dateToday.dayOfMonth}%20${dateToday.format(monthShortFormat)}%20${dateToday.year}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
 
         if(grabEntire) {
             url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=0&limit=1000&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
