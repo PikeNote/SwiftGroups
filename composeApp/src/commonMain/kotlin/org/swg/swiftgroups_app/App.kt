@@ -9,8 +9,8 @@ import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
+import coil3.request.CachePolicy
 import coil3.request.crossfade
-import okio.FileSystem
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import org.koin.mp.KoinPlatform.stopKoin
@@ -39,10 +39,13 @@ fun App() {
             }
             .diskCache {
                 DiskCache.Builder()
-                    .directory(FileSystem.SYSTEM_TEMPORARY_DIRECTORY.resolve("image_cache"))
+                    .directory(
+                        getCacheDirectory()
+                    )
                     .maxSizePercent(1.0)
                     .build()
             }
+            .diskCachePolicy(CachePolicy.ENABLED)
             .build()
     }
 

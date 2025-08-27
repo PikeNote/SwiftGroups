@@ -1,0 +1,15 @@
+package org.swg.swiftgroups_app
+
+import okio.Path
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSURL
+import platform.Foundation.NSCachesDirectory
+import platform.Foundation.NSUserDomainMask
+
+actual fun getCacheDirectory(): Path {
+    val baseDir = NSFileManager.defaultManager
+        .URLsForDirectory(NSCachesDirectory, NSUserDomainMask)
+    val url = baseDir.firstOrNull() as? NSURL
+        ?: error("No caches directory found")
+    return url.toPath().resolve("image_cache")
+}
