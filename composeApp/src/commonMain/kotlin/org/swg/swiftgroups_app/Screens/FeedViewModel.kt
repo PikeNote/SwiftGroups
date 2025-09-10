@@ -46,7 +46,7 @@ class FeedViewModel : ScreenModel {
             val filterCache = DBObject.db.swiftdataQueries.fetchModifications("filterButtons").executeAsOneOrNull()
 
             try {
-                if(filterCache != null && CGAPI.checkDBExpiry(filterCache.changed_at, 9000000)) {
+                if(filterCache != null && !CGAPI.checkDBExpiry(filterCache.changed_at, 9000000)) {
                     println("Defaulting to cached filter list")
                     _filterList.update {
                         json.decodeFromString(filterCache.value_)
