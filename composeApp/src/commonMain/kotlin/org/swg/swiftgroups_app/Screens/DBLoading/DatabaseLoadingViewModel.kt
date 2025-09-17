@@ -8,6 +8,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 import org.swg.swiftgroups_app.Screens.TabNavigation
 
@@ -41,8 +42,13 @@ class DatabaseLoadingViewModel(val navigator : Navigator) : ScreenModel {
         if(!database.eventsEmpty().executeAsOne()) {
             logs += "No events found in database! Fetching events now..."
             try {
-                CGAPI.fetchEventsData(true)
-                logs += "Events fetched!"
+                val target = 400
+                val maxFetch = 200
+                for(i in 0..<target step maxFetch) {
+                    EventsAPI.grabEvents(i, maxFetch)
+                    logs += "Events ${i}/${target} fetched"
+                }
+                logs += "All Future Events fetched!"
             } catch (_: Throwable) {
                 failed = true
                 logs += " Events API timed out! CampusGroups may be down right now."
@@ -55,9 +61,15 @@ class DatabaseLoadingViewModel(val navigator : Navigator) : ScreenModel {
         if(!database.clubsEmpty().executeAsOne()) {
             logs += "No clubs found in database! Fetching clubs now..."
             try {
-                CGAPI.fetchAllGroups()
+                val target = 1000
+                val maxFetch = 200
+                for(i in 0..<target step maxFetch) {
+                    CGAPI.fetchGroups(i, maxFetch)
+                    logs += "Clubs ${i}/${target} fetched"
+                }
+
                 CGAPI.fetchAllPersonalGroups()
-                logs += "Clubs fetched!"
+                logs += "All Clubs fetched!"
             } catch (_: Throwable) {
                 failed = true
                 logs += " Clubs API timed out! CampusGroups may be down right now."

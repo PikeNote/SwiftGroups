@@ -25,8 +25,8 @@ class GroupScreenViewModel : ScreenModel {
     var hasMoreClubs = true
     var lastFilter = ""
 
-    val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    //val _isRefreshing = MutableStateFlow(false)
+    //val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     val _groupList = MutableStateFlow(emptyList<Clubs>())
     val groupList: StateFlow<List<Clubs>> = _groupList.asStateFlow()
@@ -79,11 +79,13 @@ class GroupScreenViewModel : ScreenModel {
         }
     }
 
+    /*
     fun fetchUpdatedGroups() {
         screenModelScope.launch {
-            CGAPI.fetchAllGroups()
+            CGAPI.fetchGroups()
             fetchGroups()
             _isRefreshing.update { false }
         }
     }
+     */
 }

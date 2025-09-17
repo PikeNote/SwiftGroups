@@ -17,7 +17,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroup
 import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.CGAPI.CGAPI.fetchGroups
 import org.swg.swiftgroups_app.CGAPI.CGAPI.json
+import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
@@ -104,7 +106,7 @@ class HomeViewModel : ScreenModel {
                     if (eventsCache != null && !CGAPI.checkDBExpiry(eventsCache.changed_at)) {
                         println("Defaulting to cached events")
                     } else {
-                        CGAPI.fetchEventsData()
+                        EventsAPI.grabEvents(0,300)
                         loadMyGroupsEvents()
                         upcomingGroupEvents = groupsDeferred.await()
                     }
@@ -116,7 +118,9 @@ class HomeViewModel : ScreenModel {
                     } else {
                         CGAPI.fetchAllPersonalGroups()
                         yield()
-                        CGAPI.fetchAllGroups()
+                        for(i in 0..<1000 step 200) {
+                            fetchGroups(i, 200)
+                        }
                         yield()
                     }
                 }

@@ -31,9 +31,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -59,7 +56,6 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Search
 import compose.icons.fontawesomeicons.solid.Times
-import kotlinx.coroutines.flow.update
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Fonts.AppFont
@@ -89,8 +85,8 @@ object GroupScreen : Screen {
         var searchText by rememberSaveable { mutableStateOf("") }
         val selected by viewModel._selected.collectAsState()
 
-        val state = rememberPullToRefreshState()
-        val isRefreshing by viewModel.isRefreshing.collectAsState()
+        //val state = rememberPullToRefreshState()
+        //val isRefreshing by viewModel.isRefreshing.collectAsState()
 
         val listState = rememberLazyListState()
 
@@ -174,6 +170,7 @@ object GroupScreen : Screen {
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            /*
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
                 onRefresh = {
@@ -191,6 +188,7 @@ object GroupScreen : Screen {
                     )
                 }
             ) {
+             */
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(5.dp),
                     userScrollEnabled = true,
@@ -288,7 +286,7 @@ object GroupScreen : Screen {
                         }
                     }
                 }
-            }
+            //}
         }
     }
 }

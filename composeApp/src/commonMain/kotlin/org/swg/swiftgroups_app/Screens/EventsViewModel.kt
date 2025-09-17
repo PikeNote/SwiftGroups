@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 import org.swg.swiftgroupsapp.db.Events
 
@@ -271,7 +271,7 @@ class EventsViewModel : ScreenModel {
 
     fun getNewEvents() {
         screenModelScope.launch {
-            CGAPI.fetchEventsData()
+            EventsAPI.grabEvents(0,200)
             getEvents()
             _isRefreshing.update { false }
         }

@@ -30,8 +30,6 @@ import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroup
 import org.swg.swiftgroups_app.CGAPI.AggregateAPI.AggregateGroups
 import org.swg.swiftgroups_app.CGAPI.Auth.Auth
 import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
-import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
-import org.swg.swiftgroups_app.CGAPI.Events.CGEvent
 import org.swg.swiftgroups_app.CGAPI.Feed.Button
 import org.swg.swiftgroups_app.CGAPI.Feed.Comment
 import org.swg.swiftgroups_app.CGAPI.Feed.Feed
@@ -71,7 +69,7 @@ object CGAPI {
             publicStorage(KachetorStorage(10 * 1024 * 1024))
         }
         install(HttpTimeout) {
-            requestTimeoutMillis = 30000
+            requestTimeoutMillis = 80000
         }
     }
 
@@ -215,38 +213,6 @@ object CGAPI {
         }
     }
 
-    suspend fun fetchEventsData(fetchAll : Boolean = false) {
-        val eventAPIEvents : List<CGEvent> = EventsAPI.grabEvents(fetchAll)
-
-        val swiftdataQueries = DBObject.db.swiftdataQueries
-
-        swiftdataQueries.transaction {
-
-            eventAPIEvents.forEach {
-                swiftdataQueries.insertEvent(
-                    eventId = it.eventID,
-                    eventName = it.eventName,
-                    eventDesc = it.eventDesc,
-                    eventUrl = it.eventUrl,
-                    eventLocation = it.eventLocation,
-                    eventPicture = "https://community.case.edu${it.eventPicture}",
-                    eventCategory = it.eventCategory.joinToString(),
-                    start_time = it.startTime,
-                    end_time = it.endTime,
-                    eventAttendees = it.attendeeCount.toLong(),
-                    clubName = it.club?.clubName ?: "",
-                    clubURL = it.club?.clubUrl ?: "",
-                    eventTags = it.eventTags.joinToString()
-                )
-            }
-            afterCommit {
-                println("Data added/updated to DB!")
-            }
-        }
-    }
-
-
-
     suspend fun fetchEvent(eventID : String) : EventSpecificAPI? {
         return safeRequest(
             defaultValue = null,
@@ -384,13 +350,13 @@ object CGAPI {
     }
 
 
-    suspend fun fetchAllGroups() {
+    suspend fun fetchGroups(offset : Int, limit: Int = 200) {
         safeRequest(
             defaultValue = null,
             errorContextMessage = "Error fetching all groups"
         ) {
             val response: HttpResponse =
-                backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?limit=1000") {
+                backgroundClient.get("https://community.case.edu/mobile_ws/v18/mobile_groups_new?range=${offset}&limit=${limit}") {
                     method = HttpMethod.Get
                     headers {
                         append(HttpHeaders.Host, "community.case.edu")
@@ -399,7 +365,7 @@ object CGAPI {
                 }
 
             if (response.status.value in 200..299) {
-                println("All Group fetched successfully!")
+                println("Groups $offset-${offset+limit} fetched successfully!")
                 val groupList: AggregateGroups = response.body()
 
                 val swiftdataQueries = DBObject.db.swiftdataQueries
@@ -428,6 +394,7 @@ object CGAPI {
             }
         }
     }
+
 
     suspend fun postComment(postID : String, text : String) : Boolean {
         val response: HttpResponse = client.get("https://community.case.edu/mobile_ws/v18/mobile_comment_post") {
