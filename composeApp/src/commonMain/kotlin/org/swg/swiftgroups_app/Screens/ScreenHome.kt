@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -112,6 +113,10 @@ object ScreenHome : Screen {
                     items(viewModel.upcomingEvents, key = {it.eventId}) {
                         EventHome(it, enableButton = false, isUTC = true).Content()
                     }
+
+                    item {
+                        Spacer(modifier = Modifier.width(1.dp))
+                    }
                 }
                 Spacer(modifier = Modifier.height(10.dp))
             }
@@ -140,6 +145,10 @@ object ScreenHome : Screen {
 
                     items (viewModel.upcomingGroupEvents, key = {it.eventId}) {
                         EventHome(it, enableButton = false, isUTC = false).Content()
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.width(1.dp))
                     }
                 }
                 Spacer(modifier = Modifier.height(10.dp))

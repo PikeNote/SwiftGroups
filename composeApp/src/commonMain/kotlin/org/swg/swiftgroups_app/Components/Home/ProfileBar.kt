@@ -49,7 +49,7 @@ class ProfileBar ( private val profileData : ProfileDataItem ) {
         Row (
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp)
+                .height(100.dp)
                 .padding(horizontal = 10.dp)
                 .clip(shape = RoundedCornerShape(15.dp))
                 .background(Brush.horizontalGradient(colorStops = AppTheme.profileColorStops)),
