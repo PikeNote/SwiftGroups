@@ -30,6 +30,13 @@ CREATE TABLE IF NOT EXISTS clubs (
         clubCacheData TEXT NOT NULL DEFAULT ''
 );
 
+CREATE TABLE IF NOT EXISTS autoRegister (
+        ticketId TEXT PRIMARY KEY,
+        eventId TEXT NOT NULL,
+        link TEXT NOT NULL,
+        signup_time TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS modifications (
     modifiedItem TEXT NOT NULL PRIMARY KEY ON CONFLICT REPLACE,
     value TEXT NOT NULL,
@@ -62,6 +69,18 @@ SELECT * FROM modifications WHERE modifiedItem = ?;
 
 insertModifications:
 INSERT OR REPLACE INTO modifications (modifiedItem, value) VALUES (?, ?);
+
+insertAutoRegister:
+INSERT OR REPLACE INTO autoRegister (ticketId, eventId, link, signup_time) VALUES (?, ?, ?, ?);
+
+removeAutoRegister:
+DELETE FROM autoRegister WHERE eventId = ?;
+
+fetchAutoRegister:
+SELECT * FROM autoRegister;
+
+existsAutoRegister:
+SELECT EXISTS ( SELECT 1 FROM autoRegister WHERE eventId = ? );
 
 insertEvent {
   UPDATE events

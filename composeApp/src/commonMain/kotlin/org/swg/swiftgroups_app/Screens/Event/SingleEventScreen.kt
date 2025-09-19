@@ -33,6 +33,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,9 +77,11 @@ import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.Components.Event.QRCode
 import org.swg.swiftgroups_app.Components.Home.Button.HorizontalLogoButton
 import org.swg.swiftgroups_app.Fonts.AppFont
+import org.swg.swiftgroups_app.Icons.Ads_click
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.MapPin
 import org.swg.swiftgroups_app.Icons.PencilSquare
+import org.swg.swiftgroups_app.Scheduler.GlobalTaskScheduler
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.Groups.GroupPage
 import org.swg.swiftgroups_app.Screens.ImageScreen.ImageScreen
@@ -98,7 +101,8 @@ class SingleEventScreen(val eventID : Int) : Screen {
             bottomTabVisibilityManager.setBottomBarVisibility(false)
         }
 
-        val eventAPI = singleEventViewModel.eventSpecificAPI.value
+        val eventAPI by singleEventViewModel.eventSpecificAPI.collectAsState()
+        val existingAutoRegister by singleEventViewModel.existingAutoRegister.collectAsState()
 
         val maxImageHeight = 210.dp
         val currentImgSize : MutableState<Dp> = remember { mutableStateOf(maxImageHeight) }
@@ -109,6 +113,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
         var columnSize by remember { mutableStateOf(0) }
 
         val nestedScrollConnection = remember {
+
             object : NestedScrollConnection {
                 override fun onPreScroll(
                     available: Offset,
@@ -168,7 +173,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
                     Spacer(modifier = Modifier.height(currentImgSize.value + 20.dp))
                     if(eventAPI != null) {
                         AsyncImage(
-                            model = "https://community.case.edu${eventAPI.photo_url}",
+                            model = "https://community.case.edu${eventAPI!!.photo_url}",
                             contentDescription = null,
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
@@ -182,7 +187,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
                                     this.alpha = imageAlpha
                                 }
                                 .clickable {
-                                    navigator.push(ImageScreen(listOf(eventAPI.photo_url)))
+                                    navigator.push(ImageScreen(listOf(eventAPI!!.photo_url)))
                                 }
                         )
                     } else {
@@ -251,7 +256,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
                        style = AppFont.InterTypography.h6,
                        color = Color.Gray, modifier = Modifier.clickable {
                            if(eventAPI!= null) {
-                               navigator.push(GroupPage(eventAPI.event_group_id.toString()))
+                               navigator.push(GroupPage(eventAPI!!.event_group_id.toString()))
                            }
                        }
                    )
@@ -260,7 +265,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
                 Spacer(modifier = Modifier.height(3.dp))
 
                 if(eventAPI?.tickets != null) {
-                    eventAPI.tickets.forEach {
+                    eventAPI!!.tickets?.forEach {
                         QRCode(
                             name = it.name,
                             ticketName = "${it.ticketName} - ${it.amount}",
@@ -276,36 +281,37 @@ class SingleEventScreen(val eventID : Int) : Screen {
 
                 Spacer(modifier = Modifier.height(7.dp))
 
-                Row(
-                    modifier = Modifier.padding(6.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
+                if (eventAPI != null) {
+                    Row(
+                        modifier = Modifier.padding(6.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
 
-                    if (eventAPI != null) {
+
                         HorizontalLogoButton(
                             text = "Share",
                             onClick = {
-                                shareLink(eventAPI.share_url, eventAPI.event_name)
+                                shareLink(eventAPI!!.share_url, eventAPI!!.event_name)
                             },
                             size = 20.dp,
                             logo = FontAwesomeIcons.Regular.ShareSquare,
                             textStyle = AppFont.InterTypography.h5,
                             backgroundColor = Color(0xFFD9D9D9),
                             textColor = Color.Black,
-                            width = if(eventAPI.register_url=="") 340.dp else 170.dp
+                            width = if(eventAPI!!.register_url=="") 340.dp else 170.dp
                         )
 
-                        if(eventAPI.register_url.isNotEmpty()) {
+                        if(eventAPI!!.register_url.isNotEmpty()) {
                             Spacer(modifier = Modifier.width(20.dp))
 
                             HorizontalLogoButton(
-                                text = if (eventAPI.registered == 0) "Registration" else "Edit",
+                                text = if (eventAPI!!.registered == 0) "Registration" else "Edit",
                                 onClick = {
-                                    val title = if (eventAPI.registered == 0) "Registration" else "Edit Registration"
-                                    val matchUrl = if (eventAPI.registered == 0)
+                                    val title = if (eventAPI!!.registered == 0) "Registration" else "Edit Registration"
+                                    val matchUrl = if (eventAPI!!.registered == 0)
                                         "https://community.case.edu/confirmation?type=rsvp&" else "/rsvp_boot?id="
 
-                                    navigator.push(WebviewScreen(eventAPI.register_url,
+                                    navigator.push(WebviewScreen(eventAPI!!.register_url,
                                         title,
                                         { singleEventViewModel.updateData() },
                                         matchUrl))
@@ -317,7 +323,70 @@ class SingleEventScreen(val eventID : Int) : Screen {
                         }
                     }
 
+                    if (singleEventViewModel.registrationOpen.value) {
+                        HorizontalLogoButton(
+                            text = if (existingAutoRegister) "Cancel Auto Registration" else "Auto Registration",
+                            onClick = {
+                                if (existingAutoRegister) {
+                                    GlobalTaskScheduler.swiftdataQueries.removeAutoRegister(eventID.toString())
+                                    singleEventViewModel.checkEventAutoRegister()
+                                } else {
+                                    navigator.push(WebviewScreen(eventAPI!!.share_url,
+                                        "Auto Registration",
+                                        {
+                                            singleEventViewModel.checkEventAutoRegister()
+                                        },
+                                        "", inject = """
+                                        
+                                        var table = document.querySelector("table.rsvp__table-resp");
+                                        if (table) {
+                                            var rows = table.querySelectorAll("tbody tr");
+                                            rows.forEach(function(row) {
+                                                if (!row.querySelector(".app-action-btn")) {
+                                                    var newCell = document.createElement("td");
+                                                    newCell.style.textAlign = "center";
+
+                                                    var btn = document.createElement("button");
+                                                    btn.innerText = "App Action";
+                                                    btn.className = "app-action-btn";
+                                                    btn.style.padding = "5px 10px";
+                                                    btn.style.backgroundColor = "#1A73E8";
+                                                    btn.style.color = "white";
+                                                    btn.style.border = "none";
+                                                    btn.style.borderRadius = "4px";
+                                                    btn.style.cursor = "pointer";
+
+                                                    btn.onclick = function(e) {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                        window.kmpJsBridge.callNative(
+                                                            "TicketAction",
+                                                            JSON.stringify({ ticketId: row.id }),
+                                                            null
+                                                        );
+                                                    };
+
+                                                    newCell.appendChild(btn);
+                                                    row.appendChild(newCell);
+                                                }
+                                            });
+                                        }
+                                        
+                                        
+                                        
+                                    """.trimIndent()) )
+                                }
+
+                            },
+                            size = 20.dp,
+                            width = 240.dp,
+                            logo = Ads_click,
+                            textStyle = AppFont.InterTypography.h5,
+                        )
+                    }
                 }
+
+
 
                 Column(modifier = Modifier.padding(10.dp).fillMaxWidth()) {
 

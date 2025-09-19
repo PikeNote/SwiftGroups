@@ -1,6 +1,8 @@
 package org.swg.swiftgroups_app.DateTimeFormats
 
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
@@ -37,5 +39,22 @@ object DateTimeFormat {
         minute(padding = Padding.ZERO)
         char(':')
         second(padding = Padding.ZERO)
+    }
+
+    val ticketDate = LocalDate.Format {
+        monthName(MonthNames.ENGLISH_ABBREVIATED)
+        char(' ')
+        dayOfMonth()
+        char(',')
+        char(' ')
+        year()
+    }
+
+    val ticketTime = LocalTime.Format {
+        amPmHour(padding = Padding.NONE)
+        char(':')
+        minute(padding = Padding.NONE)
+        char(' ')
+        amPmMarker("AM", "PM")
     }
 }

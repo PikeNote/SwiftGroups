@@ -1,0 +1,6 @@
+CREATE TABLE autoRegister (
+    ticketId TEXT PRIMARY KEY,
+    eventId TEXT NOT NULL,
+    link TEXT NOT NULL,
+    signup_time TEXT NOT NULL
+);

@@ -14,6 +14,7 @@ sqldelight {
     databases {
         create("Database") {
             packageName.set("org.swg.swiftgroups_app.db")
+            version = 2
         }
     }
     linkSqlite.set(true)
@@ -76,6 +77,7 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.compose.shadow)
             implementation(libs.autolinktext)
+            implementation(libs.lifecycle)
         }
         appleMain.dependencies {
             implementation(libs.ktor.client.darwin)

@@ -2,8 +2,10 @@ package org.swg.swiftgroups_app
 
 
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
+import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
@@ -11,10 +13,13 @@ import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import coil3.request.CachePolicy
 import coil3.request.crossfade
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import org.koin.mp.KoinPlatform.stopKoin
 import org.swg.swiftgroups_app.Fonts.AppFont
+import org.swg.swiftgroups_app.Scheduler.GlobalTaskScheduler
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.Login
 
@@ -56,9 +61,17 @@ fun App() {
         typography = typography,
         colors = AppTheme.theme
     ) {
+        val lifecycle = remember { LifecycleRegistry() }
 
-        Navigator(Login, onBackPressed = null)
+        Navigator(Login, onBackPressed = null) {
+            DisposableEffect(lifecycle, it) {
+                GlobalTaskScheduler.attachToLifecycle(lifecycle, it)
+                onDispose {
+                    GlobalTaskScheduler.cancelAllTasks()
+                }
+            }
+
+            CurrentScreen()
+        }
     }
-
-
 }
