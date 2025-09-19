@@ -6,14 +6,14 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.swg.swiftgroups_app.Icons.Gear
-import org.swg.swiftgroups_app.Screens.ScreenEvents
+import org.swg.swiftgroups_app.Screens.SettingsScreen
 
 object TabSettings : TabWithNavigator {
     override var nav: Navigator? = null
 
     @Composable
     override fun Content() {
-        Navigator(screen = ScreenEvents) { navigator ->
+        Navigator(screen = SettingsScreen) { navigator ->
             SlideTransition(navigator = navigator)
             nav = navigator
         }
