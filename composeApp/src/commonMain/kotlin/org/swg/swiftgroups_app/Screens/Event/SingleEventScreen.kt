@@ -70,7 +70,6 @@ import compose.icons.fontawesomeicons.regular.Calendar
 import compose.icons.fontawesomeicons.regular.Clock
 import compose.icons.fontawesomeicons.regular.Eye
 import compose.icons.fontawesomeicons.regular.ShareSquare
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.AppTheme
@@ -433,19 +432,17 @@ class SingleEventScreen(val eventID : Int) : Screen {
                     LazyRow (
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        runBlocking {
-                            eventAPI?.attendees?.forEach {
-                                item {
-                                    AsyncImage(
-                                        model = "https://community.case.edu${it.photo_url}",
-                                        contentDescription = "Person",
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier.height(45.dp).width(45.dp)
-                                            .clip(
-                                                CircleShape
-                                            )
-                                    )
-                                }
+                        eventAPI?.attendees?.let { attendeeList ->
+                            items(attendeeList, key = {it.user_id}) {
+                                AsyncImage(
+                                    model = "https://community.case.edu${it.photo_url}",
+                                    contentDescription = "Person",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.height(45.dp).width(45.dp)
+                                        .clip(
+                                            CircleShape
+                                        )
+                                )
                             }
                         }
 

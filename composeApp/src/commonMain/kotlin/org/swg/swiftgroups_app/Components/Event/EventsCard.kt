@@ -54,8 +54,6 @@ class EventsCard(
     private val eventStartTime = Instant.parse(eventDat.start_time).toLocalDateTime(TimeZone.UTC)
     private val eventEndTime = Instant.parse(eventDat.end_time).toLocalDateTime(TimeZone.UTC)
     private val locationHTMLRegex = Regex("^([^<]+).*?href=[\"'](?:\\\\&quot;)?(https://[^\"'>\\\\]+)")
-    private var onlineEventMeeting = false
-    private var meetingLink = ""
 
     @Composable
     fun Content() {
@@ -119,7 +117,7 @@ class EventsCard(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .height(130.dp)
-                                .fillMaxWidth()
+                                .width(cardWidth)
                         )
                         if (currentEDTTime in eventStartTime..eventEndTime) {
                             Box(
@@ -189,10 +187,10 @@ class EventsCard(
                             modifier = Modifier
                                 .padding(vertical = 2.dp)
                                 .clickable {
-                                    if(!onlineEventMeeting) {
-                                        openMapLocationQuery(eventDat.eventLocation)
+                                    if(processedLocation.isOnline) {
+                                        processedLocation.meetingLink?.let { uriHandler.openUri(it) }
                                     } else {
-                                        uriHandler.openUri(meetingLink)
+                                        openMapLocationQuery(eventDat.eventLocation)
                                     }
                                 },
                             verticalAlignment = Alignment.CenterVertically,
@@ -203,7 +201,7 @@ class EventsCard(
                                 modifier = Modifier.size(10.dp)
                             )
                             Text(
-                                processedLocation,
+                                processedLocation.displayText,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 color = Color.Blue,
@@ -216,17 +214,22 @@ class EventsCard(
         }
     }
 
-    private fun processLocation(location : String) : String {
+    data class ProcessedLocation(
+        val displayText: String,
+        val isOnline: Boolean,
+        val meetingLink: String? = null
+    )
+
+    private fun processLocation(location : String) : ProcessedLocation {
         val regexMatches = locationHTMLRegex.findAll(location)
 
         if(regexMatches.any()) {
             val firstMatch = regexMatches.first()
             if(firstMatch.groupValues.size >= 3) {
-                meetingLink = firstMatch.groupValues[2]
-                onlineEventMeeting = true
-                return "${firstMatch.groupValues[1]} (Link)"
+                val meetingLink = firstMatch.groupValues[2]
+                return ProcessedLocation("${firstMatch.groupValues[1]} (Link)", true, meetingLink)
             }
         }
-        return location
+        return ProcessedLocation(location, false)
     }
 }
