@@ -271,7 +271,7 @@ class EventsViewModel : ScreenModel {
 
     fun getNewEvents() {
         screenModelScope.launch {
-            EventsAPI.grabEvents(0,200)
+            EventsAPI.grabEvents(0,300)
             getEvents()
             _isRefreshing.update { false }
         }

@@ -45,17 +45,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import coil3.SingletonImageLoader
 import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
+import coil3.size.Precision
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Search
 import compose.icons.fontawesomeicons.solid.Times
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Fonts.AppFont
@@ -85,6 +93,8 @@ object GroupScreen : Screen {
         var searchText by rememberSaveable { mutableStateOf("") }
         val selected by viewModel._selected.collectAsState()
 
+        val displayList by viewModel.displayList.collectAsState()
+
         //val state = rememberPullToRefreshState()
         //val isRefreshing by viewModel.isRefreshing.collectAsState()
 
@@ -95,7 +105,33 @@ object GroupScreen : Screen {
             bottomTabVisibilityManager.setBottomBarVisibility(true)
         }
 
-        val displayList by viewModel.displayList.collectAsState()
+        val context = LocalPlatformContext.current
+        val imageLoader = remember(context) { SingletonImageLoader.get(context) }
+
+        val sizePx = with(LocalDensity.current) { 60.dp.roundToPx() }
+
+        LaunchedEffect(listState.firstVisibleItemIndex) {
+            if (!listState.isScrollInProgress) {
+                val preloadRange = 5
+                val start = listState.firstVisibleItemIndex
+                val end = (start + preloadRange).coerceAtMost(displayList.lastIndex)
+
+                withContext(Dispatchers.IO) {
+                    for (i in start..end) {
+                        val url = displayList[i].clubLogo
+
+                        imageLoader.enqueue(
+                            ImageRequest.Builder(context)
+                                .data(url)
+                                .size(sizePx)
+                                .precision(Precision.INEXACT)
+                                .build()
+                        )
+                    }
+                }
+            }
+
+        }
 
         Column(
             modifier = Modifier
@@ -222,6 +258,7 @@ object GroupScreen : Screen {
                             AsyncImage(
                                 model = "https://community.case.edu${it.clubLogo}",
                                 contentDescription = "${it.clubName} Club Logo",
+                                imageLoader = imageLoader,
                                 modifier = Modifier
                                     .padding(start = 12.dp)
                                     .size(60.dp)

@@ -45,9 +45,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import coil3.SingletonImageLoader
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
+import coil3.size.Precision
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Calendar
@@ -55,7 +60,10 @@ import compose.icons.fontawesomeicons.solid.ChevronRight
 import compose.icons.fontawesomeicons.solid.Search
 import compose.icons.fontawesomeicons.solid.Times
 import compose.icons.fontawesomeicons.solid.Undo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -93,6 +101,44 @@ object ScreenEvents : Screen {
             bottomTabVisibilityManager.setBottomBarVisibility(true)
         }
 
+        val eventListState = rememberLazyListState()
+
+        val context = LocalPlatformContext.current
+        val imageLoader = remember(context) { SingletonImageLoader.get(context) }
+
+
+        val filteredEvents by remember(viewModel.events, viewModel.showLongEvents) {
+            derivedStateOf {
+                viewModel.events.filter {
+                    longDate(it.start_time, it.end_time) || viewModel.showLongEvents
+                }
+            }
+        }
+
+        val widthPx = with(LocalDensity.current) { 270.dp.roundToPx() }
+        val heightPx = with(LocalDensity.current) { 130.dp.roundToPx() }
+
+        LaunchedEffect(eventListState.firstVisibleItemIndex) {
+            val preloadRange = 5
+            val start = eventListState.firstVisibleItemIndex
+            val end = (start + preloadRange).coerceAtMost(filteredEvents.lastIndex)
+
+            withContext(Dispatchers.IO) {
+                for (i in start..end) {
+                    val url = filteredEvents[i].eventPicture
+
+                    imageLoader.enqueue(
+                        ImageRequest.Builder(context)
+                            .data(url)
+                            .size(width = widthPx, height = heightPx)
+                            .precision(Precision.INEXACT)
+                            .build()
+                    )
+                }
+            }
+        }
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -100,6 +146,7 @@ object ScreenEvents : Screen {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal=10.dp)) {
             Image(
                 painter = painterResource(Res.drawable.swiftgroups_title),
@@ -256,15 +303,6 @@ object ScreenEvents : Screen {
                 }
             }
 
-
-            val filteredEvents by remember(viewModel.events, viewModel.showLongEvents) {
-                derivedStateOf {
-                    viewModel.events.filter {
-                        longDate(it.start_time, it.end_time) || viewModel.showLongEvents
-                    }
-                }
-            }
-
             // Events List
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
@@ -284,6 +322,7 @@ object ScreenEvents : Screen {
                 }
             ) {
                 LazyColumn(
+                    state = eventListState,
                     modifier = Modifier
                         .fillMaxSize(),
                     contentPadding = PaddingValues(

@@ -42,7 +42,7 @@ class DatabaseLoadingViewModel(val navigator : Navigator) : ScreenModel {
         if(!database.eventsEmpty().executeAsOne()) {
             logs += "No events found in database! Fetching events now..."
             try {
-                val target = 400
+                val target = 600
                 val maxFetch = 200
                 for(i in 0..<target step maxFetch) {
                     EventsAPI.grabEvents(i, maxFetch)
