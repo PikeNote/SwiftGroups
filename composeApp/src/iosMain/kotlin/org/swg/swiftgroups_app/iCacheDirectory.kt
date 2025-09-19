@@ -12,5 +12,5 @@ actual fun getCacheDirectory(): Path {
         .URLsForDirectory(NSCachesDirectory, NSUserDomainMask)
     val url = baseDir.firstOrNull() as? NSURL
         ?: error("No caches directory found")
-    return url.toString().toPath().resolve("image_cache")
+    return url.path?.toPath()?.resolve("image_cache") ?: error("Failed to resolve cache directory path")
 }
