@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -76,7 +75,7 @@ object GroupScreen : Screen {
     private val categoryTagModifier = Modifier
         .widthIn(min = 80.dp)
         .clip(RoundedCornerShape(5.dp))
-        .background(Color(0xFFD9D9D9))
+        .background(Color(0xFFe0e7ff))
         .padding(horizontal = 1.dp)
 
     private val basicColor = Color(0xFF003B7F)
@@ -267,32 +266,32 @@ object GroupScreen : Screen {
                             )
 
 
-                            Row(
+                            Column(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(start = 82.dp, end = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
                                     text = it.clubName,
                                     color = Color.White,
-                                    style = AppFont.InterTypography.h4,
+                                    style = AppFont.InterTypography.h5,
                                     maxLines = 2,
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.fillMaxWidth()
                                 )
 
-                                Spacer(Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.height(5.dp))
 
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterVertically),
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(5.dp) ,
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    categories.forEach { cat ->
+                                    items(categories) { cat ->
                                         Text(
                                             text = cat,
                                             modifier = categoryTagModifier,
-                                            style = AppFont.InterTypography.body1,
+                                            style = AppFont.InterTypography.body2,
                                             textAlign = TextAlign.Center,
                                             maxLines = 1
                                         )
