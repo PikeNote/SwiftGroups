@@ -24,7 +24,7 @@
 * 🏫 Support multiple different campuses
 
 ## Built Upon
-- [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) - Primary front-end communication with the Discord API
+- [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) - Primary Frontend UI Framework
 - [Voyager](https://github.com/adrielcafe/voyager) - App navigation library
 - [Coil3](https://github.com/coil-kt/coil) - Networking request library
 - [qrose](https://github.com/alexzhirkevich/qrose) - QR Code Generation
