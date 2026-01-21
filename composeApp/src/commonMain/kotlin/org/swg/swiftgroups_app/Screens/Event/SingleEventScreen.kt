@@ -31,6 +31,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -59,6 +60,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -135,6 +137,10 @@ class SingleEventScreen(val eventID : Int) : Screen {
         }
 
         val imageAlpha: Float = ((currentImgSize.value) / (maxImageHeight)).coerceIn(0f, 1f)
+
+        LaunchedEffect(Unit) {
+            singleEventViewModel.updateData()
+        }
 
         Box(modifier = Modifier.nestedScroll(nestedScrollConnection)) {
             Column(
@@ -310,7 +316,6 @@ class SingleEventScreen(val eventID : Int) : Screen {
 
                                     navigator.push(WebviewScreen(eventAPI!!.register_url,
                                         title,
-                                        { singleEventViewModel.updateData() },
                                         matchUrl))
                                 },
                                 size = 20.dp,

@@ -58,7 +58,7 @@ import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 
-class WebviewScreen(val url : String, val text : String, val callback : ()->Unit = {}, val urlMatch : String = "",
+class WebviewScreen(val url : String, val text : String, val urlMatch : String = "",
     val inject : String = "", val eventId : String = "") : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -150,7 +150,6 @@ class WebviewScreen(val url : String, val text : String, val callback : ()->Unit
                     .collect {
                         isRefreshing = false
                         if (urlMatch.isNotEmpty() && state.lastLoadedUrl?.contains(urlMatch) == true) {
-                            callback()
                             CGAPI.refetchProfile.value = true
                             navigator.pop()
                         }
@@ -186,7 +185,6 @@ class WebviewScreen(val url : String, val text : String, val callback : ()->Unit
                         println("Found text: $text")
                         DBObject.db.swiftdataQueries.insertAutoRegister(ticketId, eventId, signup_time = parseRegistrationString.toInstant(
                             TimeZone.currentSystemDefault()).toString(), link = "https://community.case.edu/rsvp?id=${eventId}&reg_call=activate&${ticketId}=1")
-                        callback()
                         navigator.pop()
                     }
                 })
