@@ -76,11 +76,9 @@ import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.Components.Event.QRCode
 import org.swg.swiftgroups_app.Components.Home.Button.HorizontalLogoButton
 import org.swg.swiftgroups_app.Fonts.AppFont
-import org.swg.swiftgroups_app.Icons.Ads_click
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.MapPin
 import org.swg.swiftgroups_app.Icons.PencilSquare
-import org.swg.swiftgroups_app.Scheduler.GlobalTaskScheduler
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.Groups.GroupPage
 import org.swg.swiftgroups_app.Screens.ImageScreen.ImageScreen
@@ -321,70 +319,6 @@ class SingleEventScreen(val eventID : Int) : Screen {
                             )
                         }
                     }
-
-                    /*
-                    if (singleEventViewModel.registrationOpen.value) {
-                        HorizontalLogoButton(
-                            text = if (existingAutoRegister) "Cancel Auto Registration" else "Auto Registration",
-                            onClick = {
-                                if (existingAutoRegister) {
-                                    GlobalTaskScheduler.swiftdataQueries.removeAutoRegister(eventID.toString())
-                                    singleEventViewModel.checkEventAutoRegister()
-                                } else {
-                                    navigator.push(WebviewScreen(eventAPI!!.share_url,
-                                        "Auto Registration",
-                                        {
-                                            singleEventViewModel.checkEventAutoRegister()
-                                        },
-                                        "", inject = """
-                                        
-                                        var table = document.querySelector("table.rsvp__table-resp");
-                                        if (table) {
-                                            var rows = table.querySelectorAll("tbody tr");
-                                            rows.forEach(function(row) {
-                                                if (!row.querySelector(".app-action-btn")) {
-                                                    var newCell = document.createElement("td");
-                                                    newCell.style.textAlign = "center";
-
-                                                    var btn = document.createElement("button");
-                                                    btn.innerText = "App Action";
-                                                    btn.className = "app-action-btn";
-                                                    btn.style.padding = "5px 10px";
-                                                    btn.style.backgroundColor = "#1A73E8";
-                                                    btn.style.color = "white";
-                                                    btn.style.border = "none";
-                                                    btn.style.borderRadius = "4px";
-                                                    btn.style.cursor = "pointer";
-
-                                                    btn.onclick = function(e) {
-                                                        e.stopPropagation();
-                                                        e.preventDefault();
-                                                        window.kmpJsBridge.callNative(
-                                                            "TicketAction",
-                                                            JSON.stringify({ ticketId: row.id }),
-                                                            null
-                                                        );
-                                                    };
-
-                                                    newCell.appendChild(btn);
-                                                    row.appendChild(newCell);
-                                                }
-                                            });
-                                        }
-                                        
-                                        
-                                        
-                                    """.trimIndent()) )
-                                }
-
-                            },
-                            size = 20.dp,
-                            width = 240.dp,
-                            logo = Ads_click,
-                            textStyle = AppFont.InterTypography.h5,
-                        )
-                    }
-                    */
                 }
 
 

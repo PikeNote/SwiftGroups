@@ -3,7 +3,6 @@ package org.swg.swiftgroups_app
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
@@ -19,7 +18,6 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import org.koin.mp.KoinPlatform.stopKoin
 import org.swg.swiftgroups_app.Fonts.AppFont
-import org.swg.swiftgroups_app.Scheduler.GlobalTaskScheduler
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.Login
 
@@ -64,13 +62,6 @@ fun App() {
         val lifecycle = remember { LifecycleRegistry() }
 
         Navigator(Login, onBackPressed = null) {
-            DisposableEffect(lifecycle, it) {
-                GlobalTaskScheduler.attachToLifecycle(lifecycle, it)
-                onDispose {
-                    GlobalTaskScheduler.cancelAllTasks()
-                }
-            }
-
             CurrentScreen()
         }
     }
