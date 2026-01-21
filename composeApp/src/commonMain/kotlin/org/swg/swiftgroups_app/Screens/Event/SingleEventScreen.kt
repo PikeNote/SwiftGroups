@@ -322,6 +322,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
                         }
                     }
 
+                    /*
                     if (singleEventViewModel.registrationOpen.value) {
                         HorizontalLogoButton(
                             text = if (existingAutoRegister) "Cancel Auto Registration" else "Auto Registration",
@@ -383,6 +384,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
                             textStyle = AppFont.InterTypography.h5,
                         )
                     }
+                    */
                 }
 
 
