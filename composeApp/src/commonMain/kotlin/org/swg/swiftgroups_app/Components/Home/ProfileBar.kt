@@ -83,7 +83,7 @@ class ProfileBar ( private val profileData : ProfileDataItem ) {
             }
 
             VerticalLogoButton(logo = FontAwesomeIcons.Solid.User, text = "My Profile", onClick = {
-                navigator.push(MyUserProfile(initProfileDataItem = profileData))
+                navigator.push(MyUserProfile())
             }, size = 25.dp, textStyle = AppFont.InterTypography.h6, modifier = Modifier.width(110.dp))
         }
     }
