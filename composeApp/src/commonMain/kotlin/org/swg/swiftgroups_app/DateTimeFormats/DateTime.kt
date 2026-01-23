@@ -3,7 +3,7 @@ package org.swg.swiftgroups_app.DateTimeFormats
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
@@ -15,7 +15,7 @@ object DateTimeFormat {
         chars(", ")
         monthName(MonthNames.ENGLISH_ABBREVIATED)
         char(' ')
-        dayOfMonth()
+        day(padding = Padding.ZERO)
     }
 
     val home_event_time_format = LocalDateTime.Format {
@@ -26,13 +26,13 @@ object DateTimeFormat {
         amPmMarker(am = "AM", pm = "PM")
     }
 
-    val db_currentTimestamp = DateTimeComponents.Format {
+    val db_currentTimestamp: DateTimeFormat<LocalDateTime> = LocalDateTime.Format {
         //YYYY-MM-DD HH:MM:SS
         year()
         char('-')
         monthNumber(padding = Padding.ZERO)
         char('-')
-        dayOfMonth(padding = Padding.ZERO)
+        day(padding = Padding.ZERO)
         char(' ')
         hour(padding = Padding.ZERO)
         char(':')
@@ -44,7 +44,7 @@ object DateTimeFormat {
     val ticketDate = LocalDate.Format {
         monthName(MonthNames.ENGLISH_ABBREVIATED)
         char(' ')
-        dayOfMonth()
+        day()
         char(',')
         char(' ')
         year()

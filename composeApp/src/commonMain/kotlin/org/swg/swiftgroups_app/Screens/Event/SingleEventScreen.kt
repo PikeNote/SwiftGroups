@@ -2,51 +2,29 @@ package org.swg.swiftgroups_app.Screens.Event
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -56,11 +34,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.coerceIn
-import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.lifecycle.LifecycleEffect
+import androidx.compose.ui.unit.*
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -72,7 +46,6 @@ import compose.icons.fontawesomeicons.regular.Calendar
 import compose.icons.fontawesomeicons.regular.Clock
 import compose.icons.fontawesomeicons.regular.Eye
 import compose.icons.fontawesomeicons.regular.ShareSquare
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.Components.Event.QRCode
@@ -90,7 +63,6 @@ import org.swg.swiftgroups_app.ShareManager.shareLink
 class SingleEventScreen(val eventID : Int) : Screen {
 
     @Composable
-    @Preview
     override fun Content() {
         val singleEventViewModel = rememberScreenModel { SingleEventViewModel(eventID) }
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
@@ -101,7 +73,6 @@ class SingleEventScreen(val eventID : Int) : Screen {
         }
 
         val eventAPI by singleEventViewModel.eventSpecificAPI.collectAsState()
-        val existingAutoRegister by singleEventViewModel.existingAutoRegister.collectAsState()
 
         val maxImageHeight = 210.dp
         val currentImgSize : MutableState<Dp> = remember { mutableStateOf(maxImageHeight) }
@@ -147,17 +118,24 @@ class SingleEventScreen(val eventID : Int) : Screen {
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .fillMaxWidth()
-                    .shadow(3.dp, shape=RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
                     .padding(bottom = 3.dp)
                     .clip(RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
                     .background(Brush.verticalGradient(colorStops = AppTheme.eventPageImage))
+                    .dropShadow(
+                        shape = RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp),
+                        shadow = Shadow(
+                            radius = 0.dp,
+                            color = Color.Black.copy(alpha = 0.2f),
+                            offset = DpOffset(1.dp, 3.dp)
+                        )
+                    )
             ) {
                 TextButton(
                     onClick = {
                         navigator.pop()},
                     colors = ButtonDefaults.buttonColors(
                         contentColor = Color.Black,
-                        backgroundColor = Color.Transparent
+                        containerColor = Color.Transparent
                     ),
                     modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
                 ) {
@@ -182,10 +160,17 @@ class SingleEventScreen(val eventID : Int) : Screen {
                             modifier = Modifier
                                 .height(currentImgSize.value)
                                 .fillMaxWidth()
-                                .shadow(3.dp, shape = RoundedCornerShape(35.dp))
                                 .padding(bottom = 5.dp)
                                 .padding(PaddingValues(start = 2.5.dp, end = 5.dp))
                                 .clip(RoundedCornerShape(35.dp))
+                                .dropShadow(
+                                    shape =RoundedCornerShape(35.dp),
+                                    shadow = Shadow(
+                                        radius = 0.dp,
+                                        color = Color.Black.copy(alpha = 0.2f),
+                                        offset = DpOffset(1.dp, 3.dp)
+                                    )
+                                )
                                 .graphicsLayer {
                                     this.alpha = imageAlpha
                                 }
@@ -331,7 +316,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
                 Column(modifier = Modifier.padding(10.dp).fillMaxWidth()) {
 
                     if(!eventAPI?.registration_status.isNullOrEmpty()) {
-                        logoText(
+                        LogoText(
                             logo = FontAwesomeIcons.Regular.Eye,
                             contentDesc = "Registration Status",
                             text = eventAPI?.registration_status ?: "---"
@@ -344,19 +329,19 @@ class SingleEventScreen(val eventID : Int) : Screen {
                         eventAPI?.event_date ?: "---"
                     }
 
-                    logoText(
+                    LogoText(
                         logo = FontAwesomeIcons.Regular.Calendar,
                         contentDesc = "Calendar Icon",
                         text = text
                     )
 
-                    logoText(
+                    LogoText(
                         logo = FontAwesomeIcons.Regular.Clock,
                         contentDesc = "Clock  Icon",
                         text = "${eventAPI?.event_start_time ?: "---"} - ${eventAPI?.event_end_time  ?: "---"} ${eventAPI?.event_timezone ?: "---" }"
                     )
 
-                    logoText(
+                    LogoText(
                         logo = MapPin,
                         contentDesc = "Map Pin Icon",
                         text = eventAPI?.location ?: "---"
@@ -390,10 +375,10 @@ class SingleEventScreen(val eventID : Int) : Screen {
                     }
                 }
 
-                Divider(
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
                     thickness = 2.dp,
-                    color = Color.Black,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)
+                    color = Color.Black
                 )
 
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -442,7 +427,7 @@ class SingleEventScreen(val eventID : Int) : Screen {
     }
 
     @Composable
-    fun logoText(logo : ImageVector, contentDesc : String, text : String) {
+    fun LogoText(logo : ImageVector, contentDesc : String, text : String) {
         Row(
             modifier = Modifier.padding(5.dp),
             verticalAlignment = Alignment.CenterVertically

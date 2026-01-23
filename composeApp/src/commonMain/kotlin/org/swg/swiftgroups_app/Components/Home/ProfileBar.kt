@@ -17,9 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -27,7 +31,6 @@ import coil3.compose.AsyncImage
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.User
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.AppTheme
@@ -43,7 +46,7 @@ class ProfileBar ( private val profileData : ProfileDataItem ) {
 
         val navigator = LocalNavigator.currentOrThrow
 
-        val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val currentTime = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
 
         Row (
@@ -51,8 +54,17 @@ class ProfileBar ( private val profileData : ProfileDataItem ) {
                 .fillMaxWidth()
                 .height(100.dp)
                 .padding(horizontal = 10.dp)
+                .dropShadow(
+                    shape = RoundedCornerShape(15.dp),
+                    shadow = Shadow(
+                        radius = 0.dp,
+                        color = Color.Black.copy(alpha = 0.2f),
+                        offset = DpOffset(1.dp, 2.dp)
+                    )
+                )
                 .clip(shape = RoundedCornerShape(15.dp))
-                .background(Brush.horizontalGradient(colorStops = AppTheme.profileColorStops)),
+                .background(Brush.horizontalGradient(colorStops = AppTheme.profileColorStops))
+                ,
 
 
 

@@ -2,69 +2,37 @@ package org.swg.swiftgroups_app.Screens
 
 import EventFilterTemp
 import FilterButton
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import coil3.SingletonImageLoader
 import coil3.compose.LocalPlatformContext
-import coil3.request.ImageRequest
-import coil3.size.Precision
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.solid.Calendar
-import compose.icons.fontawesomeicons.solid.ChevronRight
-import compose.icons.fontawesomeicons.solid.Search
-import compose.icons.fontawesomeicons.solid.Times
-import compose.icons.fontawesomeicons.solid.Undo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import compose.icons.fontawesomeicons.solid.*
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -78,11 +46,14 @@ import swiftgroups.composeapp.generated.resources.Res
 import swiftgroups.composeapp.generated.resources.swiftgroups_title
 
 private fun formatDate(date: LocalDate): String {
-    return "${date.month.name.take(3)} ${date.dayOfMonth}, ${date.year}"
+    return "${date.month.name.take(3)} ${date.day}, ${date.year}"
 }
 
 object ScreenEvents : Screen {
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalFoundationApi::class)
+    val dpCacheWindow = LazyLayoutCacheWindow(ahead = 500.dp, behind = 250.dp)
+
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
         val viewModel: EventsViewModel = rememberScreenModel { EventsViewModel() }
@@ -101,11 +72,8 @@ object ScreenEvents : Screen {
             bottomTabVisibilityManager.setBottomBarVisibility(true)
         }
 
-        val eventListState = rememberLazyListState()
 
-        val context = LocalPlatformContext.current
-        val imageLoader = remember(context) { SingletonImageLoader.get(context) }
-
+        val eventListState = rememberLazyListState(cacheWindow = dpCacheWindow)
 
         val filteredEvents by remember(viewModel.events, viewModel.showLongEvents) {
             derivedStateOf {
@@ -114,30 +82,6 @@ object ScreenEvents : Screen {
                 }
             }
         }
-
-        val widthPx = with(LocalDensity.current) { 270.dp.roundToPx() }
-        val heightPx = with(LocalDensity.current) { 130.dp.roundToPx() }
-
-        LaunchedEffect(eventListState.firstVisibleItemIndex) {
-            val preloadRange = 5
-            val start = eventListState.firstVisibleItemIndex
-            val end = (start + preloadRange).coerceAtMost(filteredEvents.lastIndex)
-
-            withContext(Dispatchers.IO) {
-                for (i in start..end) {
-                    val url = filteredEvents[i].eventPicture
-
-                    imageLoader.enqueue(
-                        ImageRequest.Builder(context)
-                            .data(url)
-                            .size(width = widthPx, height = heightPx)
-                            .precision(Precision.INEXACT)
-                            .build()
-                    )
-                }
-            }
-        }
-
 
         Column(
             modifier = Modifier
@@ -388,6 +332,7 @@ object ScreenEvents : Screen {
                 onDismiss = { showCategoryPicker = false },
                 onCategoriesSelected = { categories ->
                     viewModel.updateSelectedCategories(categories)
+                    showCategoryPicker = false
                 },
                 onClearSelection = {
                     viewModel.updateSelectedCategories(emptySet())
@@ -432,7 +377,7 @@ object ScreenEvents : Screen {
     }
 
     private fun longDate(startTime : String, endTime : String) : Boolean {
-        return Instant.parse(startTime).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear ==
-                Instant.parse(endTime).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear
+        return kotlin.time.Instant.parse(startTime).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear ==
+                kotlin.time.Instant.parse(endTime).toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear
     }
 }

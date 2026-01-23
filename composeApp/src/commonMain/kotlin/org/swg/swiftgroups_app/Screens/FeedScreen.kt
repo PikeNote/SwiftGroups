@@ -1,6 +1,6 @@
 package org.swg.swiftgroups_app.Screens
 
-import FilterBar
+import org.swg.swiftgroups_app.Components.Feed.FilterBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

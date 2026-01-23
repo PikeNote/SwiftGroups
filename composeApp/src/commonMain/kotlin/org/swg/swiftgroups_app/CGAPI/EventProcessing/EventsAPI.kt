@@ -7,7 +7,6 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.utils.io.readRemaining
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -43,7 +42,7 @@ object EventsAPI {
     val dateTimeFormat = LocalDateTime.Format {
         monthName(MonthNames.ENGLISH_ABBREVIATED)
         chars(" ")
-        dayOfMonth(padding = Padding.NONE)
+        day(padding = Padding.NONE)
         chars(" ")
         year()
         chars(" ")
@@ -60,14 +59,14 @@ object EventsAPI {
 
     suspend fun grabEvents(offset : Int, limit : Int = 200) {
 
-        val timestamp = Clock.System.now()
+        val timestamp = kotlin.time.Clock.System.now()
         val tz = TimeZone.currentSystemDefault()
         val dateToday = timestamp.toLocalDateTime(tz).date
 
         val swiftdataQueries = DBObject.db.swiftdataQueries
 
         try {
-            val url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=${offset}&limit=${limit}&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter8=${dateToday.dayOfMonth}%20${dateToday.format(monthShortFormat)}%20${dateToday.year}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
+            val url = "https://community.case.edu/mobile_ws/v17/mobile_events_list?range=${offset}&limit=${limit}&filter4_contains=OR&timestamp=${timestamp.epochSeconds}&filter8=${dateToday.day}%20${dateToday.format(monthShortFormat)}%20${dateToday.year}&filter4_notcontains=OR&order=undefined&search_word=&&1726272567036"
 
             CGAPI.backgroundClient.prepareGet(url) {
                 method = HttpMethod.Get

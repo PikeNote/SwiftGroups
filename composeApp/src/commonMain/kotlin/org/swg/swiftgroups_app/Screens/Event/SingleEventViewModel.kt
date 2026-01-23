@@ -21,12 +21,8 @@ class SingleEventViewModel (private val eventID : Int) : ScreenModel {
     private val _registrationOpen = MutableStateFlow(true)
     val registrationOpen: StateFlow<Boolean> = _registrationOpen.asStateFlow()
 
-    private val _existingAutoRegister  = MutableStateFlow(true)
-    val existingAutoRegister: StateFlow<Boolean> = _existingAutoRegister.asStateFlow()
-
     init {
         try {
-            checkEventAutoRegister()
             val event = DBObject.db.swiftdataQueries.fetchSpecificEvent(eventID.toString()).executeAsOneOrNull()
 
             if (event != null) {
@@ -55,14 +51,5 @@ class SingleEventViewModel (private val eventID : Int) : ScreenModel {
              }
          }
 
-    }
-
-    fun checkEventAutoRegister() {
-        val existsRegister = DBObject.db.swiftdataQueries.existsAutoRegister(eventSpecificAPI.value?.event_id.toString()).executeAsOne()
-        if(existsRegister) {
-            _existingAutoRegister.update {true}
-        } else {
-            _existingAutoRegister.update {false}
-        }
     }
 }

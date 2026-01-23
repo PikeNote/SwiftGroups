@@ -1,3 +1,5 @@
+package org.swg.swiftgroups_app.Components.Feed
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -18,13 +20,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.innerShadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.adamglin.composeshadow.innerShadow
 import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.CGAPI.Feed.Button
 import org.swg.swiftgroups_app.Fonts.AppFont
@@ -48,13 +52,17 @@ fun FilterBar(
         buttonList.forEachIndexed { index, item ->
             Column (modifier = Modifier.width(80.dp).height(56.dp).clip(RoundedCornerShape(20.dp)).background(
                 Color(0xFFF5F5F5)
-            ).then(if(index==selectedIndex) Modifier.innerShadow(
-                color = Color(0xFFc5c5c5),
-                shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                offsetY = 5.dp,
-                blur = 5.4.dp,
-                spread = 1.dp,
-            ) else Modifier
+            ).then(if(index==selectedIndex) Modifier
+                .innerShadow(
+                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                    shadow = Shadow(
+                        offset = DpOffset(1.dp, 5.dp),
+                        color = Color(0xFFc5c5c5),
+                        radius = 5.4.dp,
+                        spread = 1.dp
+                    )
+                )
+            else Modifier
             ).clickable {
                 if(index != selectedIndex) {
                     onFilterSelected(index)

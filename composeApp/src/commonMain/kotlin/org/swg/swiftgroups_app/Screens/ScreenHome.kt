@@ -30,7 +30,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import org.swg.swiftgroups_app.Components.Home.EventHome
@@ -103,7 +106,15 @@ object ScreenHome : Screen {
                     Modifier
                         .fillMaxWidth()
                         .height(195.dp)
-                        .clip(shape = RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp))
+                        .dropShadow(
+                            shape = RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp),
+                            shadow = Shadow(
+                                radius = 0.dp,
+                                color = Color.Black.copy(alpha = 0.2f),
+                                offset = DpOffset(1.dp, 3.dp)
+                            )
+                        )
+                        .clip(RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp))
                         .background(Color(0xFFd9d9d9)),
                     contentPadding = PaddingValues(horizontal = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -135,8 +146,17 @@ object ScreenHome : Screen {
                     Modifier
                         .fillMaxWidth()
                         .height(195.dp)
+                        .dropShadow(
+                            shape = RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp),
+                            shadow = Shadow(
+                                radius = 0.dp,
+                                color = Color.Black.copy(alpha = 0.2f),
+                                offset = DpOffset(1.dp, 3.dp)
+                            )
+                        )
                         .clip(shape = RoundedCornerShape(topStart = 15.dp, bottomStart = 15.dp))
-                        .background(Color(0xFFd9d9d9)),
+                        .background(Color(0xFFd9d9d9))
+                        ,
                     contentPadding = PaddingValues(horizontal = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(15.dp),

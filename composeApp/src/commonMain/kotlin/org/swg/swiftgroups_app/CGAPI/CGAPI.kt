@@ -21,8 +21,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlinx.io.IOException
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -41,7 +42,7 @@ import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.CGAPI.UpcomingEvents.UpcomingEvents
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
-import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
+import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat.db_currentTimestamp
 import org.swg.swiftgroups_app.SecureStorage.SecureStorage
 
 object CGAPI {
@@ -541,8 +542,8 @@ object CGAPI {
     }
 
     fun checkDBExpiry(dbTimeString : String, expiryMin : Int = 60) : Boolean {
-        val changedAt = Instant.parse(dbTimeString, DateTimeFormat.db_currentTimestamp)
-        val now = Clock.System.now()
+        val changedAt = LocalDateTime.parse(dbTimeString, db_currentTimestamp).toInstant(TimeZone.UTC)
+        val now = kotlin.time.Clock.System.now()
         return (now-changedAt).inWholeMinutes >= expiryMin
     }
 

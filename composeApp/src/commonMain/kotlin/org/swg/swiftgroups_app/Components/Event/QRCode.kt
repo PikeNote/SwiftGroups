@@ -14,8 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import org.swg.swiftgroups_app.Fonts.AppFont
@@ -28,10 +30,18 @@ class QRCode(private val code : String,
     fun Content() {
         Spacer(modifier = Modifier.height(7.dp))
 
-        Column (modifier = Modifier.shadow(
-            elevation = 3.dp,
-            shape = RoundedCornerShape(20.dp)
-        ).clip(RoundedCornerShape(20.dp))) {
+        Column (
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .dropShadow(
+                    shape = RoundedCornerShape(20.dp),
+                    shadow = Shadow(
+                        radius = 0.dp,
+                        color = Color.Black.copy(alpha = 0.2f),
+                        offset = DpOffset(1.dp, 3.dp)
+                    )
+                )
+        ) {
             Column (
                 modifier = Modifier
                     .fillMaxWidth()

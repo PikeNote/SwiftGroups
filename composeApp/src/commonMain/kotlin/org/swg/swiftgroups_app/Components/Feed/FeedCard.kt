@@ -29,19 +29,21 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
-import com.adamglin.composeshadow.dropShadow
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Regular
 import compose.icons.fontawesomeicons.Solid
@@ -50,7 +52,6 @@ import compose.icons.fontawesomeicons.regular.ShareSquare
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Feed.Feed
 import org.swg.swiftgroups_app.Fonts.AppFont
@@ -61,8 +62,9 @@ import sh.calvin.autolinktext.rememberAutoLinkText
 
 class FeedCard(val feed: Feed) : Screen {
 
+
+
     @Composable
-    @Preview
     override fun Content() {
         val showComments = remember{ mutableStateOf(false) }
         val fadeOut = remember{ mutableStateOf(true) }
@@ -72,10 +74,12 @@ class FeedCard(val feed: Feed) : Screen {
 
         Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
             Column (modifier = Modifier.dropShadow(
-                offsetY = 6.dp,
-                blur = 3.dp,
                 shape = RectangleShape,
-                spread = 0.dp
+                shadow = Shadow(
+                    radius = 3.dp,
+                    color = Color.Black.copy(alpha = 0.2f),
+                    offset = DpOffset(2.dp,  4.dp)
+                ),
             ).background(Color(0xFFFFFFFF))) {
                 Row(
                     modifier = Modifier
@@ -89,7 +93,14 @@ class FeedCard(val feed: Feed) : Screen {
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(40.dp)
-                            .dropShadow(offsetY = 3.dp, shape = CircleShape)
+                            .dropShadow(
+                                shape = CircleShape,
+                                shadow = Shadow(
+                                    radius = 0.dp,
+                                    color = Color.Black.copy(alpha = 0.2f),
+                                    offset = DpOffset(1.dp, 1.dp)
+                                )
+                            )
                             .clip(shape = CircleShape)
                     )
                     Column(modifier = Modifier.padding(vertical = 3.dp, horizontal = 6.dp)) {
@@ -213,7 +224,14 @@ class FeedCard(val feed: Feed) : Screen {
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(40.dp)
-                                .dropShadow(offsetY = 3.dp, shape = CircleShape)
+                                .dropShadow(
+                                    shape = CircleShape,
+                                    shadow = Shadow(
+                                        radius = 0.dp,
+                                        color = Color.Black.copy(alpha = 0.2f),
+                                        offset = DpOffset(1.dp, 1.dp)
+                                    )
+                                )
                                 .clip(shape = CircleShape)
                         )
                         Column(

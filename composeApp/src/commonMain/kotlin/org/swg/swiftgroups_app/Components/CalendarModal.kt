@@ -10,7 +10,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -31,7 +30,7 @@ fun DatePickerModal(
             TextButton(
                 onClick = {
                     datePickerState.selectedDateMillis?.let {
-                        val instant = Instant.fromEpochMilliseconds(it + 24 * 60 * 60 * 1000L)
+                        val instant = kotlin.time.Instant.fromEpochMilliseconds(it + 24 * 60 * 60 * 1000L)
                         val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
                         onDateSelected(localDateTime.date)
                     }

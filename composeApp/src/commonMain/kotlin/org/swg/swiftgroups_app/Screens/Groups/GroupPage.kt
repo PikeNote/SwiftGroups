@@ -34,16 +34,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
-import com.adamglin.composeshadow.dropShadow
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Regular
 import compose.icons.fontawesomeicons.regular.Calendar
@@ -83,9 +85,14 @@ class GroupPage (private val groupID : String) : Screen {
 
                 AsyncImage(model=group?.group_cover_url?.let{"https://community.case.edu$it"} ?: "https://placehold.co/200x200?text=-",
                     "Group Cover Image", modifier = Modifier.fillMaxWidth().height(200.dp)
+
                         .dropShadow(
                             shape = RoundedCornerShape(0.dp),
-                            offsetY = 4.dp
+                            shadow = Shadow(
+                                radius = 0.dp,
+                                color = Color.Black.copy(alpha = 0.2f),
+                                offset = DpOffset(1.dp, 2.dp)
+                            )
                         ).clickable {
                             if(group!= null) {
                                 navigator.push(ImageScreen(listOf(group.group_cover_url)))
@@ -102,9 +109,12 @@ class GroupPage (private val groupID : String) : Screen {
                             .align(Alignment.BottomCenter)
                             .dropShadow(
                                 shape = CircleShape,
-                                offsetY = 4.dp
+                                shadow = Shadow(
+                                    radius = 0.dp,
+                                    color = Color.Black.copy(alpha = 0.2f),
+                                    offset = DpOffset(1.dp, 4.dp)
+                                )
                             )
-
                         , contentScale = ContentScale.Crop)
                 } else {
                     SpinningBar(height = 100.dp, Modifier.align(Alignment.BottomCenter))

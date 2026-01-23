@@ -3,16 +3,7 @@ package org.swg.swiftgroups_app.Components.Home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -20,12 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -36,13 +29,9 @@ import compose.icons.fontawesomeicons.solid.Info
 import compose.icons.fontawesomeicons.solid.LocationArrow
 import compose.icons.fontawesomeicons.solid.PencilAlt
 import compose.icons.fontawesomeicons.solid.Qrcode
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
-import kotlinx.datetime.minus
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.swg.swiftgroups_app.Components.Home.Button.VerticalLogoButton
 import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat.home_event_date_format
@@ -60,14 +49,14 @@ class EventHome(
     private val isUTC: Boolean = false
 ) {
 
-    private val currentTime = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-    private val currentEDTTime = Clock.System.now().toLocalDateTime(TimeZone.of("America/New_York"))
+    private val currentTime = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.UTC)
+    private val currentEDTTime = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.of("America/New_York"))
     private val eventStartTime : LocalDateTime
     private val eventEndTime : LocalDateTime
 
     init {
-        val eventStart = Instant.parse(eventData.start_time)
-        val eventEnd = Instant.parse(eventData.end_time)
+        val eventStart = kotlin.time.Instant.parse(eventData.start_time)
+        val eventEnd = kotlin.time.Instant.parse(eventData.end_time)
         if (isUTC) {
             eventStartTime = eventStart.toLocalDateTime(TimeZone.currentSystemDefault())
             eventEndTime = eventEnd.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -88,11 +77,13 @@ class EventHome(
             modifier = Modifier
                 .width(cardWidth)
                 .padding(horizontal = horizontalPadding)
-                .shadow(
-                    elevation = 12.dp,
+                .dropShadow(
                     shape = RoundedCornerShape(15.dp),
-                    spotColor = Color.Black.copy(alpha = 0.35f),
-                    ambientColor = Color.Black.copy(alpha = 0.35f)
+                    shadow = Shadow(
+                        radius = 0.dp,
+                        color = Color.Black.copy(alpha = 0.2f),
+                        offset = DpOffset(1.dp, 2.dp)
+                    )
                 )
                 .height(174.dp)
                 .clip(shape = RoundedCornerShape(15.dp))
@@ -103,14 +94,6 @@ class EventHome(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .shadow(
-                        elevation = 1.dp,
-                        shape = RoundedCornerShape(15.dp)
-                    )
-            ) {
                 Box(
                     modifier = Modifier.then(
                         if (currentEDTTime in eventStartTime..eventEndTime) {
@@ -215,7 +198,7 @@ class EventHome(
                         }
                     }
                 }
-            }
+
 
             if(enableButton) {
                 Column(

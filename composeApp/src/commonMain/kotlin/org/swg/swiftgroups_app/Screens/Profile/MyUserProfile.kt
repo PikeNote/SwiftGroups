@@ -18,13 +18,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
@@ -63,21 +65,27 @@ class MyUserProfile : Screen {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
+
         ) {
             Column(
                 modifier =
                     Modifier.fillMaxWidth()
-                        .shadow(
-                            3.dp,
-                            shape = RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp)
-                        )
                         .padding(bottom = 3.dp)
+                        .dropShadow(
+                            shape = RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp),
+                            shadow = Shadow(
+                                radius = 0.dp,
+                                color = Color.Black.copy(alpha = 0.2f),
+                                offset = DpOffset(1.dp, 3.dp)
+                            )
+                        )
                         .clip(RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
                         .background(
                             Brush.verticalGradient(colorStops = AppTheme.profilePageColorStop)
                         )
                         .padding(horizontal = 20.dp)
-                        .statusBarsPadding(),
+                        .statusBarsPadding()
+                        ,
             ) {
                 Icon(
                     ArrowLeft,
