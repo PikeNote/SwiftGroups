@@ -22,10 +22,14 @@ import org.swg.swiftgroups_app.CGAPI.CGAPI.json
 import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
+import org.swg.swiftgroups_app.DataStore.UserSettings
+import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 import org.swg.swiftgroupsapp.db.Events
 
-class HomeViewModel : ScreenModel {
+class HomeViewModel(userPref : UserSettingsPreferences) : ScreenModel {
+
+    val settings : UserSettings = userPref.settingsFlow.value
 
     init {
         fetchData()
@@ -56,7 +60,7 @@ class HomeViewModel : ScreenModel {
 
             val profileDeferred = async {
                 // If the data was fetched more than 60 minutes ago, don't fetch it again
-                if (profileCache != null && CGAPI.checkDBExpiry(profileCache.changed_at, 5) && profileCache.value_ != "[]") {
+                if (profileCache != null && CGAPI.checkDBExpiry(profileCache.changed_at, settings.cacheTimer) && profileCache.value_ != "[]") {
                     println("Defaulting to cached profile")
                     json.decodeFromString(profileCache.value_)
 
@@ -137,7 +141,7 @@ class HomeViewModel : ScreenModel {
             .fetchModifications("homeMyGroups")
             .executeAsOneOrNull()
 
-        val groupData : List<AggregateGroup> = if (myGroupsCache != null && !CGAPI.checkDBExpiry(myGroupsCache.changed_at)) {
+        val groupData : List<AggregateGroup> = if (myGroupsCache != null && !CGAPI.checkDBExpiry(myGroupsCache.changed_at, settings.cacheTimer)) {
             println("Defaulting to cached my groups")
             json.decodeFromString<List<AggregateGroup>>(myGroupsCache.value_)
         } else {

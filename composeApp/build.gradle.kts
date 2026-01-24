@@ -48,12 +48,14 @@ kotlin {
             implementation(libs.ktor.client.cio)
         }
         commonMain.dependencies {
+            implementation(libs.androidx.datastore)
+            implementation(libs.androidx.datastore.preferences)
+            implementation(libs.jetbrains.ui.tooling.preview)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
             implementation(compose.ui)
             implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.voyager.navigator)
@@ -129,9 +131,9 @@ android {
 }
 
 dependencies {
+    debugImplementation(libs.ui.tooling)
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.ui.graphics.android)
     implementation(libs.compose.material3)
-    debugImplementation(compose.uiTooling)
 }
 

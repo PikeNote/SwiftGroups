@@ -6,7 +6,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.swg.swiftgroups_app.Icons.Gear
-import org.swg.swiftgroups_app.Screens.SettingsScreen
+import org.swg.swiftgroups_app.Screens.Settings.SettingsScreen
 
 object TabSettings : TabWithNavigator {
     override var nav: Navigator? = null

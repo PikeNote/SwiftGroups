@@ -4,54 +4,40 @@ package org.swg.swiftgroups_app
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
-import coil3.ImageLoader
-import coil3.compose.setSingletonImageLoaderFactory
-import coil3.disk.DiskCache
-import coil3.memory.MemoryCache
-import coil3.request.CachePolicy
-import coil3.request.crossfade
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
 import org.koin.core.context.startKoin
+import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
-import org.koin.mp.KoinPlatform.stopKoin
+import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.Login
 
+val commonModule = module {
+    single { UserSettingsPreferences(get(), get()) }
+    single<BottomTabVisibilityManager> { BottomTabVisibilityManager() }
+    //factory { SettingsViewModel(get()) }
+    single<CoroutineScope> {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    }
+}
+
+fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
+    startKoin {
+        appDeclaration()
+        modules(commonModule)
+    }
+
 @Composable
 @Preview
 fun App() {
-    stopKoin()
-    startKoin {
-        modules(
-            module { single<BottomTabVisibilityManager> { BottomTabVisibilityManager() } }
-        )
-    }
-
-    setSingletonImageLoaderFactory { context ->
-        ImageLoader.Builder(context)
-            .crossfade(true)
-            .memoryCache {
-                MemoryCache.Builder()
-                    .maxSizePercent(context,0.25)
-                    .strongReferencesEnabled(true)
-                    .build()
-            }
-            .diskCache {
-                DiskCache.Builder()
-                    .directory(
-                        getCacheDirectory()
-                    )
-                    .maxSizePercent(1.0)
-                    .build()
-            }
-            .diskCachePolicy(CachePolicy.ENABLED)
-            .build()
-    }
-
     val typography = AppFont.InterTypography
 
 

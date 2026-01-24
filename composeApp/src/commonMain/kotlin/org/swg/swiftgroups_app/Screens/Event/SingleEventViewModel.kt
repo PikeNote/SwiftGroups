@@ -11,9 +11,13 @@ import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.CGAPI.json
 import org.swg.swiftgroups_app.CGAPI.EventAPI.EventSpecificAPI
+import org.swg.swiftgroups_app.DataStore.UserSettings
+import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 
-class SingleEventViewModel (private val eventID : Int) : ScreenModel {
+class SingleEventViewModel (private val eventID : Int, userPrefs : UserSettingsPreferences) : ScreenModel {
+
+    val userSettingsPref: UserSettings = userPrefs.settingsFlow.value
 
     private var _eventSpecificAPI : MutableStateFlow<EventSpecificAPI?> = MutableStateFlow(null)
     var eventSpecificAPI : StateFlow<EventSpecificAPI?> = _eventSpecificAPI.asStateFlow()
@@ -26,7 +30,7 @@ class SingleEventViewModel (private val eventID : Int) : ScreenModel {
             val event = DBObject.db.swiftdataQueries.fetchSpecificEvent(eventID.toString()).executeAsOneOrNull()
 
             if (event != null) {
-                if (event.userCacheData.isNotEmpty()) {
+                if (event.userCacheData.isNotEmpty() && userSettingsPref.cacheEvents) {
                     _eventSpecificAPI.update { json.decodeFromString(event.userCacheData) }
                     _registrationOpen.update { eventSpecificAPI.value?.registration_status?.contains("Registration will only be open")
                         ?: true }
@@ -45,9 +49,12 @@ class SingleEventViewModel (private val eventID : Int) : ScreenModel {
 
              if (eventSpecificAPI.value != cgData && cgData != null) {
                  _eventSpecificAPI.update { cgData }
-                 DBObject.db.swiftdataQueries.updateCache(Json.encodeToString(cgData), eventID.toString())
                  _registrationOpen.update { eventSpecificAPI.value?.registration_status?.contains("Registration will only be open")
                      ?: true }
+
+                 if(userSettingsPref.cacheEvents) {
+                     DBObject.db.swiftdataQueries.updateCache(Json.encodeToString(cgData), eventID.toString())
+                 }
              }
          }
 

@@ -55,6 +55,7 @@ import org.swg.swiftgroups_app.Components.GroupPage.IconText
 import org.swg.swiftgroups_app.Components.Home.Button.HorizontalLogoButton
 import org.swg.swiftgroups_app.Components.Home.EventHome
 import org.swg.swiftgroups_app.Components.SpinningBar
+import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.Person
@@ -66,10 +67,10 @@ class GroupPage (private val groupID : String) : Screen {
 
     @Composable
     override fun Content() {
+        val userPrefs : UserSettingsPreferences = koinInject()
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
 
-
-        val viewmodel = rememberScreenModel { GroupPageViewModel(groupID) }
+        val viewmodel = rememberScreenModel { GroupPageViewModel(groupID, userPrefs) }
         val navigator =  LocalNavigator.currentOrThrow
         val group = viewmodel.group.value
 

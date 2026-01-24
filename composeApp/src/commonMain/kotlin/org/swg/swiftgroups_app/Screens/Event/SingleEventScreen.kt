@@ -50,6 +50,7 @@ import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.AppTheme
 import org.swg.swiftgroups_app.Components.Event.QRCode
 import org.swg.swiftgroups_app.Components.Home.Button.HorizontalLogoButton
+import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.MapPin
@@ -64,7 +65,8 @@ class SingleEventScreen(val eventID : Int) : Screen {
 
     @Composable
     override fun Content() {
-        val singleEventViewModel = rememberScreenModel { SingleEventViewModel(eventID) }
+        val userPrefs : UserSettingsPreferences = koinInject()
+        val singleEventViewModel = rememberScreenModel { SingleEventViewModel(eventID, userPrefs) }
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
         val navigator = LocalNavigator.currentOrThrow
 

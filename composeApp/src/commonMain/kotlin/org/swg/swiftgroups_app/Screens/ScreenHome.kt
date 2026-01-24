@@ -45,6 +45,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.CGAPI.CGAPI
+import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.Icons.QrCodeScan
 import org.swg.swiftgroups_app.Screens.Home.QRScreen
 import swiftgroups.composeapp.generated.resources.Res
@@ -54,7 +55,8 @@ object ScreenHome : Screen {
 
     @Composable
     override fun Content() {
-        val viewModel: HomeViewModel = rememberScreenModel { HomeViewModel() }
+        val userPref : UserSettingsPreferences = koinInject()
+        val viewModel: HomeViewModel = rememberScreenModel { HomeViewModel(userPref) }
         val refetchProfile by  CGAPI.refetchProfile
         val profileData by viewModel.profileData.collectAsState()
         val navigator = LocalNavigator.currentOrThrow

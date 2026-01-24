@@ -9,18 +9,21 @@ import kotlinx.serialization.json.Json
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.CGAPI.json
 import org.swg.swiftgroups_app.CGAPI.Groups.Group
+import org.swg.swiftgroups_app.DataStore.UserSettings
+import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 import org.swg.swiftgroupsapp.db.Events
 
-class GroupPageViewModel(private val groupID : String) : ScreenModel
+class GroupPageViewModel(private val groupID : String, userPrefs : UserSettingsPreferences) : ScreenModel
 {
+    val userSettingsPref: UserSettings = userPrefs.settingsFlow.value
     var group : MutableState<Group?> = mutableStateOf(null)
     val upcomingEvents : MutableState<List<Events>> = mutableStateOf(emptyList())
 
     init {
         val cacheString = fetchCache()
         try {
-            if(!cacheString.isNullOrEmpty()) {
+            if(!cacheString.isNullOrEmpty() && userSettingsPref.cacheClubs) {
                 group = json.decodeFromString(cacheString)
             }
         } catch (_: Exception){}
@@ -43,7 +46,10 @@ class GroupPageViewModel(private val groupID : String) : ScreenModel
             val groupCacheData : Group? = group.value
             if(groupCacheData != null) {
                 val jsonData = Json.encodeToString(Group.serializer(),groupCacheData)
-                DBObject.db.swiftdataQueries.updateClubCache(jsonData, groupID)
+
+                if(userSettingsPref.cacheClubs) {
+                    DBObject.db.swiftdataQueries.updateClubCache(jsonData, groupID)
+                }
             }
         }
     }

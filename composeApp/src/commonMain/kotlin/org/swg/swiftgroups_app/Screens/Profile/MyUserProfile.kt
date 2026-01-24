@@ -39,6 +39,7 @@ import org.swg.swiftgroups_app.CGAPI.Profile.Job
 import org.swg.swiftgroups_app.CGAPI.Profile.Language
 import org.swg.swiftgroups_app.CGAPI.Profile.ProfileDataItem
 import org.swg.swiftgroups_app.Components.SpinningBar
+import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.MapPin
@@ -51,8 +52,9 @@ class MyUserProfile : Screen {
     @Composable
     override fun Content() {
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
+        val userPrefs : UserSettingsPreferences = koinInject()
 
-        val viewmodel = rememberScreenModel { MyUserProfileViewModel() }
+        val viewmodel = rememberScreenModel { MyUserProfileViewModel(userPrefs) }
         val profileDataItem: ProfileDataItem? by viewmodel.profileData.collectAsState()
         val profile = profileDataItem
 

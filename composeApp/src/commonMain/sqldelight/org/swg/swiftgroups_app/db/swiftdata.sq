@@ -336,3 +336,9 @@ AND (
 AND eventCategory IN :categories
 AND clubName IN :clubs
 ORDER BY start_time LIMIT ?, 50;
+
+countEvents:
+SELECT COUNT(*) FROM events;
+
+countClubs:
+SELECT COUNT(*) FROM clubs;
