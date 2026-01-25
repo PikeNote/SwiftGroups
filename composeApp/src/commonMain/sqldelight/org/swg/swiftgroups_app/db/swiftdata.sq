@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS events (
-        eventId TEXT PRIMARY KEY,
+        eventId INTEGER NOT NULL PRIMARY KEY,
         start_time TEXT NOT NULL,
         end_time TEXT NOT NULL,
         eventName TEXT NOT NULL,
@@ -28,13 +28,6 @@ CREATE TABLE IF NOT EXISTS clubs (
         clubStatus TEXT NOT NULL,
         clubJoinURL TEXT NOT NULL,
         clubCacheData TEXT NOT NULL DEFAULT ''
-);
-
-CREATE TABLE IF NOT EXISTS autoRegister (
-        ticketId TEXT PRIMARY KEY,
-        eventId TEXT NOT NULL,
-        link TEXT NOT NULL,
-        signup_time TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS modifications (
@@ -69,18 +62,6 @@ SELECT * FROM modifications WHERE modifiedItem = ?;
 
 insertModifications:
 INSERT OR REPLACE INTO modifications (modifiedItem, value) VALUES (?, ?);
-
-insertAutoRegister:
-INSERT OR REPLACE INTO autoRegister (ticketId, eventId, link, signup_time) VALUES (?, ?, ?, ?);
-
-removeAutoRegister:
-DELETE FROM autoRegister WHERE eventId = ?;
-
-fetchAutoRegister:
-SELECT * FROM autoRegister;
-
-existsAutoRegister:
-SELECT EXISTS ( SELECT 1 FROM autoRegister WHERE eventId = ? );
 
 insertEvent {
   UPDATE events
@@ -342,3 +323,9 @@ SELECT COUNT(*) FROM events;
 
 countClubs:
 SELECT COUNT(*) FROM clubs;
+
+sweepDeleteEvents:
+DELETE FROM events
+WHERE eventId >= :minId
+  AND eventId <= :maxId
+  AND eventId NOT IN :fetchedIds;

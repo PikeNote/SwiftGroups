@@ -82,31 +82,42 @@ object EventsAPI {
                 }
 
                 println("Events ${offset}-${offset+limit} from API fetched!")
-                httpResponse.bodyAsSequence<AggregateAPIEventItem>().forEach {
-                    if(it.p2 != "separator" && it.p4 != "") {
-                        val fixedTime = htmlRegex.replace(it.p4, " ").replace("&ndash;", "-").replace("  ", " ")
-                        val convertedTime : List<String> = timeConverter(fixedTime)
-                        val eventTags : List<String> = extractEventTags(it.p22)
 
-                        swiftdataQueries.insertEvent(
-                            eventName = it.p3,
-                            eventDesc = "",
-                            eventUrl = it.p18,
-                            eventPicture = "https://community.case.edu${it.p11.replace("r2_image_upload", "r3_image_upload")}",
-                            eventId = it.p1,
-                            eventLocation = it.p6,
-                            eventCategory = it.p5.replace(htmlRegex, "\n"),
-                            clubName = it.p9,
-                            clubURL = "",
-                            eventAttendees = it.p10.toLong(),
-                            start_time = convertedTime[0],
-                            end_time = convertedTime[1],
-                            eventTags = eventTags.joinToString()
-                        )
-                    }
+                val fetchedEvents = httpResponse.bodyAsSequence<AggregateAPIEventItem>()
+                    .filter { it.p2 != "separator" && it.p4 != "" }
+                    .toList()
+
+                if (fetchedEvents.isEmpty()) return@execute
+
+                val fetchedIds = fetchedEvents.map { it.p1.toLongOrNull() ?: 0L }
+                val minId : Long = fetchedIds.min()
+                val maxId : Long = fetchedIds.min()
+
+                fetchedEvents.forEach {
+                    val fixedTime = htmlRegex.replace(it.p4, " ").replace("&ndash;", "-").replace("  ", " ")
+                    val convertedTime : List<String> = timeConverter(fixedTime)
+                    val eventTags : List<String> = extractEventTags(it.p22)
+
+                    swiftdataQueries.insertEvent(
+                        eventName = it.p3,
+                        eventDesc = "",
+                        eventUrl = it.p18,
+                        eventPicture = "https://community.case.edu${it.p11.replace("r2_image_upload", "r3_image_upload")}",
+                        eventId = it.p1.toLong(),
+                        eventLocation = it.p6,
+                        eventCategory = it.p5.replace(htmlRegex, "\n"),
+                        clubName = it.p9,
+                        clubURL = "",
+                        eventAttendees = it.p10.toLong(),
+                        start_time = convertedTime[0],
+                        end_time = convertedTime[1],
+                        eventTags = eventTags.joinToString()
+                    )
                 }
-            }
 
+                swiftdataQueries.sweepDeleteEvents(minId = minId, maxId = maxId, fetchedIds = fetchedIds)
+
+            }
         } catch (e: Exception) {
              println(e.message)
          }

@@ -1,0 +1,31 @@
+CREATE TABLE events_new (
+    eventId INTEGER AS INTEGER NOT NULL PRIMARY KEY,
+    start_time TEXT NOT NULL,
+    end_time TEXT NOT NULL,
+    eventName TEXT NOT NULL,
+    eventDesc TEXT NOT NULL,
+    eventAttendees INTEGER,
+    eventUrl TEXT NOT NULL,
+    eventLocation TEXT NOT NULL,
+    eventPicture TEXT NOT NULL,
+    clubURL TEXT NOT NULL,
+    eventCategory TEXT NOT NULL,
+    eventTags TEXT NOT NULL,
+    clubName TEXT NOT NULL,
+    userCacheData TEXT NOT NULL DEFAULT '',
+    FOREIGN KEY (clubName) REFERENCES clubs (clubName)
+);
+
+INSERT INTO events_new (
+    eventId, start_time, end_time, eventName, eventDesc, 
+    eventAttendees, eventUrl, eventLocation, eventPicture, 
+    clubURL, eventCategory, eventTags, clubName, userCacheData
+)
+SELECT 
+    CAST(eventId AS INTEGER), start_time, end_time, eventName, eventDesc, 
+    eventAttendees, eventUrl, eventLocation, eventPicture, 
+    clubURL, eventCategory, eventTags, clubName, userCacheData
+FROM events;
+
+DROP TABLE events;
+ALTER TABLE events_new RENAME TO events;

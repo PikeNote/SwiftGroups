@@ -90,7 +90,7 @@ class EventsCard(
                 ).clickable {
                     println("Event clicked: ${eventDat.eventName}")
                     println("Event tags: ${eventDat.eventTags}")
-                    navigator.push(SingleEventScreen(eventDat.eventId.toInt()))
+                    navigator.push(SingleEventScreen(eventDat.eventId))
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween

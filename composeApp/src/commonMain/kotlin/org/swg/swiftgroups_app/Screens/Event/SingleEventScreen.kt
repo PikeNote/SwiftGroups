@@ -61,7 +61,7 @@ import org.swg.swiftgroups_app.Screens.ImageScreen.ImageScreen
 import org.swg.swiftgroups_app.Screens.Webview.WebviewScreen
 import org.swg.swiftgroups_app.ShareManager.shareLink
 
-class SingleEventScreen(val eventID : Int) : Screen {
+class SingleEventScreen(val eventID : Long) : Screen {
 
     @Composable
     override fun Content() {

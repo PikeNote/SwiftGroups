@@ -73,7 +73,7 @@ class HomeViewModel(userPref : UserSettingsPreferences) : ScreenModel {
             val eventsDeferred = async {
                 CGAPI.grabMyEvents().list.map {
                     Events(
-                        eventId = it.event_id.toString(),
+                        eventId = it.event_id,
                         eventName = it.event_name,
                         start_time = it.event_start_utc,
                         end_time = it.event_end_utc,

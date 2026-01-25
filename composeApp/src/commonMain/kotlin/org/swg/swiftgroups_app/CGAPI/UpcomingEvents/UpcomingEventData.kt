@@ -18,7 +18,7 @@ data class UpcomingEventData(
     val event_group: String,
     val event_group_id: Int,
     val event_header: String?,
-    val event_id: Int,
+    val event_id: Long,
     val event_name: String,
     val event_start_time: String,
     val event_start_utc: String,

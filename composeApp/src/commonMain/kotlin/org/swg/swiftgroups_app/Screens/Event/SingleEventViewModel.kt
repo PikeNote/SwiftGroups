@@ -15,7 +15,7 @@ import org.swg.swiftgroups_app.DataStore.UserSettings
 import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
 
-class SingleEventViewModel (private val eventID : Int, userPrefs : UserSettingsPreferences) : ScreenModel {
+class SingleEventViewModel (private val eventID : Long, userPrefs : UserSettingsPreferences) : ScreenModel {
 
     val userSettingsPref: UserSettings = userPrefs.settingsFlow.value
 
@@ -27,7 +27,7 @@ class SingleEventViewModel (private val eventID : Int, userPrefs : UserSettingsP
 
     init {
         try {
-            val event = DBObject.db.swiftdataQueries.fetchSpecificEvent(eventID.toString()).executeAsOneOrNull()
+            val event = DBObject.db.swiftdataQueries.fetchSpecificEvent(eventID).executeAsOneOrNull()
 
             if (event != null) {
                 if (event.userCacheData.isNotEmpty() && userSettingsPref.cacheEvents) {
@@ -53,7 +53,7 @@ class SingleEventViewModel (private val eventID : Int, userPrefs : UserSettingsP
                      ?: true }
 
                  if(userSettingsPref.cacheEvents) {
-                     DBObject.db.swiftdataQueries.updateCache(Json.encodeToString(cgData), eventID.toString())
+                     DBObject.db.swiftdataQueries.updateCache(Json.encodeToString(cgData), eventID)
                  }
              }
          }

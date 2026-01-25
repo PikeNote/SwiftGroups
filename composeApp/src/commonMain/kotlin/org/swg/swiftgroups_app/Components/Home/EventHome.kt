@@ -89,7 +89,7 @@ class EventHome(
                 .clip(shape = RoundedCornerShape(15.dp))
                 .background(Color(0xFFf2f1f1))
                 .clickable {
-                    navigator.push(SingleEventScreen(eventData.eventId.toInt()))
+                    navigator.push(SingleEventScreen(eventData.eventId))
                 },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -215,7 +215,7 @@ class EventHome(
                             logo = FontAwesomeIcons.Solid.Info,
                             text = "Info",
                             onClick = {
-                                navigator.push(SingleEventScreen(eventData.eventId.toInt()))
+                                navigator.push(SingleEventScreen(eventData.eventId))
                             }
                         )
                         VerticalLogoButton(
