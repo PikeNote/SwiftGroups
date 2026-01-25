@@ -23,7 +23,6 @@ import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -182,6 +181,11 @@ object GroupScreen : Screen {
                     state = listState,
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
+                    if (displayList.isEmpty()) {
+                        item {
+
+                        }
+                    }
                     items(displayList, key = { it.clubID }) {
                         val categories = remember(it.clubCategories) {
                             it.clubCategories.split(",").filter { cat -> cat.isNotBlank() }.take(3)

@@ -27,8 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
-import coil3.SingletonImageLoader
-import coil3.compose.LocalPlatformContext
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.*
@@ -276,6 +274,11 @@ object ScreenEvents : Screen {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 )
                 {
+                    if (filteredEvents.isEmpty()) {
+                        item {
+
+                        }
+                    }
                     items(filteredEvents, key = { it.eventId }) { eventData ->
                         EventsCard(
                             eventData,
