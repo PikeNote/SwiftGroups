@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
@@ -63,14 +64,16 @@ import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 import org.swg.swiftgroups_app.Screens.ImageScreen.ImageScreen
 import org.swg.swiftgroups_app.Screens.Webview.WebviewScreen
 
-class GroupPage (private val groupID : String) : Screen {
+class SingleGroupScreen (private val groupID : String) : Screen {
+
+    override val key: ScreenKey = "SingleGroupScreen_$groupID"
 
     @Composable
     override fun Content() {
         val userPrefs : UserSettingsPreferences = koinInject()
         val bottomTabVisibilityManager: BottomTabVisibilityManager = koinInject()
 
-        val viewmodel = rememberScreenModel { GroupPageViewModel(groupID, userPrefs) }
+        val viewmodel = rememberScreenModel { SingleGroupViewModel(groupID, userPrefs) }
         val navigator =  LocalNavigator.currentOrThrow
         val group = viewmodel.group.value
 

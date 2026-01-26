@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
@@ -56,12 +57,14 @@ import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Icons.MapPin
 import org.swg.swiftgroups_app.Icons.PencilSquare
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
-import org.swg.swiftgroups_app.Screens.Groups.GroupPage
+import org.swg.swiftgroups_app.Screens.Groups.SingleGroupScreen
 import org.swg.swiftgroups_app.Screens.ImageScreen.ImageScreen
 import org.swg.swiftgroups_app.Screens.Webview.WebviewScreen
 import org.swg.swiftgroups_app.ShareManager.shareLink
 
 class SingleEventScreen(val eventID : Long) : Screen {
+
+    override val key: ScreenKey = "SingleEventScreen_$eventID"
 
     @Composable
     override fun Content() {
@@ -246,7 +249,7 @@ class SingleEventScreen(val eventID : Long) : Screen {
                        style = AppFont.InterTypography.h6,
                        color = Color.Gray, modifier = Modifier.clickable {
                            if(eventAPI!= null) {
-                               navigator.push(GroupPage(eventAPI!!.event_group_id.toString()))
+                               navigator.push(SingleGroupScreen(eventAPI!!.event_group_id.toString()))
                            }
                        }
                    )

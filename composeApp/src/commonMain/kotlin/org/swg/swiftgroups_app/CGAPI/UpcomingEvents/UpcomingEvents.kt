@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UpcomingEvents(
-    val count: Int,
-    val list: List<UpcomingEventData>,
-    val next_range: Int
+    val count: Int = 0,
+    val list: List<UpcomingEventData> = emptyList(),
+    val next_range: Int = 0
 )

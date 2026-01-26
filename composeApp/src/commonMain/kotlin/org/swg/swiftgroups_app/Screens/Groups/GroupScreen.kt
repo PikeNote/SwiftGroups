@@ -205,7 +205,7 @@ object GroupScreen : Screen {
                                 )
                                 .clip(RoundedCornerShape(20.dp))
                                 .background(basicColor)
-                                .clickable { naivgator.push(GroupPage(groupID = it.clubID)) }
+                                .clickable { naivgator.push(SingleGroupScreen(groupID = it.clubID)) }
                         ) {
                             Box(
                                 modifier = Modifier
