@@ -46,8 +46,8 @@ import org.swg.swiftgroups_app.Components.CategorySelectionModal
 import org.swg.swiftgroups_app.Components.DatePickerModal
 import org.swg.swiftgroups_app.Components.Home.EventsCard
 import org.swg.swiftgroups_app.Fonts.AppFont
-import swiftgroups.composeapp.generated.resources.Res
-import swiftgroups.composeapp.generated.resources.swiftgroups_title
+import swiftgroups.shared.generated.resources.Res
+import swiftgroups.shared.generated.resources.swiftgroups_title
 
 private fun formatDate(date: LocalDate): String {
     return "${date.month.name.take(3)} ${date.day}, ${date.year}"

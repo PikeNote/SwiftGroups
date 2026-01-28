@@ -48,8 +48,8 @@ import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.Icons.QrCodeScan
 import org.swg.swiftgroups_app.Screens.Home.QRScreen
-import swiftgroups.composeapp.generated.resources.Res
-import swiftgroups.composeapp.generated.resources.swiftgroups_title
+import swiftgroups.shared.generated.resources.Res
+import swiftgroups.shared.generated.resources.swiftgroups_title
 
 object ScreenHome : Screen {
 

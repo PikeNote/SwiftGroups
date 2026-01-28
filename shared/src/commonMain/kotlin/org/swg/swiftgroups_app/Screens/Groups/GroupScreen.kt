@@ -47,8 +47,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
-import swiftgroups.composeapp.generated.resources.Res
-import swiftgroups.composeapp.generated.resources.swiftgroups_title
+import swiftgroups.shared.generated.resources.Res
+import swiftgroups.shared.generated.resources.swiftgroups_title
 
 object GroupScreen : Screen {
 

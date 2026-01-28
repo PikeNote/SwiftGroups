@@ -23,8 +23,8 @@ import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.BootstrapArchive
 import org.swg.swiftgroups_app.Icons.Database
 import org.swg.swiftgroups_app.Icons.MaterialSymbolsAuto_timer
-import swiftgroups.composeapp.generated.resources.Res
-import swiftgroups.composeapp.generated.resources.swiftgroups_title
+import swiftgroups.shared.generated.resources.Res
+import swiftgroups.shared.generated.resources.swiftgroups_title
 
 object SettingsScreen : Screen {
     @Composable

@@ -23,8 +23,8 @@ import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Components.Feed.FeedCard
 import org.swg.swiftgroups_app.Components.Feed.FilterBar
 import org.swg.swiftgroups_app.Components.SpinningBar
-import swiftgroups.composeapp.generated.resources.Res
-import swiftgroups.composeapp.generated.resources.swiftgroups_title
+import swiftgroups.shared.generated.resources.Res
+import swiftgroups.shared.generated.resources.swiftgroups_title
 
 object FeedScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)

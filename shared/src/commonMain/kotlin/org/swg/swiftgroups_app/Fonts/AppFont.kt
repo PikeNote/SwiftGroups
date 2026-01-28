@@ -8,8 +8,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
-import swiftgroups.composeapp.generated.resources.Res
-import swiftgroups.composeapp.generated.resources.inter_multi
+import swiftgroups.shared.generated.resources.Res
+import swiftgroups.shared.generated.resources.inter_multi
 
 object AppFont {
 
