@@ -1,0 +1,58 @@
+name: Build KMP App
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+
+concurrency:
+  group: "Build: ${{ github.workflow }} @ ${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  android-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build and Test Debug variant
+        run: ./gradlew assembleDebug testDebugUnitTest --stacktrace
+
+      - name: Build Release variant
+        run: ./gradlew assembleRelease --stacktrace
+
+  ios-check:
+    runs-on: macos-latest
+    needs: android-check
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Kotlin Framework for iOS
+        run: ./gradlew embedAndSignAppleFrameworkForXcode
+
+      - name: Build iOS App (Swift)
+        run: |
+          cd iosApp
+          xcodebuild build \
+            -project iosApp.xcodeproj \
+            -scheme iosApp \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            CODE_SIGNING_ALLOWED=NO
