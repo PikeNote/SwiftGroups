@@ -2,10 +2,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.androidMultiplatformLibrary)
     kotlin("plugin.serialization") version "2.1.0"
 }
 
@@ -21,9 +21,17 @@ sqldelight {
 }
 
 kotlin {
-    androidTarget {
+    androidLibrary {
+        namespace = "org.swg.swiftgroups.shared"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+
+        androidResources {
+            enable = true
         }
     }
     
@@ -39,30 +47,31 @@ kotlin {
     }
     
     sourceSets {
-        
+
         androidMain.dependencies {
-            implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.security.crypto.ktx)
             implementation(libs.android.driver)
             implementation(libs.ktor.client.cio)
+            implementation(libs.ui.tooling)
+            implementation(libs.androidx.ui.graphics.android)
         }
+
         commonMain.dependencies {
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)
             implementation(libs.jetbrains.ui.tooling.preview)
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
+            implementation("org.jetbrains.compose.runtime:runtime:1.10.0")
+            implementation("org.jetbrains.compose.foundation:foundation:1.10.0")
+            implementation("org.jetbrains.compose.material:material:1.10.0")
+            implementation("org.jetbrains.compose.ui:ui:1.10.0")
+            implementation("org.jetbrains.compose.components:components-resources:1.10.0")
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.tabNavigator)
             implementation(libs.fontAwesome)
-            implementation(compose.components.resources)
             implementation(libs.compose.webview.multiplatform)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
@@ -94,46 +103,3 @@ kotlin {
         }
     }
 }
-
-android {
-    namespace = "org.swg.swiftgroups_app"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    defaultConfig {
-        applicationId = "org.swg.swiftgroups_app"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt")
-            )
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    buildFeatures {
-        compose = true
-    }
-}
-
-dependencies {
-    debugImplementation(libs.ui.tooling)
-    implementation(libs.androidx.material3.android)
-    implementation(libs.androidx.ui.graphics.android)
-    implementation(libs.compose.material3)
-}
-

@@ -23,6 +23,8 @@ class MainActivity : ComponentActivity() {
             )
         )
 
+        AndroidApp.init(this)
+
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = true
 
@@ -30,9 +32,11 @@ class MainActivity : ComponentActivity() {
 
         appContext = applicationContext
 
-        initKoin {
-            androidContext(this@MainActivity)
-            modules(commonModule, androidModule)
+        if (org.koin.core.context.GlobalContext.getOrNull() == null) {
+            initKoin {
+                androidContext(this@MainActivity)
+                modules(commonModule, androidModule)
+            }
         }
 
 

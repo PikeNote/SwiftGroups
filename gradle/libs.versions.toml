@@ -1,10 +1,10 @@
 [versions]
-agp = "8.9.1"
-android-compileSdk = "35"
+agp = "9.0.0"
+android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "35"
-androidx-activityCompose = "1.10.1"
-androidx-lifecycle = "2.8.4"
+androidx-activityCompose = "1.12.2"
+androidx-lifecycle = "2.9.6"
 autolinktext = "2.0.2"
 coilCompose = "3.3.0"
 compose-multiplatform = "1.10.0"
@@ -14,10 +14,10 @@ datastorePreferences = "1.2.0"
 kachetor = "1.1.0"
 kotlin = "2.3.0"
 kotlinxDatetime = "0.7.1"
-ktorClientAndroid = "3.3.3"
+ktorClientAndroid = "3.4.0"
 lifecycle = "2.5.0"
 material3 = "1.9.0"
-qrose = "1.0.1"
+qrose = "1.1.0"
 securityCryptoKtx = "1.1.0"
 uiTooling = "1.10.0"
 uiToolingPreview = "1.10.0"
@@ -42,6 +42,7 @@ androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", nam
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 jetbrains-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 kachetor = { module = "com.vipulasri.kachetor:kachetor", version.ref = "kachetor" }
+koin-android = { module = "io.insert-koin:koin-android" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-compose =  { module = "io.insert-koin:koin-compose" }
@@ -66,8 +67,9 @@ android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = 
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
