@@ -63,7 +63,6 @@ kotlin {
             implementation(libs.jetbrains.ui.tooling.preview)
             implementation("org.jetbrains.compose.runtime:runtime:1.10.0")
             implementation("org.jetbrains.compose.foundation:foundation:1.10.0")
-            implementation("org.jetbrains.compose.material:material:1.10.0")
             implementation("org.jetbrains.compose.ui:ui:1.10.0")
             implementation("org.jetbrains.compose.components:components-resources:1.10.0")
             implementation(libs.androidx.lifecycle.viewmodel)

@@ -1,14 +1,29 @@
 package org.swg.swiftgroups_app.Screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.CurrentTab
@@ -17,7 +32,12 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.multiplatform.webview.cookie.Cookie
 import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Fonts.AppFont.InterFontFamily
-import org.swg.swiftgroups_app.Tabs.*
+import org.swg.swiftgroups_app.Tabs.TabEvents
+import org.swg.swiftgroups_app.Tabs.TabFeed
+import org.swg.swiftgroups_app.Tabs.TabGroups
+import org.swg.swiftgroups_app.Tabs.TabHome
+import org.swg.swiftgroups_app.Tabs.TabSettings
+import org.swg.swiftgroups_app.Tabs.TabWithNavigator
 import org.swg.swiftgroups_app.getScreenResult
 
 object TabNavigation : Screen {
@@ -43,7 +63,10 @@ object TabNavigation : Screen {
                     if (isBottomBarVisible.value) {
                         NavigationBar(
                             containerColor = MaterialTheme.colorScheme.surface,
-                            windowInsets = WindowInsets.navigationBars
+                            windowInsets = WindowInsets.navigationBars,
+                            modifier = Modifier.topShadow(
+                                shadowHeight = 3.dp
+                            )
                         ) {
                             TabItem(TabHome)
                             TabItem(TabEvents)
@@ -89,6 +112,23 @@ object TabNavigation : Screen {
                 unselectedTextColor = Color(0xFF929292),
                 indicatorColor = Color(0xFFD1E4FF)
             )
+        )
+    }
+
+    fun Modifier.topShadow(
+        shadowHeight: Dp = 12.dp,
+        shadowColor: Color = Color.Black.copy(alpha = 0.1f)
+    ): Modifier = this.drawBehind {
+        val shadowHeightPx = shadowHeight.toPx()
+
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(Color.Transparent, shadowColor),
+                startY = -shadowHeightPx,
+                endY = 0f
+            ),
+            topLeft = Offset(0f, -shadowHeightPx),
+            size = Size(this.size.width, shadowHeightPx)
         )
     }
 }
