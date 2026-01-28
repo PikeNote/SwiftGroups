@@ -142,7 +142,7 @@ class FeedCard(val feed: Feed) : Screen {
                                     .fillMaxWidth()
                                     .height(240.dp)
                                     .clickable {
-                                        navigator.push(ImageScreen(feed.photos.map {it.photo_url}))
+                                        navigator.push(ImageScreen(feed.photos.map {it.photo_url}, page))
                                     }
                             )
                         }

@@ -35,7 +35,7 @@ import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Icons.ArrowLeft
 import org.swg.swiftgroups_app.Screens.BottomTabVisibilityManager
 
-class ImageScreen(private val linkList : List<String>) : Screen {
+class ImageScreen(private val linkList : List<String>, private val page : Int = 0) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -57,7 +57,7 @@ class ImageScreen(private val linkList : List<String>) : Screen {
             Box (modifier = Modifier.weight(1.0f)) {
                 val pagerState = rememberPagerState(pageCount = {
                     linkList.size
-                })
+                }, initialPage = page)
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.fillMaxSize()
