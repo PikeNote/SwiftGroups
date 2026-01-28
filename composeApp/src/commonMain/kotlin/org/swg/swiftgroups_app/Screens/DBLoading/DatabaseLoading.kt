@@ -15,9 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -62,8 +62,8 @@ object DatabaseLoading : Screen {
                 Icon(
                     Database, "Database Icon", modifier = Modifier.size(200.dp).alpha(opacity)
                 )
-                Text("Compiling database..", style = AppFont.InterTypography.h2)
-                Text("This is a one time process to ensure the app runs smoothly!", style = AppFont.InterTypography.h4, textAlign = TextAlign.Center)
+                Text("Compiling database..", style = AppFont.InterTypography.displayMedium)
+                Text("This is a one time process to ensure the app runs smoothly!", style = AppFont.InterTypography.headlineMedium, textAlign = TextAlign.Center)
 
                 Spacer(modifier=Modifier.height(50.dp))
 
@@ -78,7 +78,7 @@ object DatabaseLoading : Screen {
                     ) {
                         Text(
                             "Retry Request", 
-                            style = AppFont.InterTypography.h4,
+                            style = AppFont.InterTypography.headlineMedium,
                             color = Color.Black,
                             modifier = Modifier.padding(8.dp)
                         )
@@ -94,10 +94,10 @@ object DatabaseLoading : Screen {
                     .padding(horizontal = 10.dp)
             ) {
                 item {
-                    Text("Fancy Logs", style = AppFont.InterTypography.h3)
+                    Text("Fancy Logs", style = AppFont.InterTypography.headlineLarge)
                 }
                 items(viewModel.logs) { log ->
-                    Text(log, style = AppFont.InterTypography.body1)
+                    Text(log, style = AppFont.InterTypography.bodyLarge)
                 }
             }
         }

@@ -1,8 +1,8 @@
 package org.swg.swiftgroups_app.Components
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -40,7 +40,7 @@ fun DatePickerModal(
                 Text(
                     "OK",
                     color = Color(0xFF1A73E8),
-                    style = AppFont.InterTypography.button
+                    style = AppFont.InterTypography.labelLarge
                 )
             }
         },
@@ -56,14 +56,14 @@ fun DatePickerModal(
                     Text(
                         "Clear",
                         color = Color(0xFF1A73E8),
-                        style = AppFont.InterTypography.button
+                        style = AppFont.InterTypography.labelLarge
                     )
                 }
                 TextButton(onClick = onDismiss) {
                     Text(
                         "Cancel",
                         color = Color(0xFF1A73E8),
-                        style = AppFont.InterTypography.button
+                        style = AppFont.InterTypography.labelLarge
                     )
                 }
             }

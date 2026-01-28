@@ -1,6 +1,6 @@
 package org.swg.swiftgroups_app.Fonts
 
-import androidx.compose.material.Typography
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -32,63 +32,71 @@ object AppFont {
     }
 
 
-    val InterTypography : Typography
+    val InterTypography: Typography
         @Composable
         get() {
             return Typography(
-                h1 = TextStyle(
+                // M2 h1 -> M3 displayLarge (38.sp)
+                displayLarge = TextStyle(
                     fontFamily = InterFontFamily,
                     fontSize = 38.sp,
                     fontWeight = FontWeight.Bold,
                 ),
-                h2 = TextStyle(
+                // M2 h2 -> M3 displayMedium (30.sp)
+                displayMedium = TextStyle(
                     fontFamily = InterFontFamily,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                 ),
-                h3 = TextStyle(
+                // M2 h3 -> M3 headlineLarge (22.sp)
+                headlineLarge = TextStyle(
                     fontFamily = InterFontFamily,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                 ),
-                h4 = TextStyle(
+                // M2 h4 -> M3 headlineMedium (18.sp)
+                headlineMedium = TextStyle(
                     fontFamily = InterFontFamily,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                 ),
-                h5 = TextStyle(
+                // M2 h5 -> M3 titleLarge (16.sp)
+                titleLarge = TextStyle(
                     fontFamily = InterFontFamily,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                h6 = TextStyle(
+                // M2 h6 -> M3 titleMedium (14.sp)
+                titleMedium = TextStyle(
                     fontFamily = InterFontFamily,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                body1 = TextStyle(
+                // M2 body1 -> M3 bodyLarge (14.sp)
+                bodyLarge = TextStyle(
                     fontFamily = InterFontFamily,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                 ),
-                body2 = TextStyle(
+                // M2 body2 -> M3 bodySmall (11.sp)
+                bodySmall = TextStyle(
                     fontFamily = InterFontFamily,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Normal,
                 ),
-                subtitle1 = TextStyle(
+                // M2 subtitle1 -> M3 labelLarge (11.sp + Blue Color)
+                labelLarge = TextStyle(
                     fontFamily = InterFontFamily,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF274c85)
+                    color = Color(0xFF274C85)
                 ),
-                subtitle2 = TextStyle(
+                // M2 subtitle2 -> M3 labelMedium (12.sp)
+                labelMedium = TextStyle(
                     fontFamily = InterFontFamily,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                 )
-
-
             )
         }
 }

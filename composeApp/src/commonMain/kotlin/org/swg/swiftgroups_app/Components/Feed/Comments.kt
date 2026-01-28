@@ -7,33 +7,13 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.IconButton
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,18 +25,14 @@ import coil3.compose.AsyncImage
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Heart
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.CGAPI.Feed.Comment
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Icons.Send
 
 @Composable
-fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUID : String) {
+fun CommentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUID : String) {
 
     var commentText by rememberSaveable { mutableStateOf("") }
     var commentList by remember { mutableStateOf(comments) }
@@ -106,7 +82,7 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUI
                                     Box(modifier = Modifier.fillMaxSize()) {
                                         Text(
                                             "Hmm- no comments seem to be here...",
-                                            style = AppFont.InterTypography.h5,
+                                            style = AppFont.InterTypography.titleLarge,
                                             color = Color.Gray,
                                             modifier = Modifier.align(Alignment.Center)
                                         )
@@ -131,7 +107,7 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUI
                                         ) {
                                             Text(
                                                 "${it.writerFirstName} ${it.writerLastName} • ${it.writeWhen}",
-                                                style = AppFont.InterTypography.h5
+                                                style = AppFont.InterTypography.titleLarge
                                             )
                                             Text(it.content)
                                         }
@@ -158,7 +134,7 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUI
 
                         TextField(
                             value = commentText,
-                            textStyle = AppFont.InterTypography.body1,
+                            textStyle = AppFont.InterTypography.bodyLarge,
                             onValueChange = {
                                 commentText = it
                             },
@@ -169,9 +145,9 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUI
                                 .clip(RoundedCornerShape(20.dp))
                                 .align(Alignment.BottomCenter),
                             placeholder = {
-                                androidx.compose.material.Text(
+                                Text(
                                     "Enter a comment...",
-                                    style = AppFont.InterTypography.body1
+                                    style = AppFont.InterTypography.bodyLarge
                                 )
                             },
                             enabled = enabled,
@@ -201,18 +177,19 @@ fun commentModal(onDismissRequest : () -> Unit, comments : List<Comment>, postUI
                                     },
                                     enabled = enabled
                                 ) {
-                                    androidx.compose.material.Icon(
+                                    Icon(
                                         Send,
                                         contentDescription = "Send Comment",
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
                             },
-                            colors = TextFieldDefaults.textFieldColors(
-                                backgroundColor = Color(0xFFF5F5F5),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color(0xFFF5F5F5),
+                                unfocusedContainerColor = Color(0xFFF5F5F5),
                                 focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent,
-                                textColor = Color.Black,
+                                focusedTextColor = Color.Black,
                                 cursorColor = Color.Black
                             ),
                             singleLine = true

@@ -1,15 +1,15 @@
 package org.swg.swiftgroups_app
 
-import androidx.compose.material.Colors
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 object AppTheme {
-    val theme = Colors(
-        primary = Color(0xffffffff),
-        primaryVariant = Color(0xFF0279fd),
+    val theme = lightColorScheme(
+        primary = Color(0xff446ba0),
+        onPrimaryFixedVariant = Color(0xFF0279fd),
         secondary = Color(0xFF0279fd),
-        secondaryVariant = Color(0xFF0279fd),
-        background = Color(0xffffffff),
+        onSecondaryFixedVariant = Color(0xFF0279fd),
+        background = Color(0xfff5f5f5),
         surface = Color(0xffffffff),
         error = Color(0xFFB00020),
         onPrimary = Color(0xff000000),
@@ -17,7 +17,7 @@ object AppTheme {
         onBackground = Color(0xff000000),
         onSurface = Color(0xff000000),
         onError = Color(0xffffffff),
-        isLight = true
+        surfaceContainerHighest = Color(0xFFe5e5e6)
     )
 
     val profileColorStops = arrayOf(

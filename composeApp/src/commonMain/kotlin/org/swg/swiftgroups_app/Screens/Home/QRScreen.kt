@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.TextButton
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -47,7 +47,7 @@ class QRScreen (val qrString : String) : Screen {
                           },
                 colors = ButtonDefaults.buttonColors(
                     contentColor = Color.Black,
-                    backgroundColor = Color.Transparent
+                    containerColor = Color.Transparent
                 ),
                 modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars).align(Alignment.TopStart),
 

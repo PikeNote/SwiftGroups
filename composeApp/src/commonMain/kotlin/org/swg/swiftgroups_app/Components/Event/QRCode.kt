@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,7 +53,7 @@ class QRCode(private val code : String,
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(name, style = AppFont.InterTypography.h3)
+                Text(name, style = AppFont.InterTypography.headlineLarge)
                 Spacer(modifier = Modifier.height(20.dp))
                 Image(
                     modifier = Modifier.height(200.dp).fillMaxWidth(),
@@ -61,8 +61,8 @@ class QRCode(private val code : String,
                     contentDescription = "QR code displaying ${code}"
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                Text(ticketName , style = AppFont.InterTypography.h5)
-                Text(time, style = AppFont.InterTypography.h5)
+                Text(ticketName , style = AppFont.InterTypography.titleLarge)
+                Text(time, style = AppFont.InterTypography.titleLarge)
             }
         }
     }

@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +33,7 @@ class IconText (val icon : ImageVector, val contentDesc : String = "", val text 
                     .size(30.dp),
                 tint = Color.Black
             )
-            Text(text, style= AppFont.InterTypography.h6, textAlign = TextAlign.Center)
+            Text(text, style= AppFont.InterTypography.titleMedium, textAlign = TextAlign.Center)
         }
     }
 }

@@ -4,8 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,9 +24,11 @@ fun SpinningBar(height : Dp, modifier: Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.width(64.dp),
+            modifier = Modifier.size(64.dp),
             color = Color(0xFFd3d3da),
-            backgroundColor = Color(0xFF003B7F),
+            strokeWidth = ProgressIndicatorDefaults.CircularStrokeWidth,
+            trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
+            strokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap,
         )
     }
 }

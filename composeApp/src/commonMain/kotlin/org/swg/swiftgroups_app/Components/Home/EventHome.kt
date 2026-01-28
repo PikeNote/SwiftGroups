@@ -5,8 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,10 +46,10 @@ class EventHome(
     private val cardWidth: Dp = 270.dp,
     private val horizontalPadding: Dp = 0.dp,
     private val enableButton: Boolean = false,
-    private val isUTC: Boolean = false
+    isUTC: Boolean = false
 ) {
 
-    private val currentTime = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.UTC)
+    //private val currentTime = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.UTC)
     private val currentEDTTime = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.of("America/New_York"))
     private val eventStartTime : LocalDateTime
     private val eventEndTime : LocalDateTime
@@ -149,7 +149,7 @@ class EventHome(
                                             "LIVE",
                                             color = Color.White,
                                             fontWeight = FontWeight.Bold,
-                                            style = AppFont.InterTypography.body2
+                                            style = AppFont.InterTypography.bodySmall
                                         )
                                     }
                                 }
@@ -172,7 +172,7 @@ class EventHome(
                             Text(
                                 "${eventStartTime.format(home_event_date_format)} | ${eventStartTime.format(home_event_time_format)} - ${eventEndTime.format(
                                     home_event_time_format)}",
-                                style = AppFont.InterTypography.body2,
+                                style = AppFont.InterTypography.bodySmall,
                                 fontWeight = FontWeight.Bold
                             )
                             Row(
@@ -189,7 +189,7 @@ class EventHome(
                                 Text(
                                     eventData.eventLocation,
                                     color = Color.Blue,
-                                    style = AppFont.InterTypography.subtitle1,
+                                    style = AppFont.InterTypography.labelLarge,
                                     modifier = Modifier.clickable {
                                         openMapLocationQuery(eventData.eventLocation)
                                     }

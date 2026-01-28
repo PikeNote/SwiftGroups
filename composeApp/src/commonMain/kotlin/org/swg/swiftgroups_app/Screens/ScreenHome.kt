@@ -21,8 +21,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -102,7 +102,7 @@ object ScreenHome : Screen {
                     .offset(x = (10).dp),
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text("My Events", style= AppFont.InterTypography.h3)
+                Text("My Events", style= AppFont.InterTypography.headlineLarge)
                 Spacer(modifier = Modifier.height(10.dp))
                 LazyRow(
                     Modifier
@@ -142,7 +142,7 @@ object ScreenHome : Screen {
                     .offset(x = (10).dp),
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text("Events Hosted by My Groups", style= AppFont.InterTypography.h3)
+                Text("Events Hosted by My Groups", style= AppFont.InterTypography.headlineLarge)
                 Spacer(modifier = Modifier.height(10.dp))
                 LazyRow(
                     Modifier

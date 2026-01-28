@@ -62,7 +62,7 @@ fun CategorySelectionModal(
             ) {
                 Text(
                     title,
-                    style = AppFont.InterTypography.h4
+                    style = AppFont.InterTypography.headlineMedium
                 )
                 IconButton(onClick = onDismiss) {
                     Icon(
@@ -108,7 +108,7 @@ fun CategorySelectionModal(
                     ),
                     border = BorderStroke(1.dp, Color(0xFFCCCCCC))
                 ) {
-                    Text("Clear Selection", style = AppFont.InterTypography.body2)
+                    Text("Clear Selection", style = AppFont.InterTypography.bodySmall)
                 }
             }
         }
@@ -131,7 +131,7 @@ private fun CategoryItem(
     ) {
         Text(
             category,
-            style = AppFont.InterTypography.body1,
+            style = AppFont.InterTypography.bodyLarge,
             modifier = Modifier.weight(1f)
         )
         if (isSelected) {

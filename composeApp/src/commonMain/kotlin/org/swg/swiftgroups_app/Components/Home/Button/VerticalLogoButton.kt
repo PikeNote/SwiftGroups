@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +24,7 @@ fun VerticalLogoButton (
     logo: ImageVector,
     text: String,
     size: Dp = 12.dp,
-    textStyle: TextStyle = AppFont.InterTypography.subtitle2,
+    textStyle: TextStyle = AppFont.InterTypography.labelMedium,
     onClick: ()-> Unit)
 {
     Column (

@@ -1,7 +1,7 @@
 package org.swg.swiftgroups_app
 
 
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,9 +43,9 @@ fun App() {
 
     MaterialTheme(
         typography = typography,
-        colors = AppTheme.theme
+        colorScheme = AppTheme.theme
     ) {
-        val lifecycle = remember { LifecycleRegistry() }
+        remember { LifecycleRegistry() }
 
         Navigator(Login, onBackPressed = null) {
             CurrentScreen()

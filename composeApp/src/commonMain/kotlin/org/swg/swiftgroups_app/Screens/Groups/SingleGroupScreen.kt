@@ -25,10 +25,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -129,7 +129,8 @@ class SingleGroupScreen (private val groupID : String) : Screen {
                         bottomTabVisibilityManager.setBottomBarVisibility(true)
                         navigator.pop()},
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.Transparent
+                        containerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
                     ),
                     modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
                 ) {
@@ -143,20 +144,20 @@ class SingleGroupScreen (private val groupID : String) : Screen {
             }
 
             Column (modifier = Modifier.padding(horizontal = 15.dp)) {
-                Text(group?.name ?: "---", style = AppFont.InterTypography.h3, modifier = Modifier.align(Alignment.CenterHorizontally))
+                Text(group?.name ?: "---", style = AppFont.InterTypography.headlineLarge, modifier = Modifier.align(Alignment.CenterHorizontally))
                 Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.CenterHorizontally)) {
                     Text(group?.group_type ?:  "---", modifier = Modifier.widthIn(min=80.dp).clip(
                         RoundedCornerShape(10.dp))
                         .background(Color(0xFFD9D9D9))
-                        .padding(horizontal = 1.dp), style=AppFont.InterTypography.body1, textAlign = TextAlign.Center)
+                        .padding(horizontal = 1.dp), style=AppFont.InterTypography.bodyLarge, textAlign = TextAlign.Center)
 
                     group?.group_categories?.forEach {
                         Text(it.name, modifier = Modifier.widthIn(min=80.dp).clip(
-                            RoundedCornerShape(10.dp)).background(Color(0xFFD9D9D9)).padding(horizontal = 1.dp), style=AppFont.InterTypography.body1, textAlign = TextAlign.Center)
+                            RoundedCornerShape(10.dp)).background(Color(0xFFD9D9D9)).padding(horizontal = 1.dp), style=AppFont.InterTypography.bodyLarge, textAlign = TextAlign.Center)
                     }
                 }
                 Spacer(modifier = Modifier.height(10.dp))
-                Text(group?.mission ?: "---", style=AppFont.InterTypography.body1)
+                Text(group?.mission ?: "---", style=AppFont.InterTypography.bodyLarge)
 
             }
 
@@ -187,7 +188,7 @@ class SingleGroupScreen (private val groupID : String) : Screen {
             Spacer(modifier = Modifier.height(15.dp))
 
             Column (modifier = Modifier.fillMaxWidth().offset(x = (10).dp)) {
-                Text("Events Hosted By This Group", style = AppFont.InterTypography.h3)
+                Text("Events Hosted By This Group", style = AppFont.InterTypography.headlineLarge)
                 Spacer(modifier = Modifier.height(10.dp))
                 LazyRow(
                     Modifier

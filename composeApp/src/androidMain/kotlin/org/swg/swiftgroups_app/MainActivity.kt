@@ -3,7 +3,10 @@ package org.swg.swiftgroups_app
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.core.view.WindowInsetsControllerCompat
 import org.koin.android.ext.koin.androidContext
 
 class MainActivity : ComponentActivity() {
@@ -13,6 +16,16 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge(
+            navigationBarStyle = SystemBarStyle.auto(
+                lightScrim = android.graphics.Color.WHITE,
+                darkScrim = android.graphics.Color.WHITE,
+            )
+        )
+
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = true
+
         super.onCreate(savedInstanceState)
 
         appContext = applicationContext
@@ -21,6 +34,7 @@ class MainActivity : ComponentActivity() {
             androidContext(this@MainActivity)
             modules(commonModule, androidModule)
         }
+
 
         setContent {
             App()

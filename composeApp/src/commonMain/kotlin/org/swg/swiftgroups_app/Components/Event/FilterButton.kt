@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +28,7 @@ fun FilterButton(
             .height(36.dp),
         shape = RoundedCornerShape(4.dp),
         colors = ButtonDefaults.outlinedButtonColors(
-            backgroundColor = if (selected) Color(0xFFEEEEEE) else Color.Transparent,
+            containerColor = if (selected) Color(0xFFEEEEEE) else Color.Transparent,
             contentColor = if (selected) Color.Black else Color(0xFF666666)
         ),
         border = BorderStroke(
@@ -40,7 +40,7 @@ fun FilterButton(
             Icon(it, contentDescription = label, modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(4.dp))
         }
-        Text(label, style = AppFont.InterTypography.body2)
+        Text(label, style = AppFont.InterTypography.bodySmall)
     }
 }
 

@@ -104,7 +104,7 @@ class FeedCard(val feed: Feed) : Screen {
                             .clip(shape = CircleShape)
                     )
                     Column(modifier = Modifier.padding(vertical = 3.dp, horizontal = 6.dp)) {
-                        Text("${feed.writerFirstName} ${feed.writerLastName}", style = AppFont.InterTypography.h4)
+                        Text("${feed.writerFirstName} ${feed.writerLastName}", style = AppFont.InterTypography.headlineMedium)
                         Text("${feed.feedWhen} ago in ${feed.feedTypeName}")
                     }
                 }
@@ -242,7 +242,7 @@ class FeedCard(val feed: Feed) : Screen {
                         ) {
                             Text(
                                 "${comment.writerFirstName} ${comment.writerLastName} • ${comment.writeWhen}",
-                                style = AppFont.InterTypography.h5
+                                style = AppFont.InterTypography.titleLarge
                             )
                             Text(comment.content)
                         }
@@ -258,7 +258,7 @@ class FeedCard(val feed: Feed) : Screen {
                 visible = fadeOut.value,
                 exit = fadeOut()
             ) {
-                commentModal(onDismissRequest = {fadeOut.value=false}, feed.comments, feed.uid)
+                CommentModal(onDismissRequest = {fadeOut.value=false}, feed.comments, feed.uid)
 
                 DisposableEffect(Unit) {
                     onDispose {

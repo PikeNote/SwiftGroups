@@ -8,9 +8,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -113,7 +113,7 @@ class MyUserProfile : Screen {
                             Text(
                                 "${profile?.firstName.orEmpty()} ${profile?.lastName.orEmpty()}"
                                     .ifBlank { "---" },
-                                style = AppFont.InterTypography.h4
+                                style = AppFont.InterTypography.headlineMedium
                             )
                             Text(
                                 profile?.genderPronoun ?: "---",
@@ -163,14 +163,14 @@ class MyUserProfile : Screen {
                 modifier = Modifier.fillMaxWidth().then(contentPadding),
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                Text("Biography", style = AppFont.InterTypography.h4)
+                Text("Biography", style = AppFont.InterTypography.headlineMedium)
                 Text(profile?.bio ?: "---")
             }
 
             if (profile?.interests?.isNotEmpty() == true) {
 
                 Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                    Text("Interests", style = AppFont.InterTypography.h4)
+                    Text("Interests", style = AppFont.InterTypography.headlineMedium)
                     Spacer(modifier = Modifier.height(5.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                         items(profile.interests) { ChipItem(it.interest) }
@@ -181,7 +181,7 @@ class MyUserProfile : Screen {
             if (profile?.languages?.isNotEmpty() == true) {
 
                 Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                    Text("Languages", style = AppFont.InterTypography.h4)
+                    Text("Languages", style = AppFont.InterTypography.headlineMedium)
                     Spacer(modifier = Modifier.height(5.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                         items(profile.languages) { LanguageItem(it) }
@@ -192,7 +192,7 @@ class MyUserProfile : Screen {
             if (profile?.nationalities?.isNotEmpty() == true) {
 
                 Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                    Text("Nationalities", style = AppFont.InterTypography.h4)
+                    Text("Nationalities", style = AppFont.InterTypography.headlineMedium)
                     Spacer(modifier = Modifier.height(5.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                         items(profile.nationalities) { ChipItem(it.nationality) }
@@ -203,7 +203,7 @@ class MyUserProfile : Screen {
             if (profile?.jobs?.isNotEmpty() == true) {
 
                 Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-                    Text("Jobs", style = AppFont.InterTypography.h4)
+                    Text("Jobs", style = AppFont.InterTypography.headlineMedium)
                     Spacer(modifier = Modifier.height(5.dp))
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(7.dp)) {
                         items(profile.jobs) { JobCard(it) }

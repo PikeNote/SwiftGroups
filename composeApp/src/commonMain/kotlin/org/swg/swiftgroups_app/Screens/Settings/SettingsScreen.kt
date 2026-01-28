@@ -48,7 +48,7 @@ object SettingsScreen : Screen {
 
             Row (horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text("Database and Storage",
-                    style = AppFont.InterTypography.h4)
+                    style = AppFont.InterTypography.headlineMedium)
                 Icon(
                     Database,  "Database Icon",
                     modifier = Modifier.size(24.dp))
@@ -56,11 +56,11 @@ object SettingsScreen : Screen {
             Row {
                 Column (Modifier.weight(1f)) {
                     Text("Event Database",
-                        style = AppFont.InterTypography.h6, fontWeight = FontWeight.Bold)
+                        style = AppFont.InterTypography.titleMedium, fontWeight = FontWeight.Bold)
                     Text("${viewModel.eventCount.value} Events Stored",
-                        style = AppFont.InterTypography.body1)
+                        style = AppFont.InterTypography.bodyLarge)
                     Text("Last Fetched: ${viewModel.eventLastModified.value}",
-                        style = AppFont.InterTypography.body1)
+                        style = AppFont.InterTypography.bodyLarge)
 
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -73,11 +73,11 @@ object SettingsScreen : Screen {
             Row () {
                 Column (Modifier.weight(1f)) {
                     Text("Club Database",
-                        style = AppFont.InterTypography.h6, fontWeight = FontWeight.Bold)
+                        style = AppFont.InterTypography.titleMedium, fontWeight = FontWeight.Bold)
                     Text("${viewModel.clubCount.value} Clubs Stored",
-                        style = AppFont.InterTypography.body1)
+                        style = AppFont.InterTypography.bodyLarge)
                     Text("Last Fetched: ${viewModel.clubLastModified.value}",
-                        style = AppFont.InterTypography.body1)
+                        style = AppFont.InterTypography.bodyLarge)
 
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -89,7 +89,7 @@ object SettingsScreen : Screen {
 
             Row (horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text("Cache Settings",
-                    style = AppFont.InterTypography.h4)
+                    style = AppFont.InterTypography.headlineMedium)
                 Icon(
                     BootstrapArchive,  "Database Icon",
                     modifier = Modifier.size(24.dp))
@@ -101,7 +101,7 @@ object SettingsScreen : Screen {
             Column () {
                 Row (verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text("Cache Events",
-                        style = AppFont.InterTypography.h6, fontWeight = FontWeight.Bold)
+                        style = AppFont.InterTypography.titleMedium, fontWeight = FontWeight.Bold)
 
                     CustomSwitch(
                         checked = state.cacheEvents,
@@ -111,7 +111,7 @@ object SettingsScreen : Screen {
                     )
                 }
                 Text("Cache the event details on first load to display on subsequent loads while up to date information is fetched in the background",
-                    style = AppFont.InterTypography.body1)
+                    style = AppFont.InterTypography.bodyLarge)
 
             }
 
@@ -121,7 +121,7 @@ object SettingsScreen : Screen {
             Column () {
                 Row (verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text("Cache Clubs",
-                        style = AppFont.InterTypography.h6, fontWeight = FontWeight.Bold)
+                        style = AppFont.InterTypography.titleMedium, fontWeight = FontWeight.Bold)
                     CustomSwitch(
                         checked = state.cacheClubs,
                         onCheckedChange = {
@@ -130,7 +130,7 @@ object SettingsScreen : Screen {
                     )
                 }
                 Text("Cache the group information on first load to display on subsequent loads while up to date information is fetched in the background",
-                    style = AppFont.InterTypography.body1)
+                    style = AppFont.InterTypography.bodyLarge)
 
             }
 
@@ -138,7 +138,7 @@ object SettingsScreen : Screen {
 
             Row (horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text("Cache Timer",
-                    style = AppFont.InterTypography.h5)
+                    style = AppFont.InterTypography.titleLarge)
                 Icon(
                     MaterialSymbolsAuto_timer,  "Database Icon",
                     modifier = Modifier.size(24.dp))
@@ -162,7 +162,7 @@ object SettingsScreen : Screen {
             Spacer(modifier = Modifier.height(5.dp))
 
             Text("Select how old must the cached data be until you want the app to fetch updated events/club information",
-                style = AppFont.InterTypography.body1)
+                style = AppFont.InterTypography.bodyLarge)
 
         }
     }
@@ -180,7 +180,7 @@ object SettingsScreen : Screen {
             modifier = Modifier.width(130.dp).height(25.dp)
         ) {
                 Text(text = buttonText,
-                    style = AppFont.InterTypography.h6,
+                    style = AppFont.InterTypography.titleMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth())
         }

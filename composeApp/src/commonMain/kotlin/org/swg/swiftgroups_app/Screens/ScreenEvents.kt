@@ -12,8 +12,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -120,12 +126,12 @@ object ScreenEvents : Screen {
                     searchText = it
                     viewModel.filterEvents(it)
                 },
-                textStyle = AppFont.InterTypography.h4,
+                textStyle = AppFont.InterTypography.headlineMedium,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .clip(RoundedCornerShape(8.dp)),
-                placeholder = { Text("Search events...", style = AppFont.InterTypography.h4) },
+                placeholder = { Text("Search events...", style = AppFont.InterTypography.headlineMedium) },
                 leadingIcon = {
                     Icon(
                         FontAwesomeIcons.Solid.Search,
@@ -149,11 +155,10 @@ object ScreenEvents : Screen {
                         }
                     }
                 },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color(0xFFF5F5F5),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    textColor = Color.Black,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    focusedTextColor = Color.Black,
                     cursorColor = Color.Black
                 ),
                 singleLine = true

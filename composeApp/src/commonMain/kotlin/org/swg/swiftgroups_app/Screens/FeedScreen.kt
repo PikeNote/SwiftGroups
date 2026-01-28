@@ -1,29 +1,16 @@
 package org.swg.swiftgroups_app.Screens
 
-import org.swg.swiftgroups_app.Components.Feed.FilterBar
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Components.Feed.FeedCard
+import org.swg.swiftgroups_app.Components.Feed.FilterBar
 import org.swg.swiftgroups_app.Components.SpinningBar
 import swiftgroups.composeapp.generated.resources.Res
 import swiftgroups.composeapp.generated.resources.swiftgroups_title
@@ -113,9 +101,11 @@ object FeedScreen : Screen {
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     CircularProgressIndicator(
+                                        modifier = Modifier.size(50.dp),
                                         color = Color(0xFF446BA0),
-                                        backgroundColor = Color(0xFFCCCCCC),
-                                        modifier = Modifier.height(50.dp).width(50.dp)
+                                        strokeWidth = ProgressIndicatorDefaults.CircularStrokeWidth,
+                                        trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
+                                        strokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap,
                                     )
                                 }
                             }

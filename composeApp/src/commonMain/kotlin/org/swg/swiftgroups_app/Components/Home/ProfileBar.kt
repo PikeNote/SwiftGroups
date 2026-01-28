@@ -15,7 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Brush
@@ -90,13 +90,13 @@ class ProfileBar ( private val profileData : ProfileDataItem ) {
 
             Spacer(Modifier.weight(1f))
             Column {
-                Text("Good ${greetingText}, ", style = AppFont.InterTypography.h3, fontWeight = FontWeight.Medium)
-                Text("${profileData.firstName}!", style = AppFont.InterTypography.h3)
+                Text("Good ${greetingText}, ", style = AppFont.InterTypography.headlineLarge, fontWeight = FontWeight.Medium)
+                Text("${profileData.firstName}!", style = AppFont.InterTypography.headlineLarge)
             }
 
             VerticalLogoButton(logo = FontAwesomeIcons.Solid.User, text = "My Profile", onClick = {
                 navigator.push(MyUserProfile())
-            }, size = 25.dp, textStyle = AppFont.InterTypography.h6, modifier = Modifier.width(110.dp))
+            }, size = 25.dp, textStyle = AppFont.InterTypography.titleMedium, modifier = Modifier.width(110.dp))
         }
     }
 }

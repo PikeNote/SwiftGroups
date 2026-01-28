@@ -12,8 +12,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -97,7 +103,7 @@ object GroupScreen : Screen {
             )
             TextField(
                 value = searchText,
-                textStyle = AppFont.InterTypography.h4,
+                textStyle = AppFont.InterTypography.headlineMedium,
                 onValueChange = {
                     searchText = it
                     viewModel.fetchGroups(searchText)
@@ -105,13 +111,14 @@ object GroupScreen : Screen {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                placeholder = { Text("Search clubs...", style=AppFont.InterTypography.h4) },
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xe5e5e6)),
+                placeholder = { Text("Search clubs...", style=AppFont.InterTypography.headlineMedium) },
                 leadingIcon = {
                     Icon(
                         FontAwesomeIcons.Solid.Search,
                         contentDescription = "Search",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(15.dp)
                     )
                 },
                 trailingIcon = {
@@ -125,16 +132,15 @@ object GroupScreen : Screen {
                             Icon(
                                 FontAwesomeIcons.Solid.Times,
                                 contentDescription = "Clear search",
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(15.dp)
                             )
                         }
                     }
                 },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color(0xFFF5F5F5),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    textColor = Color.Black,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    focusedTextColor = Color.Black,
                     cursorColor = Color.Black
                 ),
                 singleLine = true
@@ -239,7 +245,7 @@ object GroupScreen : Screen {
                                 Text(
                                     text = it.clubName,
                                     color = Color.White,
-                                    style = AppFont.InterTypography.h5,
+                                    style = AppFont.InterTypography.titleLarge,
                                     maxLines = 2,
                                     modifier = Modifier.fillMaxWidth()
                                 )
@@ -254,7 +260,7 @@ object GroupScreen : Screen {
                                         Text(
                                             text = cat,
                                             modifier = categoryTagModifier,
-                                            style = AppFont.InterTypography.body2,
+                                            style = AppFont.InterTypography.bodySmall,
                                             textAlign = TextAlign.Center,
                                             maxLines = 1
                                         )

@@ -1,14 +1,8 @@
 package org.swg.swiftgroups_app.Screens
 
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,12 +17,7 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.multiplatform.webview.cookie.Cookie
 import org.koin.compose.koinInject
 import org.swg.swiftgroups_app.Fonts.AppFont.InterFontFamily
-import org.swg.swiftgroups_app.Tabs.TabEvents
-import org.swg.swiftgroups_app.Tabs.TabFeed
-import org.swg.swiftgroups_app.Tabs.TabGroups
-import org.swg.swiftgroups_app.Tabs.TabHome
-import org.swg.swiftgroups_app.Tabs.TabSettings
-import org.swg.swiftgroups_app.Tabs.TabWithNavigator
+import org.swg.swiftgroups_app.Tabs.*
 import org.swg.swiftgroups_app.getScreenResult
 
 object TabNavigation : Screen {
@@ -47,35 +36,37 @@ object TabNavigation : Screen {
 
         cookies = getScreenResult("cookies")
 
-        MaterialTheme() {
 
-            TabNavigator(TabHome) {
-                Scaffold(
-                    bottomBar = {
-                        if (isBottomBarVisible.value) {
-                            BottomNavigation {
-                                TabItem(TabHome)
-                                TabItem(TabEvents)
-                                TabItem(TabFeed)
-                                TabItem(TabGroups)
-                                TabItem(TabSettings)
+        TabNavigator(TabHome) {
+            Scaffold(
+                bottomBar = {
+                    if (isBottomBarVisible.value) {
+                        NavigationBar(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            windowInsets = WindowInsets.navigationBars
+                        ) {
+                            TabItem(TabHome)
+                            TabItem(TabEvents)
+                            TabItem(TabFeed)
+                            TabItem(TabGroups)
+                            TabItem(TabSettings)
 
-                            }
                         }
-                    },
-                    modifier = Modifier.navigationBarsPadding()
-                ) {
-                    CurrentTab()
-                }
+                    }
+                },
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
+            ) {
+                CurrentTab()
             }
         }
+
     }
 
     @Composable
     private fun RowScope.TabItem(tab: TabWithNavigator) {
         val tabNavigator = LocalTabNavigator.current
 
-        BottomNavigationItem(
+        NavigationBarItem(
             selected = tabNavigator.current == tab,
             onClick = {
                 if(tabNavigator.current == tab) {
@@ -91,8 +82,13 @@ object TabNavigation : Screen {
             label = {
                 Text(tab.options.title, fontFamily  = InterFontFamily, fontWeight = FontWeight.Bold)
             },
-            selectedContentColor = Color(0xFF0279fd),
-            unselectedContentColor = Color(0xFF929292)
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = Color(0xFF929292),
+                unselectedTextColor = Color(0xFF929292),
+                indicatorColor = Color(0xFFD1E4FF)
+            )
         )
     }
 }

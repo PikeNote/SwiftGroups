@@ -9,12 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -192,16 +187,18 @@ class SingleEventScreen(val eventID : Long) : Screen {
                             verticalArrangement = Arrangement.Center
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.width(64.dp),
+                                modifier = Modifier.size(64.dp),
                                 color = Color(0xFFd3d3da),
-                                backgroundColor = Color(0xFF003B7F),
+                                strokeWidth = ProgressIndicatorDefaults.CircularStrokeWidth,
+                                trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
+                                strokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap,
                             )
                         }
                     }
 
                     Text(
                         text = eventAPI?.event_name ?: "---",
-                        style = AppFont.InterTypography.h3,
+                        style = AppFont.InterTypography.headlineLarge,
                         color = Color.White,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -237,16 +234,16 @@ class SingleEventScreen(val eventID : Long) : Screen {
                ) {
                    Text(
                        eventAPI?.event_type ?: "...",
-                       style = AppFont.InterTypography.h6,
+                       style = AppFont.InterTypography.titleMedium,
                        color = Color(0xFF2C58A9)
                    )
                    Text(
                        eventAPI?.event_name ?: "Loading...",
-                       style = AppFont.InterTypography.h3,
+                       style = AppFont.InterTypography.headlineLarge,
                    )
                    Text(
                        eventAPI?.event_group ?: "...",
-                       style = AppFont.InterTypography.h6,
+                       style = AppFont.InterTypography.titleMedium,
                        color = Color.Gray, modifier = Modifier.clickable {
                            if(eventAPI!= null) {
                                navigator.push(SingleGroupScreen(eventAPI!!.event_group_id.toString()))
@@ -288,7 +285,7 @@ class SingleEventScreen(val eventID : Long) : Screen {
                             },
                             size = 20.dp,
                             logo = FontAwesomeIcons.Regular.ShareSquare,
-                            textStyle = AppFont.InterTypography.h5,
+                            textStyle = AppFont.InterTypography.titleLarge,
                             backgroundColor = Color(0xFFD9D9D9),
                             textColor = Color.Black,
                             width = if(eventAPI!!.register_url=="") 340.dp else 170.dp
@@ -310,7 +307,7 @@ class SingleEventScreen(val eventID : Long) : Screen {
                                 },
                                 size = 20.dp,
                                 logo = PencilSquare,
-                                textStyle = AppFont.InterTypography.h5
+                                textStyle = AppFont.InterTypography.titleLarge
                             )
                         }
                     }
@@ -356,7 +353,7 @@ class SingleEventScreen(val eventID : Long) : Screen {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         "Attendees (${eventAPI?.attendees_count ?: "N/A"})",
-                        style = AppFont.InterTypography.h3,
+                        style = AppFont.InterTypography.headlineLarge,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier=Modifier.height(5.dp))
@@ -389,7 +386,7 @@ class SingleEventScreen(val eventID : Long) : Screen {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         "Event Details ",
-                        style = AppFont.InterTypography.h3,
+                        style = AppFont.InterTypography.headlineLarge,
                         fontWeight = FontWeight.Bold
                     )
 
@@ -399,7 +396,7 @@ class SingleEventScreen(val eventID : Long) : Screen {
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
                             "Tags",
-                            style = AppFont.InterTypography.h3,
+                            style = AppFont.InterTypography.headlineLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(5.dp))
@@ -416,7 +413,7 @@ class SingleEventScreen(val eventID : Long) : Screen {
                                 ) {
                                     Text(
                                         tag.name,
-                                        style = AppFont.InterTypography.body2,
+                                        style = AppFont.InterTypography.bodySmall,
                                         color = Color(0xFF666666)
                                     )
                                 }

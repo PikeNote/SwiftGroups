@@ -4,10 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -57,7 +57,7 @@ class WebviewScreen(val url : String, val text : String, val urlMatch : String =
                     onClick = { navigator.pop() },
                     colors = ButtonDefaults.buttonColors(
                         contentColor = Color.Black,
-                        backgroundColor = Color.Transparent
+                        containerColor = Color.Transparent
                     ),
                     modifier = Modifier.align(Alignment.CenterStart),
                 ) {
@@ -71,7 +71,7 @@ class WebviewScreen(val url : String, val text : String, val urlMatch : String =
                 Text(
                     text,
                     modifier = Modifier.align(Alignment.Center),
-                    style = AppFont.InterTypography.h3,
+                    style = AppFont.InterTypography.headlineLarge,
                     color = Color.White
                 )
             }

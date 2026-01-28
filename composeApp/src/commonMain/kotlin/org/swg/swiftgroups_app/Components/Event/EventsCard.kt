@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -137,7 +137,7 @@ class EventsCard(
                                     "LIVE",
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold,
-                                    style = AppFont.InterTypography.body2
+                                    style = AppFont.InterTypography.bodySmall
                                 )
                             }
                         }
@@ -157,7 +157,7 @@ class EventsCard(
                         Text(
                             eventDat.eventName,
                             fontWeight = FontWeight.ExtraBold,
-                            style = AppFont.InterTypography.h4,
+                            style = AppFont.InterTypography.headlineMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -166,13 +166,13 @@ class EventsCard(
                     if(eventStartTime.date != eventEndTime.date) {
                         Text(
                             "${DateTimeFormat.home_event_date_format.format(eventStartTime)} - ${DateTimeFormat.home_event_date_format.format(eventEndTime)} | ${DateTimeFormat.home_event_time_format.format(eventStartTime)} - ${DateTimeFormat.home_event_time_format.format(eventEndTime)}",
-                            style = AppFont.InterTypography.body2,
+                            style = AppFont.InterTypography.bodySmall,
                             fontWeight = FontWeight.Bold
                         )
                     } else {
                         Text(
                             "${DateTimeFormat.home_event_date_format.format(eventStartTime)} | ${DateTimeFormat.home_event_time_format.format(eventStartTime)} - ${DateTimeFormat.home_event_time_format.format(eventEndTime)}",
-                            style = AppFont.InterTypography.body2,
+                            style = AppFont.InterTypography.bodySmall,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -199,7 +199,7 @@ class EventsCard(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             color = Color.Blue,
-                            style = AppFont.InterTypography.subtitle1
+                            style = AppFont.InterTypography.labelLarge
                         )
                     }
                 }
