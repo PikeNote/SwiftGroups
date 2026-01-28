@@ -32,7 +32,6 @@ jobs:
 
   ios-check:
     runs-on: macos-latest
-    needs: android-check
     steps:
       - uses: actions/checkout@v4
       
