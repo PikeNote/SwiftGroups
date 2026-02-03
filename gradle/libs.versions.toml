@@ -1,9 +1,9 @@
 [versions]
-agp = "9.0.0"
+agp = "9.0.0-alpha06"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "35"
-androidx-activityCompose = "1.12.2"
+androidx-activityCompose = "1.12.3"
 androidx-lifecycle = "2.9.6"
 autolinktext = "2.0.2"
 coilCompose = "3.3.0"
@@ -17,14 +17,13 @@ kotlinxDatetime = "0.7.1"
 ktorClientAndroid = "3.4.0"
 lifecycle = "2.5.0"
 material3 = "1.9.0"
-qrose = "1.1.0"
+qrose = "1.1.1"
 securityCryptoKtx = "1.1.0"
 uiTooling = "1.10.0"
 uiToolingPreview = "1.10.0"
 voyager = "1.1.0-beta03"
-material3AndroidVersion = "1.4.0"
 composeIcons = "1.1.1"
-uiGraphicsAndroid = "1.10.1"
+uiGraphicsAndroid = "1.10.2"
 sqlDelight = "2.2.1"
 koin-bom = "4.1.1"
 [libraries]
@@ -59,7 +58,6 @@ voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.
 voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-tabNavigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version = "1.1.0-beta03" }
-androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3AndroidVersion" }
 fontAwesome = { module = "br.com.devsrsouza.compose.icons:font-awesome", name = 'font-awesome', version.ref = "composeIcons" }
 androidx-ui-graphics-android = { group = "androidx.compose.ui", name = "ui-graphics-android", version.ref = "uiGraphicsAndroid" }
 native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
