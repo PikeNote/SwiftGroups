@@ -187,13 +187,10 @@ object Login : Screen {
     }
 
     fun extractAccessToken(url: String): String? {
-        val query = url.substringAfter("?", "")
-        return query.split("&")
-            .mapNotNull {
-                val (key, value) = it.split("=")
-                if (key == "access_token") value else null
-            }
-            .firstOrNull()
+        // The token can be in the query string (?) or the fragment (#)
+        return url.split('?', '#', '&')
+            .find { it.startsWith("access_token=") }
+            ?.substringAfter("access_token=")
     }
 
 

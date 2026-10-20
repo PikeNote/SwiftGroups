@@ -196,7 +196,7 @@ object CGAPI {
             val location = resp.headers[HttpHeaders.Location] ?: return null
 
             // if this is the app‐scheme, we’re done
-            if (location.startsWith("cgapp://") || location.startsWith("novalsys-cwru://")) {
+            if (location.startsWith("cgapp://") || location.startsWith("novalsys-cwru://") || location.startsWith("https://cwru.campusgroups.com/mob/legacy-auth/")) {
                 location
             } else {
                 // otherwise resolve a relative redirect and recurse
