@@ -13,16 +13,10 @@ import swiftgroups.shared.generated.resources.inter_multi
 
 object AppFont {
 
-
-    init {
-
-    }
-
     val InterFontFamily : FontFamily
     @Composable
     get() {
         return FontFamily(
-
             Font(Res.font.inter_multi, FontWeight.Light),
             Font(Res.font.inter_multi, FontWeight.Normal),
             Font(Res.font.inter_multi, FontWeight.Bold),
@@ -30,7 +24,6 @@ object AppFont {
             Font(Res.font.inter_multi, FontWeight.Black)
         )
     }
-
 
     val InterTypography: Typography
         @Composable

@@ -36,7 +36,6 @@ kotlin {
     }
     
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -61,10 +60,11 @@ kotlin {
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)
             implementation(libs.jetbrains.ui.tooling.preview)
-            implementation("org.jetbrains.compose.runtime:runtime:1.10.0")
-            implementation("org.jetbrains.compose.foundation:foundation:1.10.0")
-            implementation("org.jetbrains.compose.ui:ui:1.10.0")
-            implementation("org.jetbrains.compose.components:components-resources:1.10.0")
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.ui)
+            implementation(compose.components.resources)
+            implementation(compose.material3)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.voyager.navigator)
@@ -80,7 +80,6 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.qrose)
             implementation(libs.kachetor)
-            implementation(libs.compose.material3)
             implementation(libs.voyager.koin)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
@@ -101,4 +100,8 @@ kotlin {
             }
         }
     }
+}
+
+compose.resources {
+    packageOfResClass = "swiftgroups.shared.generated.resources"
 }

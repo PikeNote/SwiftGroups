@@ -43,7 +43,7 @@ import org.swg.swiftgroups_app.DateTimeFormats.DateTimeFormat
 import org.swg.swiftgroups_app.Fonts.AppFont
 import org.swg.swiftgroups_app.Screens.Event.SingleEventScreen
 import org.swg.swiftgroups_app.ShareManager.openMapLocationQuery
-import org.swg.swiftgroupsapp.db.Events
+import org.swg.swiftgroups_app.db.Events
 
 class EventsCard(
     private val eventDat: Events,

@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import org.swg.swiftgroups_app.CGAPI.EventProcessing.EventsAPI
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
-import org.swg.swiftgroupsapp.db.Events
+import org.swg.swiftgroups_app.db.Events
 
 class EventsViewModel : ScreenModel {
     var events: List<Events> by mutableStateOf(emptyList())

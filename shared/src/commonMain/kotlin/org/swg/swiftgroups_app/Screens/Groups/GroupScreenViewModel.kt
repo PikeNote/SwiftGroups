@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.swg.swiftgroups_app.CGAPI.CGAPI
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
-import org.swg.swiftgroupsapp.db.Clubs
+import org.swg.swiftgroups_app.db.Clubs
 
 class GroupScreenViewModel : ScreenModel {
 

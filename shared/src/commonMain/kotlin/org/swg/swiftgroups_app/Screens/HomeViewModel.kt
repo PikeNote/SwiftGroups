@@ -25,7 +25,7 @@ import org.swg.swiftgroups_app.CGAPI.Profile.UserProfileQRCode
 import org.swg.swiftgroups_app.DataStore.UserSettings
 import org.swg.swiftgroups_app.DataStore.UserSettingsPreferences
 import org.swg.swiftgroups_app.DatabaseDriver.DBObject
-import org.swg.swiftgroupsapp.db.Events
+import org.swg.swiftgroups_app.db.Events
 
 class HomeViewModel(userPref : UserSettingsPreferences) : ScreenModel {
 
